@@ -1,40 +1,59 @@
-name: Pulse Music CI
+name: Pulse Music CI & Release
 
 on:
   push:
     branches: [ main, master, develop ]
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   build:
-    name: Build & Test
+    name: Build, Test & Release
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Grant Execute Permission for Gradle
-        run: chmod +x gradlew 2>/dev/null || true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
 
-      - name: Run Unit Tests
-        run: gradle :app:testDebugUnitTest --no-daemon
+      - name: Restore Debug Keystore
+        run: |
+          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
+            echo "Restoring debug.keystore from debug.keystore.base64..."
+            base64 -d debug.keystore.base64 > debug.keystore || true
+          fi
 
-      - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon
+      - name: Grant Execute Permission for Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Run JVM Unit Tests
+        run: ./gradlew :app:testDebugUnitTest --no-daemon
 
       - name: Upload Test Reports
         if: always()
@@ -44,10 +63,68 @@ jobs:
           path: app/build/reports/tests/testDebugUnitTest/
           retention-days: 7
 
-      - name: Upload Debug APK
-        if: success()
+      - name: Build Android APKs
+        run: ./gradlew :app:assembleRelease :app:assembleDebug --no-daemon
+
+      - name: Prepare Release APK Artifacts
+        id: prepare_apks
+        run: |
+          VERSION_TAG="${GITHUB_REF_NAME}"
+          if [ -z "$VERSION_TAG" ] || [ "$VERSION_TAG" = "main" ] || [ "$VERSION_TAG" = "master" ]; then
+            VERSION_TAG="latest"
+          fi
+          
+          mkdir -p release-artifacts
+          
+          # Handle Release APK (fall back to debug if release not present)
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk "release-artifacts/PulseMusic-${VERSION_TAG}.apk"
+          fi
+          
+          # Handle Debug APK
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk "release-artifacts/PulseMusic-${VERSION_TAG}-debug.apk"
+          fi
+
+          ls -lh release-artifacts/
+
+      - name: Upload APKs as Workflow Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pulse-music-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: pulse-music-apks
+          path: release-artifacts/*.apk
           retention-days: 14
+
+      - name: Extract Release Notes from CHANGELOG
+        if: startsWith(github.ref, 'refs/tags/')
+        id: release_notes
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          CLEAN_VERSION="${TAG#v}"
+          
+          echo "Extracting release notes for version $CLEAN_VERSION from CHANGELOG.md..."
+          if [ -f CHANGELOG.md ]; then
+            awk -v ver="$CLEAN_VERSION" '
+              $0 ~ "^## \\[" ver "\\]" { found=1; next }
+              found && /^## \\[/ { exit }
+              found { print }
+            ' CHANGELOG.md > release_notes.md
+          fi
+          
+          if [ ! -s release_notes.md ]; then
+            echo "Release $TAG of Pulse Music - Hi-Fi Audio Streaming & Offline Player" > release_notes.md
+            echo "" >> release_notes.md
+            cat CHANGELOG.md >> release_notes.md 2>/dev/null || true
+          fi
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*.apk
+          body_path: release_notes.md
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
