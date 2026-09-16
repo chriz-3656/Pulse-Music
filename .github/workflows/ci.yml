@@ -106,7 +106,7 @@ jobs:
           if [ -f CHANGELOG.md ]; then
             awk -v ver="$CLEAN_VERSION" '
               $0 ~ "^## \\[" ver "\\]" { found=1; next }
-              found && /^## \\[/ { exit }
+              found && /^## \[/ { exit }
               found { print }
             ' CHANGELOG.md > release_notes.md
           fi
