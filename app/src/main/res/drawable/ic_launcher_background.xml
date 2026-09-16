@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Base Brushed Dark Gunmetal Deck Canvas -->
+    <path
+        android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:type="linear">
+                <item android:color="#FF111317" android:offset="0.0" />
+                <item android:color="#FF1B1E26" android:offset="0.5" />
+                <item android:color="#FF0C0D10" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Outer Beveled Hardware Chassis Edge Highlights -->
+    <path
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#1FFFFFFF" />
+
+    <!-- Recessed Circular Turntable Well Outer Shadow Rim -->
+    <path
+        android:pathData="M54,54m-45,0a45,45 0 1,0 90,0a45,45 0 1,0 -90,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="9"
+                android:endX="54"
+                android:endY="99"
+                android:type="linear">
+                <item android:color="#FF07080A" android:offset="0.0" />
+                <item android:color="#FF13151A" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Metallic Chamfer Ring Around Platter Well -->
+    <path
+        android:pathData="M54,54m-44,0a44,44 0 1,0 88,0a44,44 0 1,0 -88,0"
+        android:strokeWidth="1.2">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="20"
+                android:startY="20"
+                android:endX="88"
+                android:endY="88"
+                android:type="linear">
+                <item android:color="#4DFFFFFF" android:offset="0.0" />
+                <item android:color="#1AFFFFFF" android:offset="0.5" />
+                <item android:color="#40000000" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Warm Amber Vacuum Tube Glow radiating from the platter bed -->
+    <path
+        android:pathData="M54,54m-36,0a36,36 0 1,0 72,0a36,36 0 1,0 -72,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="28"
+                android:endX="54"
+                android:endY="80"
+                android:type="linear">
+                <item android:color="#24FFB300" android:offset="0.0" />
+                <item android:color="#00FFB300" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

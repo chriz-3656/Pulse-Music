@@ -1,0 +1,122 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Gold Milled Platter Rim -->
+    <path
+        android:pathData="M54,54m-30,0a30,30 0 1,0 60,0a30,30 0 1,0 -60,0"
+        android:strokeWidth="1.8">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="30"
+                android:startY="24"
+                android:endX="78"
+                android:endY="84"
+                android:type="linear">
+                <item android:color="#FFFFD54F" android:offset="0.0" />
+                <item android:color="#FFFFB300" android:offset="0.4" />
+                <item android:color="#FFE65100" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Vinyl Disc Body -->
+    <path
+        android:pathData="M54,54m-28.5,0a28.5,28.5 0 1,0 57,0a28.5,28.5 0 1,0 -57,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="25"
+                android:endX="54"
+                android:endY="83"
+                android:type="linear">
+                <item android:color="#FF1C1E24" android:offset="0.0" />
+                <item android:color="#FF101115" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Vinyl Micro-Groove Rings -->
+    <path
+        android:pathData="M54,54m-25,0a25,25 0 1,0 50,0a25,25 0 1,0 -50,0"
+        android:strokeWidth="0.8"
+        android:strokeColor="#1FFFFFFF" />
+    <path
+        android:pathData="M54,54m-21.5,0a21.5,21.5 0 1,0 43,0a21.5,21.5 0 1,0 -43,0"
+        android:strokeWidth="0.8"
+        android:strokeColor="#1FFFFFFF" />
+    <path
+        android:pathData="M54,54m-18,0a18,18 0 1,0 36,0a18,18 0 1,0 -36,0"
+        android:strokeWidth="0.8"
+        android:strokeColor="#1FFFFFFF" />
+
+    <!-- Vinyl Sheen Conical Highlight Reflection -->
+    <path
+        android:pathData="M54,54 L36,36 A28.5,28.5 0 0,1 46,26.5 Z"
+        android:fillColor="#18FFFFFF" />
+    <path
+        android:pathData="M54,54 L72,72 A28.5,28.5 0 0,1 62,81.5 Z"
+        android:fillColor="#18FFFFFF" />
+
+    <!-- Center Gold Master Label Disc -->
+    <path
+        android:pathData="M54,54m-13.5,0a13.5,13.5 0 1,0 27,0a13.5,13.5 0 1,0 -27,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="40"
+                android:startY="40"
+                android:endX="68"
+                android:endY="68"
+                android:type="linear">
+                <item android:color="#FFFFC107" android:offset="0.0" />
+                <item android:color="#FFFF8F00" android:offset="0.6" />
+                <item android:color="#FFE65100" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Label Inner Gold Border -->
+    <path
+        android:pathData="M54,54m-12.5,0a12.5,12.5 0 1,0 25,0a12.5,12.5 0 1,0 -25,0"
+        android:strokeWidth="0.75"
+        android:strokeColor="#4DFFFFFF" />
+
+    <!-- Play Symbol Shadow for 3D Depth -->
+    <path
+        android:pathData="M50.5,46.5 L63.5,54.5 L50.5,62.5 Z"
+        android:fillColor="#4D000000" />
+
+    <!-- Tactile Glowing Amber Play Symbol -->
+    <path
+        android:pathData="M49.5,45.5 L62.5,53.5 L49.5,61.5 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="49"
+                android:startY="45"
+                android:endX="63"
+                android:endY="62"
+                android:type="linear">
+                <item android:color="#FFFFFFFF" android:offset="0.0" />
+                <item android:color="#FFFFD54F" android:offset="0.3" />
+                <item android:color="#FFFF8F00" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Stereo VU Meter LED Indicator Dots at Bottom Platter Rim -->
+    <!-- Signal Normal Green LED -->
+    <path
+        android:pathData="M46,80m-1.5,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0"
+        android:fillColor="#FF00E676" />
+    <!-- Signal Level Amber LED -->
+    <path
+        android:pathData="M54,80m-1.5,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0"
+        android:fillColor="#FFFFB300" />
+    <!-- Peak Signal Red LED -->
+    <path
+        android:pathData="M62,80m-1.5,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0"
+        android:fillColor="#FFFF1744" />
+</vector>

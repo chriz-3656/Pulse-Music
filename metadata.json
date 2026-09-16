@@ -1,0 +1,6 @@
+{
+  "name": "Pulse Music",
+  "description": "Production-ready Android music streaming app with offline playback, search, playlists, lyrics, and ExoPlayer background streaming service.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
