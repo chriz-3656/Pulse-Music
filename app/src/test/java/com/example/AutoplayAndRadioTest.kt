@@ -157,7 +157,7 @@ class AutoplayAndRadioTest {
         val controller = MusicPlayerController(context)
         controller.isAutoplayEnabled = true
 
-        controller.autoplaySongProvider = { seed ->
+        controller.autoplayProvider = { seed ->
             listOf(recommendedSong1, recommendedSong2)
         }
 
