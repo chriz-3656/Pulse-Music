@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,7 +50,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
@@ -287,6 +292,9 @@ fun SongItemRow(
     onFavoriteToggle: (() -> Unit)? = null,
     onDownloadClick: (() -> Unit)? = null,
     onAddToPlaylist: (() -> Unit)? = null,
+    onPlayNext: (() -> Unit)? = null,
+    onAddToQueue: (() -> Unit)? = null,
+    onStartRadio: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -462,6 +470,36 @@ fun SongItemRow(
                             onClick = {
                                 menuExpanded = false
                                 onDownloadClick()
+                            }
+                        )
+                    }
+                    if (onPlayNext != null) {
+                        DropdownMenuItem(
+                            text = { Text("Play Next", color = SkeuoTextPrimary) },
+                            leadingIcon = { Icon(Icons.Default.PlayArrow, contentDescription = null, tint = SkeuoAmberGlow) },
+                            onClick = {
+                                menuExpanded = false
+                                onPlayNext()
+                            }
+                        )
+                    }
+                    if (onAddToQueue != null) {
+                        DropdownMenuItem(
+                            text = { Text("Add to Queue", color = SkeuoTextPrimary) },
+                            leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoAmberGlow) },
+                            onClick = {
+                                menuExpanded = false
+                                onAddToQueue()
+                            }
+                        )
+                    }
+                    if (onStartRadio != null) {
+                        DropdownMenuItem(
+                            text = { Text("Start Radio", color = SkeuoTextPrimary) },
+                            leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = null, tint = SkeuoAmberGlow) },
+                            onClick = {
+                                menuExpanded = false
+                                onStartRadio()
                             }
                         )
                     }
@@ -706,7 +744,7 @@ fun EmptyStateView(
 }
 
 /**
- * Skeuomorphic Hi-Fi Turntable & Deck App Logo
+ * Pulse Wave App Logo with vibrant electric yellow waveform on pitch black canvas
  */
 @Composable
 fun SkeuoAppLogo(
@@ -720,9 +758,9 @@ fun SkeuoAppLogo(
             .background(
                 Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF1E212A),
-                        Color(0xFF0F1014),
-                        Color(0xFF060709)
+                        Color(0xFF14151B),
+                        Color(0xFF070709),
+                        Color(0xFF000000)
                     )
                 )
             )
@@ -731,10 +769,11 @@ fun SkeuoAppLogo(
                     1.5.dp,
                     Brush.sweepGradient(
                         listOf(
-                            Color(0xFFFFD54F),
-                            Color(0xFFFFB300),
-                            Color(0xFFE65100),
-                            Color(0xFFFFD54F)
+                            Color(0xFFFFEA00),
+                            Color(0xFFFFD600),
+                            Color(0xFFFFAB00),
+                            Color(0xFFFFD600),
+                            Color(0xFFFFEA00)
                         )
                     )
                 ),
@@ -742,42 +781,82 @@ fun SkeuoAppLogo(
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Subtle vinyl groove rings
-        Box(
-            modifier = Modifier
-                .size(size * 0.76f)
-                .clip(CircleShape)
-                .border(BorderStroke(0.8.dp, Color(0x33FFFFFF)), CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(size * 0.58f)
-                .clip(CircleShape)
-                .border(BorderStroke(0.8.dp, Color(0x22FFFFFF)), CircleShape)
-        )
+        Canvas(modifier = Modifier.size(size * 0.72f)) {
+            val w = this.size.width
+            val h = this.size.height
+            val cy = h / 2f
 
-        // Center Gold Hub
-        Box(
-            modifier = Modifier
-                .size(size * 0.42f)
-                .clip(CircleShape)
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFFFFCA28),
-                            Color(0xFFFF8F00),
-                            Color(0xFFE65100)
-                        )
-                    )
+            // Equalizer harmonic backdrop bars
+            val barY1 = cy - h * 0.18f
+            val barY2 = cy + h * 0.18f
+            val barColor = Color(0x33FFD600)
+            val barStroke = w * 0.045f
+
+            drawLine(barColor, androidx.compose.ui.geometry.Offset(w * 0.28f, barY1), androidx.compose.ui.geometry.Offset(w * 0.28f, barY2), barStroke, StrokeCap.Round)
+            drawLine(barColor, androidx.compose.ui.geometry.Offset(w * 0.40f, cy - h * 0.32f), androidx.compose.ui.geometry.Offset(w * 0.40f, cy + h * 0.32f), barStroke, StrokeCap.Round)
+            drawLine(barColor, androidx.compose.ui.geometry.Offset(w * 0.60f, cy - h * 0.28f), androidx.compose.ui.geometry.Offset(w * 0.60f, cy + h * 0.28f), barStroke, StrokeCap.Round)
+            drawLine(barColor, androidx.compose.ui.geometry.Offset(w * 0.72f, barY1), androidx.compose.ui.geometry.Offset(w * 0.72f, barY2), barStroke, StrokeCap.Round)
+
+            // Dynamic Pulse Waveform Path
+            val path = Path().apply {
+                moveTo(w * 0.05f, cy)
+                lineTo(w * 0.20f, cy)
+                lineTo(w * 0.28f, cy - h * 0.14f)
+                lineTo(w * 0.36f, cy + h * 0.18f)
+                lineTo(w * 0.43f, cy - h * 0.10f)
+                lineTo(w * 0.48f, cy)
+                lineTo(w * 0.54f, cy - h * 0.42f) // Main sharp pulse spike
+                lineTo(w * 0.60f, cy + h * 0.42f) // Sub-bass low plunge
+                lineTo(w * 0.66f, cy - h * 0.24f) // Harmonic rebound
+                lineTo(w * 0.72f, cy + h * 0.14f)
+                lineTo(w * 0.78f, cy - h * 0.08f)
+                lineTo(w * 0.84f, cy)
+                lineTo(w * 0.95f, cy)
+            }
+
+            // Glow layer
+            drawPath(
+                path = path,
+                color = Color(0x4DFFD600),
+                style = Stroke(
+                    width = w * 0.14f,
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round
                 )
-                .border(BorderStroke(1.dp, Color(0x66FFFFFF)), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = "Pulse Hi-Fi Logo",
-                tint = Color(0xFF0D0E12),
-                modifier = Modifier.size(size * 0.26f)
+            )
+
+            // Core Electric Yellow Waveform
+            drawPath(
+                path = path,
+                color = Color(0xFFFFD600),
+                style = Stroke(
+                    width = w * 0.075f,
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round
+                )
+            )
+
+            // White-hot core beam
+            drawPath(
+                path = path,
+                color = Color(0xEEFFFFFF),
+                style = Stroke(
+                    width = w * 0.028f,
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round
+                )
+            )
+
+            // Peak spark nodes
+            drawCircle(
+                color = Color(0xFFFFEA00),
+                radius = w * 0.05f,
+                center = androidx.compose.ui.geometry.Offset(w * 0.54f, cy - h * 0.42f)
+            )
+            drawCircle(
+                color = Color.White,
+                radius = w * 0.025f,
+                center = androidx.compose.ui.geometry.Offset(w * 0.54f, cy - h * 0.42f)
             )
         }
     }

@@ -344,7 +344,10 @@ fun SearchScreen(
                                 song = song,
                                 isCurrentTrack = isCurrent,
                                 isPlaying = playerState.isPlaying && isCurrent,
-                                onClick = { viewModel.playSong(song, results.songs) },
+                                onClick = { viewModel.playSong(song) },
+                                onPlayNext = { viewModel.playNext(song) },
+                                onAddToQueue = { viewModel.addToQueue(song) },
+                                onStartRadio = { viewModel.playSongAsRadio(song) },
                                 onDownloadClick = { viewModel.downloadSong(song) },
                                 onFavoriteToggle = { viewModel.toggleFavorite(song) }
                             )
@@ -399,6 +402,9 @@ fun SearchScreen(
                                 isCurrentTrack = isCurrent,
                                 isPlaying = playerState.isPlaying && isCurrent,
                                 onClick = { viewModel.playSong(song, results.similarTracks) },
+                                onPlayNext = { viewModel.playNext(song) },
+                                onAddToQueue = { viewModel.addToQueue(song) },
+                                onStartRadio = { viewModel.playSongAsRadio(song) },
                                 onDownloadClick = { viewModel.downloadSong(song) },
                                 onFavoriteToggle = { viewModel.toggleFavorite(song) }
                             )

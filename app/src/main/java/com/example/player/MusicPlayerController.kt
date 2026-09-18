@@ -27,9 +27,32 @@ class MusicPlayerController(
     // Service connection / listener callback
     var onServiceCommand: ((ServiceAction) -> Unit)? = null
 
-    // Autoplay provider callback: takes songId -> returns recommended songs
+    // Autoplay providers: takes Song or songId -> returns recommended songs
+    var autoplaySongProvider: (suspend (Song) -> List<Song>)? = null
     var autoplayProvider: (suspend (String) -> List<Song>)? = null
-    var isAutoplayEnabled: Boolean = true
+
+    private val prefs = context.getSharedPreferences("pulse_music_settings", Context.MODE_PRIVATE)
+    var isAutoplayEnabled: Boolean
+        get() = prefs.getBoolean("autoplay_enabled", true)
+        set(value) {
+            prefs.edit().putBoolean("autoplay_enabled", value).apply()
+        }
+
+    private suspend fun fetchSuggestionsForSong(song: Song): List<Song> {
+        try {
+            autoplaySongProvider?.let {
+                val results = it.invoke(song)
+                if (results.isNotEmpty()) return results
+            }
+            autoplayProvider?.let {
+                val results = it.invoke(song.id)
+                if (results.isNotEmpty()) return results
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return emptyList()
+    }
 
     init {
         // Start foreground service
@@ -37,11 +60,15 @@ class MusicPlayerController(
     }
 
     private fun startService() {
-        val intent = Intent(context, MusicPlaybackService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
+        try {
+            val intent = Intent(context, MusicPlaybackService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        } catch (e: Throwable) {
+            // Handled gracefully in tests or restricted background execution environments
         }
     }
 
@@ -63,23 +90,58 @@ class MusicPlayerController(
         }
         onServiceCommand?.invoke(ServiceAction.PlayTrack(song, queue, index))
 
-        // If playing a single track and autoplay is enabled, proactively pre-fetch suggestions
-        if (queue.size == 1 && isAutoplayEnabled && autoplayProvider != null) {
-            scope.launch {
-                try {
-                    val suggestions = autoplayProvider?.invoke(song.id) ?: emptyList()
-                    if (suggestions.isNotEmpty()) {
-                        val current = _playerState.value
-                        if (current.currentSong?.id == song.id && current.queue.size == 1) {
-                            val combined = current.queue + suggestions.filter { it.id != song.id }
-                            _playerState.update { it.copy(queue = combined) }
+        // If playing a single track (radio mode) or near queue end, proactively pre-fetch suggestions
+        if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null)) {
+            if (queue.size == 1 || index >= queue.size - 1) {
+                scope.launch {
+                    try {
+                        val suggestions = fetchSuggestionsForSong(song)
+                        if (suggestions.isNotEmpty()) {
+                            val current = _playerState.value
+                            if (current.currentSong?.id == song.id) {
+                                val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
+                                if (filtered.isNotEmpty()) {
+                                    _playerState.update { it.copy(queue = current.queue + filtered) }
+                                }
+                            }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
             }
         }
+    }
+
+    fun playRadio(song: Song) {
+        playSong(song, listOf(song))
+    }
+
+    fun addToQueue(song: Song) {
+        val current = _playerState.value
+        if (current.currentSong == null || current.queue.isEmpty()) {
+            playSong(song, listOf(song))
+            return
+        }
+        val updated = current.queue + song
+        _playerState.update { it.copy(queue = updated) }
+    }
+
+    fun playNext(song: Song) {
+        val current = _playerState.value
+        if (current.currentSong == null || current.queue.isEmpty()) {
+            playSong(song, listOf(song))
+            return
+        }
+        val insertIndex = (current.currentIndex + 1).coerceAtMost(current.queue.size)
+        val mutable = current.queue.toMutableList()
+        // Remove if existing later in queue
+        val existingLater = mutable.subList(insertIndex, mutable.size).indexOfFirst { it.id == song.id }
+        if (existingLater >= 0) {
+            mutable.removeAt(insertIndex + existingLater)
+        }
+        mutable.add(insertIndex, song)
+        _playerState.update { it.copy(queue = mutable) }
     }
 
     fun playQueue(queue: List<Song>, startIndex: Int = 0) {
@@ -128,16 +190,18 @@ class MusicPlayerController(
         if (nextIndex >= state.queue.size) {
             if (state.repeatMode == RepeatMode.ALL) {
                 nextIndex = 0
-            } else if (isAutoplayEnabled && autoplayProvider != null && state.currentSong != null) {
+            } else if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null) && state.currentSong != null) {
                 // Autoplay: fetch suggestions and keep playing
+                val currentSong = state.currentSong
+                _playerState.update { it.copy(isPlaying = true, isBuffering = true) }
                 scope.launch {
                     try {
-                        val currentSongId = state.currentSong.id
-                        val suggestions = autoplayProvider?.invoke(currentSongId) ?: emptyList()
-                        val filtered = suggestions.filter { sug -> state.queue.none { it.id == sug.id } }
+                        val suggestions = fetchSuggestionsForSong(currentSong)
+                        val current = _playerState.value
+                        val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
                         if (filtered.isNotEmpty()) {
-                            val newQueue = state.queue + filtered
-                            val playIdx = state.queue.size
+                            val newQueue = current.queue + filtered
+                            val playIdx = current.queue.size
                             val nextTrack = newQueue[playIdx]
                             _playerState.update {
                                 it.copy(
@@ -152,9 +216,12 @@ class MusicPlayerController(
                                 )
                             }
                             onServiceCommand?.invoke(ServiceAction.PlayTrack(nextTrack, newQueue, playIdx))
+                        } else {
+                            _playerState.update { it.copy(isPlaying = false, isBuffering = false) }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        _playerState.update { it.copy(isPlaying = false, isBuffering = false) }
                     }
                 }
                 return
@@ -176,6 +243,22 @@ class MusicPlayerController(
             )
         }
         onServiceCommand?.invoke(ServiceAction.PlayTrack(nextSong, state.queue, nextIndex))
+
+        // Pre-fetch suggestions when approaching the end of the queue
+        if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null) && nextIndex >= state.queue.size - 2) {
+            scope.launch {
+                try {
+                    val suggestions = fetchSuggestionsForSong(nextSong)
+                    val current = _playerState.value
+                    val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
+                    if (filtered.isNotEmpty()) {
+                        _playerState.update { it.copy(queue = current.queue + filtered) }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     fun skipToPrevious() {

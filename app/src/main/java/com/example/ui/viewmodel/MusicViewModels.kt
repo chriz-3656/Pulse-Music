@@ -88,6 +88,18 @@ class HomeViewModel(
         playerController.playSong(song, _uiState.value.trendingSongs)
     }
 
+    fun playNext(song: Song) {
+        playerController.playNext(song)
+    }
+
+    fun addToQueue(song: Song) {
+        playerController.addToQueue(song)
+    }
+
+    fun playRadio(song: Song) {
+        playerController.playRadio(song)
+    }
+
     fun playAlbum(album: Album) {
         if (album.songs.isNotEmpty()) {
             playerController.playQueue(album.songs, 0)
@@ -223,10 +235,20 @@ class SearchViewModel(
         }
     }
 
+    fun playSongAsRadio(song: Song) {
+        playerController.playRadio(song)
+    }
+
     fun playSong(song: Song, queue: List<Song>? = null) {
-        val playbackQueue = queue ?: _uiState.value.searchResults.songs
-        val targetQueue = if (playbackQueue.contains(song)) playbackQueue else listOf(song) + playbackQueue
-        playerController.playSong(song, targetQueue)
+        playerController.playSong(song, queue)
+    }
+
+    fun playNext(song: Song) {
+        playerController.playNext(song)
+    }
+
+    fun addToQueue(song: Song) {
+        playerController.addToQueue(song)
     }
 
     fun downloadSong(song: Song) {

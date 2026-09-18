@@ -253,6 +253,9 @@ fun HomeScreen(
                 isPlaying = playerState.isPlaying && playerState.currentSong?.id == song.id,
                 isCurrentTrack = playerState.currentSong?.id == song.id,
                 onClick = { viewModel.playSong(song) },
+                onPlayNext = { viewModel.playNext(song) },
+                onAddToQueue = { viewModel.addToQueue(song) },
+                onStartRadio = { viewModel.playRadio(song) },
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }

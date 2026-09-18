@@ -415,15 +415,100 @@ class MusicRepositoryImpl(
         Result.failure(Exception("No lyrics found"))
     }
 
-    override suspend fun getSongSuggestions(songId: String): List<Song> = withContext(Dispatchers.IO) {
-        try {
-            val radio = api.SongRadio.getSongRadio(songId, null).getOrNull()
-            val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
-            if (ytmSongs.isNotEmpty()) return@withContext ytmSongs
-        } catch (e: Exception) {
-            e.printStackTrace()
+    override suspend fun getSongSuggestions(song: Song): List<Song> = withContext(Dispatchers.IO) {
+        val list = mutableListOf<Song>()
+        val seedId = song.id
+        val artist = song.artist.trim()
+        val title = song.title.trim()
+        var artistId = song.artistId?.trim() ?: ""
+
+        // 1. If Deezer track or has Deezer artist ID
+        if (seedId.startsWith("dz_") || artistId.isNotBlank()) {
+            if (artistId.isBlank() && artist.isNotBlank()) {
+                artistId = fetchDeezerArtistId(artist) ?: ""
+            }
+            if (artistId.isNotBlank()) {
+                val radioSongs = fetchDeezerArtistRadio(artistId)
+                list.addAll(radioSongs)
+                if (list.size < 10) {
+                    val topSongs = fetchDeezerArtistTop(artistId)
+                    list.addAll(topSongs)
+                }
+            }
         }
-        fetchJioSaavnRadioTracks(songId)
+
+        // 2. YouTube Music SongRadio (if YTM ID or clean ID)
+        if (list.isEmpty() && !seedId.startsWith("dz_") && !seedId.startsWith("sc_")) {
+            try {
+                val radio = api.SongRadio.getSongRadio(seedId, null).getOrNull()
+                val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
+                if (ytmSongs.isNotEmpty()) {
+                    list.addAll(ytmSongs)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // 3. JioSaavn Radio by ID
+        if (list.isEmpty()) {
+            val saavnCleanId = seedId.removePrefix("dz_").removePrefix("sc_")
+            val jioReco = fetchJioSaavnRadioTracks(saavnCleanId)
+            if (jioReco.isNotEmpty()) {
+                list.addAll(jioReco)
+            }
+        }
+
+        // 4. If still empty, search Deezer by artist to find artist tracks and similar tracks
+        if (list.isEmpty() && artist.isNotBlank()) {
+            val deezerArtistId = fetchDeezerArtistId(artist)
+            if (!deezerArtistId.isNullOrBlank()) {
+                val radioSongs = fetchDeezerArtistRadio(deezerArtistId)
+                list.addAll(radioSongs)
+            }
+            if (list.isEmpty()) {
+                val artistSongs = searchDeezerSongs(artist)
+                list.addAll(artistSongs)
+            }
+        }
+
+        // 5. JioSaavn artist / query search fallback
+        if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
+            val query = if (artist.isNotBlank()) artist else title
+            val saavnSongs = searchJioSaavnSongs(query)
+            list.addAll(saavnSongs)
+        }
+
+        // Distinct by ID and filter out seed song
+        val seen = mutableSetOf<String>()
+        val result = mutableListOf<Song>()
+        for (item in list) {
+            if (item.id != seedId && item.title.isNotBlank() && seen.add(item.id)) {
+                result.add(item)
+            }
+        }
+        result
+    }
+
+    override suspend fun getSongSuggestions(songId: String): List<Song> = withContext(Dispatchers.IO) {
+        val cached = songCache[songId] ?: songDao.getSongById(songId)?.let {
+            Song(
+                id = it.id,
+                title = it.title,
+                artist = it.artist,
+                album = it.album,
+                durationSec = it.durationSec,
+                artworkUrl = it.artworkUrl,
+                stream160Url = it.stream160Url,
+                stream320Url = it.stream320Url,
+                artistId = it.artistId,
+                albumId = it.albumId
+            )
+        }
+        if (cached != null) {
+            return@withContext getSongSuggestions(cached)
+        }
+        getSongSuggestions(Song(id = songId, title = "", artist = ""))
     }
 
     override suspend fun getAlbumDetails(id: String): Result<Album> = withContext(Dispatchers.IO) {
@@ -819,6 +904,116 @@ class MusicRepositoryImpl(
             e.printStackTrace()
         }
         return null
+    }
+
+    private fun fetchDeezerArtistId(artist: String): String? {
+        try {
+            val q = URLEncoder.encode(artist, "UTF-8")
+            val url = URL("https://api.deezer.com/search/artist?q=$q&limit=1")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+            conn.connectTimeout = 4000
+            conn.readTimeout = 4000
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().readText()
+                val json = JSONObject(text)
+                val data = json.optJSONArray("data")
+                if (data != null && data.length() > 0) {
+                    return data.getJSONObject(0).optLong("id").toString()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun fetchDeezerArtistRadio(artistId: String): List<Song> {
+        val songs = mutableListOf<Song>()
+        try {
+            val url = URL("https://api.deezer.com/artist/$artistId/radio?limit=25")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+            conn.connectTimeout = 5000
+            conn.readTimeout = 5000
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().readText()
+                val json = JSONObject(text)
+                val data = json.optJSONArray("data")
+                if (data != null) {
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        val id = item.optLong("id").toString()
+                        val title = item.optString("title")
+                        val durationSec = item.optInt("duration", 0)
+                        val artistObj = item.optJSONObject("artist")
+                        val artistName = artistObj?.optString("name") ?: "Unknown Artist"
+                        val aId = artistObj?.optLong("id")?.toString() ?: ""
+                        val albumObj = item.optJSONObject("album")
+                        val albumName = albumObj?.optString("title") ?: ""
+                        val albumId = albumObj?.optLong("id")?.toString() ?: ""
+                        val artwork = albumObj?.optString("cover_xl") ?: albumObj?.optString("cover_big") ?: albumObj?.optString("cover_medium") ?: ""
+                        songs.add(Song(
+                            id = "dz_$id",
+                            title = title,
+                            artist = artistName,
+                            album = albumName,
+                            durationSec = durationSec,
+                            artworkUrl = artwork,
+                            artistId = aId,
+                            albumId = albumId
+                        ))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return songs
+    }
+
+    private fun fetchDeezerArtistTop(artistId: String): List<Song> {
+        val songs = mutableListOf<Song>()
+        try {
+            val url = URL("https://api.deezer.com/artist/$artistId/top?limit=15")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+            conn.connectTimeout = 5000
+            conn.readTimeout = 5000
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().readText()
+                val json = JSONObject(text)
+                val data = json.optJSONArray("data")
+                if (data != null) {
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        val id = item.optLong("id").toString()
+                        val title = item.optString("title")
+                        val durationSec = item.optInt("duration", 0)
+                        val artistObj = item.optJSONObject("artist")
+                        val artistName = artistObj?.optString("name") ?: "Unknown Artist"
+                        val aId = artistObj?.optLong("id")?.toString() ?: ""
+                        val albumObj = item.optJSONObject("album")
+                        val albumName = albumObj?.optString("title") ?: ""
+                        val albumId = albumObj?.optLong("id")?.toString() ?: ""
+                        val artwork = albumObj?.optString("cover_xl") ?: albumObj?.optString("cover_big") ?: albumObj?.optString("cover_medium") ?: ""
+                        songs.add(Song(
+                            id = "dz_$id",
+                            title = title,
+                            artist = artistName,
+                            album = albumName,
+                            durationSec = durationSec,
+                            artworkUrl = artwork,
+                            artistId = aId,
+                            albumId = albumId
+                        ))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return songs
     }
 
     private fun fetchJioSaavnRadioTracks(songId: String): List<Song> {

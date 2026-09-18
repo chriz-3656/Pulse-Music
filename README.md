@@ -14,6 +14,7 @@
   <a href="#tech-stack"><img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" alt="Language: Kotlin" /></a>
   <a href="#tech-stack"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" /></a>
   <a href="#playback-engine"><img src="https://img.shields.io/badge/Engine-AndroidX%20Media3%20ExoPlayer-FF6F00" alt="AndroidX Media3" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.1.0-FFD600?logo=android" alt="Version: 1.1.0" /></a>
   <a href="#license"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" /></a>
   <a href="#architecture"><img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-brightgreen" alt="Architecture" /></a>
 </p>
@@ -43,14 +44,16 @@ Stream high-bitrate audio from decentralized providers (SoundCloud, JioSaavn, an
 
 ### 🔍 Search & Multi-Provider Aggregation
 - **Federated Stream Aggregator**: Query tracks, artists, albums, and playlists simultaneously across JioSaavn, SoundCloud, and YouTube Music.
+- **Smart Queue & Radio Suggestions**: Selecting any search result immediately plays that song while automatically cueing algorithmic recommendations and radio suggestions without flooding the queue with static search listings.
 - **Debounced Instant Search**: Instant typeahead results with query history and trending suggestions.
 - **Artist & Playlist Deep-Dives**: Explore full artist discographies, top songs, related artists, and curated community playlists.
 
 ### 📜 Synchronized Lyrics & Queue Management
 - **Time-Synced & Plain Lyrics**: Real-time karaoke-style synchronized lyrics with smooth auto-scrolling and manual timestamp scrubbing.
-- **Dynamic Playback Queue**: Drag-and-drop track reordering, shuffle mode, repeat-all, and repeat-one toggle modes.
+- **Dynamic Playback Queue**: Drag-and-drop track reordering, shuffle mode, repeat-all, and repeat-one toggle modes with continuous autoplay streaming.
 
-### 🎛️ Tactile Vintage & Skeuomorphic UI
+### 🎛️ Tactile Hi-Fi & Skeuomorphic UI
+- **Pulse Wave Brand Identity**: High-voltage electric yellow pulse waveform icon (`#FFD600`) framed over a pitch-black background with acoustic radial harmonics.
 - **Analog Aesthetic**: Warm amber glow (`#FF9500`), brushed dark metallic panels, knurled dials, and dynamic VU meters.
 - **Vinyl Turntable Deck**: Rotating vinyl platter with realistic needle-drop states and album art label reproduction.
 - **Modern Material 3 Foundation**: Full support for Edge-to-Edge display, gesture navigation, and Android 15 window insets.

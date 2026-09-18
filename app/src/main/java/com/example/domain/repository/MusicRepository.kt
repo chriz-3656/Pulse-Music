@@ -38,6 +38,7 @@ interface MusicRepository {
     suspend fun getSongsBatch(ids: List<String>): List<Song>
     suspend fun getLyrics(id: String): Result<String>
     suspend fun getSongSuggestions(songId: String): List<Song>
+    suspend fun getSongSuggestions(song: Song): List<Song>
     
     // Albums & Playlists Details
     suspend fun getAlbumDetails(id: String): Result<Album>

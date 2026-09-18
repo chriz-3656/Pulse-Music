@@ -17,8 +17,8 @@ android {
     applicationId = "com.aistudio.pulsemusic.kzvpmx"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 2
+    versionName = "1.1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -136,11 +136,11 @@ dependencies {
   implementation("io.ktor:ktor-client-okhttp:3.0.3")
   
   // testImplementation(libs.androidx.compose.ui.test.junit4)
-  // testImplementation(libs.androidx.core)
-  // testImplementation(libs.androidx.junit)
+  testImplementation(libs.androidx.core)
+  testImplementation(libs.androidx.junit)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
-  // testImplementation(libs.robolectric)
+  testImplementation(libs.robolectric)
   // testImplementation(libs.roborazzi)
   // testImplementation(libs.roborazzi.compose)
   // testImplementation(libs.roborazzi.junit.rule)

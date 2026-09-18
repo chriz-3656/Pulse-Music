@@ -16,6 +16,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-09-17
+
+### ⚡ Pulse Wave Redesign & Dynamic Engine Enhancements
+
+### Added
+- **Pulse Wave Brand Identity & Adaptive Launcher Icon**:
+  - Re-engineered adaptive app icon (`ic_launcher_foreground.xml` & `ic_launcher_background.xml`) featuring a high-contrast electric yellow waveform with acoustic radial harmonics on a deep pitch-black chassis.
+  - Redesigned in-app vector logo component (`SkeuoAppLogo`) featuring dynamic pulse waveforms, equalizer spectrum depth bars, and white-hot spark nodes across the Home and Settings screens.
+- **Dynamic Radio Recommendations & Queue Engine**:
+  - Rebuilt search track playback workflow: selecting a song immediately plays that track while dynamically queueing related algorithmic tracks and radio recommendations, preventing duplicate static search lists from clogging the queue.
+  - Implemented continuous playback toggle in Settings, connecting track completion triggers directly to auto-queue suggestions.
+
+### Changed
+- **Zero Hardcoded Content**:
+  - Audited codebase and verified 100% dynamic API resolution for all songs, artists, albums, and playlists across streaming providers.
+  - Cleaned redundant repository scaffolding and temporary web assets for a lightweight, optimized Android project structure.
+
+### Fixed
+- Fixed search playback flow so contextual actions (**Play Next**, **Add to Queue**, **Start Radio**) accurately modulate the live play queue without disrupting the active playback state.
+
+---
+
 ## [1.0.0] - 2026-09-16
 
 ### 🚀 Initial Release
