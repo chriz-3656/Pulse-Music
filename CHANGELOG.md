@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2026-09-18
+
+### Added
+- In-App Auto Updater to automatically fetch and install new releases from GitHub.
+- Permanent Keystore Configuration for conflict-free seamless upgrades
+
 ### Planned
 - Audio visualizer with FFT real-time spectrum analysis.
 - Gapless playback and crossfade transitions between tracks.

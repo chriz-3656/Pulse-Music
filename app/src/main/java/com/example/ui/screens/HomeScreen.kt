@@ -32,6 +32,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.setValue
+import com.example.util.AppUpdater
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,6 +97,44 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    var updateInfo by remember { mutableStateOf<AppUpdater.UpdateInfo?>(null) }
+    
+    LaunchedEffect(Unit) {
+        val info = AppUpdater.checkForUpdates()
+        if (info != null && info.isUpdateAvailable) {
+            updateInfo = info
+        }
+    }
+
+    if (updateInfo != null) {
+        AlertDialog(
+            onDismissRequest = { updateInfo = null },
+            title = { Text("Update Available", color = SkeuoTextPrimary) },
+            text = {
+                Column {
+                    Text("Version ${updateInfo!!.latestVersion} is now available.", color = SkeuoTextSecondary)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(updateInfo!!.releaseNotes, color = SkeuoTextTertiary, fontSize = 12.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    AppUpdater.downloadAndInstall(context, updateInfo!!.downloadUrl, "PulseMusic-${updateInfo!!.latestVersion}.apk")
+                    updateInfo = null
+                }) {
+                    Text("Update Now", color = SkeuoAmberGlow)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { updateInfo = null }) {
+                    Text("Later", color = SkeuoTextSecondary)
+                }
+            },
+            containerColor = SkeuoDeckDark
+        )
+    }
 
     if (uiState.isLoading && uiState.trendingSongs.isEmpty()) {
         LoadingView(message = "Reading Audio Streams...", modifier = modifier.fillMaxSize())

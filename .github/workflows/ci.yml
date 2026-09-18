@@ -42,6 +42,12 @@ jobs:
         with:
           gradle-version: '9.3.1'
 
+      - name: Restore Release Keystore
+        run: |
+          if [ -f release.keystore.base64 ]; then
+            base64 -d release.keystore.base64 > release.keystore
+          fi
+
 
 
       - name: Grant Execute Permission for Gradle Wrapper
