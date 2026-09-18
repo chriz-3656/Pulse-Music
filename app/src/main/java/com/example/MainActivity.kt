@@ -58,7 +58,7 @@ fun KillSwitchWrapper(content: @Composable () -> Unit) {
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             try {
-                val url = URL("https://chriz-3656.github.io/pulse-landing/config.json")
+                val url = URL("https://pulseapp-music.vercel.app/config.json")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 5000
