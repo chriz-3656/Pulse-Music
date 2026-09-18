@@ -81,7 +81,7 @@ object AppUpdater {
         return false
     }
 
-    fun downloadAndInstall(context: Context, downloadUrl: String, fileName: String) {
+    fun downloadAndInstall(context: Context, downloadUrl: String, fileName: String): Long {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val uri = Uri.parse(downloadUrl)
         
@@ -110,6 +110,7 @@ object AppUpdater {
         } else {
             context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         }
+        return downloadId
     }
 
     private fun installApk(context: Context, fileName: String) {

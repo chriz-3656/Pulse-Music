@@ -100,6 +100,8 @@ fun HomeScreen(
 
     val context = LocalContext.current
     var updateInfo by remember { mutableStateOf<AppUpdater.UpdateInfo?>(null) }
+    var activeDownloadId by remember { mutableStateOf<Long?>(null) }
+    var downloadProgress by remember { mutableStateOf(0f) }
     
     LaunchedEffect(Unit) {
         val info = AppUpdater.checkForUpdates()
@@ -108,7 +110,43 @@ fun HomeScreen(
         }
     }
 
-    if (updateInfo != null) {
+    LaunchedEffect(activeDownloadId) {
+        activeDownloadId?.let { id ->
+            val downloadManager = context.getSystemService(android.content.Context.DOWNLOAD_SERVICE) as android.app.DownloadManager
+            var isDownloading = true
+            while (isDownloading) {
+                val query = android.app.DownloadManager.Query().setFilterById(id)
+                val cursor = downloadManager.query(query)
+                if (cursor != null && cursor.moveToFirst()) {
+                    val statusIndex = cursor.getColumnIndex(android.app.DownloadManager.COLUMN_STATUS)
+                    val bytesDownloadedIndex = cursor.getColumnIndex(android.app.DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                    val bytesTotalIndex = cursor.getColumnIndex(android.app.DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                    
+                    if (statusIndex >= 0 && bytesDownloadedIndex >= 0 && bytesTotalIndex >= 0) {
+                        val status = cursor.getInt(statusIndex)
+                        val bytesDownloaded = cursor.getLong(bytesDownloadedIndex)
+                        val bytesTotal = cursor.getLong(bytesTotalIndex)
+                        
+                        if (bytesTotal > 0) {
+                            downloadProgress = bytesDownloaded.toFloat() / bytesTotal.toFloat()
+                        }
+                        
+                        if (status == android.app.DownloadManager.STATUS_SUCCESSFUL || status == android.app.DownloadManager.STATUS_FAILED) {
+                            isDownloading = false
+                            if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+                                activeDownloadId = null
+                                updateInfo = null
+                            }
+                        }
+                    }
+                }
+                cursor?.close()
+                kotlinx.coroutines.delay(100)
+            }
+        }
+    }
+
+    if (updateInfo != null && activeDownloadId == null) {
         AlertDialog(
             onDismissRequest = { updateInfo = null },
             title = { Text("Update Available", color = SkeuoTextPrimary) },
@@ -121,13 +159,41 @@ fun HomeScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    AppUpdater.downloadAndInstall(context, updateInfo!!.downloadUrl, "PulseMusic-${updateInfo!!.latestVersion}.apk")
-                    updateInfo = null
+                    activeDownloadId = AppUpdater.downloadAndInstall(context, updateInfo!!.downloadUrl, "PulseMusic-${updateInfo!!.latestVersion}.apk")
                 }) {
-                    Text("Update Now", color = SkeuoAmberGlow)
+                    Text("Download & Install", color = SkeuoAmberGlow)
                 }
             },
             dismissButton = {
+                TextButton(onClick = { updateInfo = null }) { Text("Later", color = SkeuoTextSecondary) }
+            },
+            containerColor = SkeuoDeckDark
+        )
+    } else if (activeDownloadId != null) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("Downloading Update", color = SkeuoTextPrimary) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    androidx.compose.material3.LinearProgressIndicator(
+                        progress = { downloadProgress },
+                        modifier = Modifier.fillMaxWidth().height(8.dp),
+                        color = SkeuoAmberGlow,
+                        trackColor = SkeuoRecessedTray
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "${(downloadProgress * 100).toInt()}%",
+                        color = SkeuoTextSecondary,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                    )
+                }
+            },
+            confirmButton = { },
+            containerColor = SkeuoDeckDark
+        )
+    }
+$s/\$//
                 TextButton(onClick = { updateInfo = null }) {
                     Text("Later", color = SkeuoTextSecondary)
                 }
