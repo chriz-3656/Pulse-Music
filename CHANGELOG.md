@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-09-18
+
+### Added
+- Remote Emergency Kill Switch: Dynamically fetch configuration from Vercel deployment to instantly block app usage in the event of DMCA or legal strikes.
+- Implemented `KillSwitchWrapper` forcing full-screen block rendering on app load.
+
+---
+
 ## [1.2.0] - 2026-09-18
 
 ### Added
