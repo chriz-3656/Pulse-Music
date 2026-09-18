@@ -193,14 +193,6 @@ fun HomeScreen(
             containerColor = SkeuoDeckDark
         )
     }
-$s/\$//
-                TextButton(onClick = { updateInfo = null }) {
-                    Text("Later", color = SkeuoTextSecondary)
-                }
-            },
-            containerColor = SkeuoDeckDark
-        )
-    }
 
     if (uiState.isLoading && uiState.trendingSongs.isEmpty()) {
         LoadingView(message = "Reading Audio Streams...", modifier = modifier.fillMaxSize())
