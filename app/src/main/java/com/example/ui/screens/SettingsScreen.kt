@@ -680,7 +680,7 @@ fun SettingsScreen(
                                     color = SkeuoTextPrimary
                                 )
                                 Text(
-                                    text = "v1.0.0 • Skeuomorphic Hi-Fi Edition",
+                                    text = "v${com.example.BuildConfig.VERSION_NAME} • Skeuomorphic Hi-Fi Edition",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 11.sp
@@ -894,7 +894,7 @@ fun SettingsScreen(
                             color = SkeuoTextPrimary
                         )
                         Text(
-                            text = "v1.0.0 • Skeuomorphic Edition",
+                            text = "v${com.example.BuildConfig.VERSION_NAME} • Skeuomorphic Edition",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp
