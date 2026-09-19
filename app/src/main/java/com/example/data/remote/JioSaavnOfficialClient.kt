@@ -98,9 +98,8 @@ object JioSaavnOfficialClient {
                 val json = JSONObject(body)
                 val songsMap = json.optJSONObject("songs")
                 if (songsMap != null) {
-                    val songObj = songsMap.optJSONArray(0)?.optJSONObject(0)
-                        ?: songsMap.optJSONObject(songId)
-                        ?: songsMap.optJSONObject(songsMap.keys().next())
+                    val songObj = songsMap.optJSONObject(songId)
+                        ?: if (songsMap.keys().hasNext()) songsMap.optJSONObject(songsMap.keys().next()) else null
                     if (songObj != null) {
                         return parseSongObject(songObj)
                     }
@@ -121,7 +120,7 @@ object JioSaavnOfficialClient {
         var artist = item.optString("primary_artists")
         if (artist.isBlank()) artist = item.optString("singers", "Unknown")
         val album = item.optString("album", "Unknown")
-        val durationSec = item.optString("duration", "0").toLongOrNull() ?: 0L
+        val durationSec = item.optString("duration", "0").toLongOrNull()?.toInt() ?: 0
         var imageUrl = item.optString("image", "")
         if (imageUrl.isNotBlank()) {
             imageUrl = imageUrl.replace("150x150", "500x500").replace("50x50", "500x500")
@@ -140,7 +139,7 @@ object JioSaavnOfficialClient {
             album = album.replace("&quot;", "\""),
             durationSec = durationSec,
             artworkUrl = imageUrl,
-            streamUrl = encryptedMediaUrl // we'll decrypt this in repository
+            stream320Url = encryptedMediaUrl // we'll decrypt this in repository
         )
     }
 }
