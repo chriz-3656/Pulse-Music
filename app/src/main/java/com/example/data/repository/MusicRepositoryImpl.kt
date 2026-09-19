@@ -422,7 +422,15 @@ class MusicRepositoryImpl(
         val title = song.title.trim()
         var artistId = song.artistId?.trim() ?: ""
 
-        // 1. If Deezer track or has Deezer artist ID
+        // 1. SoundCloud Related Tracks (Infinite Radio)
+        if (seedId.startsWith("sc_")) {
+            val scRadio = SoundCloudClient.getRelatedTracks(seedId, 10)
+            if (scRadio.isNotEmpty()) {
+                list.addAll(scRadio)
+            }
+        }
+
+        // 2. If Deezer track or has Deezer artist ID
         if (seedId.startsWith("dz_") || artistId.isNotBlank()) {
             if (artistId.isBlank() && artist.isNotBlank()) {
                 artistId = fetchDeezerArtistId(artist) ?: ""
