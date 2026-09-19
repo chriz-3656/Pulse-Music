@@ -1,0 +1,1371 @@
+﻿2026-09-19T17:50:31.8553665Z Current runner version: '2.337.0'
+2026-09-19T17:50:31.8579501Z ##[group]Runner Image Provisioner
+2026-09-19T17:50:31.8580410Z Hosted Compute Agent
+2026-09-19T17:50:31.8581044Z Version: 20260828.587
+2026-09-19T17:50:31.8581689Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-09-19T17:50:31.8582527Z Build Date: 2026-08-28T16:44:25Z
+2026-09-19T17:50:31.8583262Z Worker ID: {cf5dac87-de3f-4eef-9617-a04ebe0a095f}
+2026-09-19T17:50:31.8584032Z Azure Region: northcentralus
+2026-09-19T17:50:31.8584667Z ##[endgroup]
+2026-09-19T17:50:31.8586128Z ##[group]Operating System
+2026-09-19T17:50:31.8586884Z Ubuntu
+2026-09-19T17:50:31.8587803Z 24.04.5
+2026-09-19T17:50:31.8588337Z LTS
+2026-09-19T17:50:31.8588956Z ##[endgroup]
+2026-09-19T17:50:31.8589533Z ##[group]Runner Image
+2026-09-19T17:50:31.8590237Z Image: ubuntu-24.04
+2026-09-19T17:50:31.8590844Z Version: 20260907.300.1
+2026-09-19T17:50:31.8592172Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+2026-09-19T17:50:31.8593765Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+2026-09-19T17:50:31.8594784Z ##[endgroup]
+2026-09-19T17:50:31.8596003Z ##[group]GITHUB_TOKEN Permissions
+2026-09-19T17:50:31.8598318Z Contents: write
+2026-09-19T17:50:31.8598964Z Metadata: read
+2026-09-19T17:50:31.8599531Z Packages: write
+2026-09-19T17:50:31.8600176Z ##[endgroup]
+2026-09-19T17:50:31.8602340Z Secret source: Actions
+2026-09-19T17:50:31.8603419Z Cache mode: write
+2026-09-19T17:50:31.8604183Z Prepare workflow directory
+2026-09-19T17:50:31.8955613Z Prepare all required actions
+2026-09-19T17:50:31.9006335Z Getting action download info
+2026-09-19T17:50:32.1704659Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-09-19T17:50:32.2662313Z Download action repository 'actions/setup-java@v4' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-09-19T17:50:32.7140385Z Download action repository 'gradle/actions@v4' (SHA:ed408507eac070d1f99cc633dbcf757c94c7933a)
+2026-09-19T17:50:33.6080755Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-09-19T17:50:33.7590811Z Download action repository 'softprops/action-gh-release@v2' (SHA:3bb12739c298aeb8a4eeaf626c5b8d85266b0e65)
+2026-09-19T17:50:34.0974348Z Complete job name: Build, Test & Release
+2026-09-19T17:50:34.1857689Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:50:34.1865763Z ##[group]Run actions/checkout@v4
+2026-09-19T17:50:34.1866339Z with:
+2026-09-19T17:50:34.1866655Z   fetch-depth: 0
+2026-09-19T17:50:34.1867006Z   repository: chriz-3656/Pulse-Music
+2026-09-19T17:50:34.1870219Z   token: ***
+2026-09-19T17:50:34.1870557Z   ssh-strict: true
+2026-09-19T17:50:34.1870902Z   ssh-user: git
+2026-09-19T17:50:34.1871233Z   persist-credentials: true
+2026-09-19T17:50:34.1871604Z   clean: true
+2026-09-19T17:50:34.1871951Z   sparse-checkout-cone-mode: true
+2026-09-19T17:50:34.1872339Z   fetch-tags: false
+2026-09-19T17:50:34.1872657Z   show-progress: true
+2026-09-19T17:50:34.1872991Z   lfs: false
+2026-09-19T17:50:34.1873332Z   submodules: false
+2026-09-19T17:50:34.1873672Z   set-safe-directory: true
+2026-09-19T17:50:34.1874051Z   allow-unsafe-pr-checkout: false
+2026-09-19T17:50:34.1874717Z ##[endgroup]
+2026-09-19T17:50:34.2924051Z Syncing repository: chriz-3656/Pulse-Music
+2026-09-19T17:50:34.2926295Z ##[group]Getting Git version info
+2026-09-19T17:50:34.2927185Z Working directory is '/home/runner/work/Pulse-Music/Pulse-Music'
+2026-09-19T17:50:34.2928848Z [command]/usr/bin/git version
+2026-09-19T17:50:34.2969047Z git version 2.55.0
+2026-09-19T17:50:34.2990261Z ##[endgroup]
+2026-09-19T17:50:34.3005649Z Temporarily overriding HOME='/home/runner/work/_temp/bee7e2a7-c972-4f36-b4b5-f590397914bd' before making global git config changes
+2026-09-19T17:50:34.3007986Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-19T17:50:34.3011376Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pulse-Music/Pulse-Music
+2026-09-19T17:50:34.3065192Z Deleting the contents of '/home/runner/work/Pulse-Music/Pulse-Music'
+2026-09-19T17:50:34.3071414Z ##[group]Initializing the repository
+2026-09-19T17:50:34.3075223Z [command]/usr/bin/git init /home/runner/work/Pulse-Music/Pulse-Music
+2026-09-19T17:50:34.3178863Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-19T17:50:34.3180232Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-19T17:50:34.3183626Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-19T17:50:34.3184899Z hint: call:
+2026-09-19T17:50:34.3185387Z hint:
+2026-09-19T17:50:34.3186079Z hint: 	git config --global init.defaultBranch <name>
+2026-09-19T17:50:34.3186881Z hint:
+2026-09-19T17:50:34.3187803Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-19T17:50:34.3188961Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-19T17:50:34.3189859Z hint:
+2026-09-19T17:50:34.3190388Z hint: 	git branch -m <name>
+2026-09-19T17:50:34.3191198Z hint:
+2026-09-19T17:50:34.3192066Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-19T17:50:34.3193496Z Initialized empty Git repository in /home/runner/work/Pulse-Music/Pulse-Music/.git/
+2026-09-19T17:50:34.3242953Z [command]/usr/bin/git remote add origin https://github.com/chriz-3656/Pulse-Music
+2026-09-19T17:50:34.3245732Z ##[endgroup]
+2026-09-19T17:50:34.3247201Z ##[group]Disabling automatic garbage collection
+2026-09-19T17:50:34.3248791Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-19T17:50:34.3281111Z ##[endgroup]
+2026-09-19T17:50:34.3282149Z ##[group]Setting up auth
+2026-09-19T17:50:34.3288761Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-19T17:50:34.3323495Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-19T17:50:34.3697806Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-19T17:50:34.3750052Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-19T17:50:34.3990108Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-19T17:50:34.4027954Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-19T17:50:34.4251500Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-19T17:50:34.4291419Z ##[endgroup]
+2026-09-19T17:50:34.4292611Z ##[group]Fetching the repository
+2026-09-19T17:50:34.4303372Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +ec2fa61a319e6beead7261d976eab0f2bc21f67e:refs/remotes/pull/1/merge
+2026-09-19T17:50:35.0244838Z From https://github.com/chriz-3656/Pulse-Music
+2026-09-19T17:50:35.0249647Z  * [new branch]      feature/soundcloud-radio                 -> origin/feature/soundcloud-radio
+2026-09-19T17:50:35.0250681Z  * [new branch]      main                                     -> origin/main
+2026-09-19T17:50:35.0251556Z  * [new tag]         v1.3.0                                   -> v1.3.0
+2026-09-19T17:50:35.0252424Z  * [new ref]         ec2fa61a319e6beead7261d976eab0f2bc21f67e -> pull/1/merge
+2026-09-19T17:50:35.0254891Z ##[endgroup]
+2026-09-19T17:50:35.0255727Z ##[group]Determining the checkout info
+2026-09-19T17:50:35.0257024Z ##[endgroup]
+2026-09-19T17:50:35.0262558Z [command]/usr/bin/git sparse-checkout disable
+2026-09-19T17:50:35.0319767Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-09-19T17:50:35.0350531Z ##[group]Checking out the ref
+2026-09-19T17:50:35.0355277Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1/merge
+2026-09-19T17:50:35.0570669Z Note: switching to 'refs/remotes/pull/1/merge'.
+2026-09-19T17:50:35.0571133Z 
+2026-09-19T17:50:35.0571504Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-09-19T17:50:35.0572213Z changes and commit them, and you can discard any commits you make in this
+2026-09-19T17:50:35.0572760Z state without impacting any branches by switching back to a branch.
+2026-09-19T17:50:35.0573084Z 
+2026-09-19T17:50:35.0573304Z If you want to create a new branch to retain commits you create, you may
+2026-09-19T17:50:35.0573815Z do so (now or later) by using -c with the switch command. Example:
+2026-09-19T17:50:35.0574134Z 
+2026-09-19T17:50:35.0574253Z   git switch -c <new-branch-name>
+2026-09-19T17:50:35.0574456Z 
+2026-09-19T17:50:35.0574598Z Or undo this operation with:
+2026-09-19T17:50:35.0574777Z 
+2026-09-19T17:50:35.0574881Z   git switch -
+2026-09-19T17:50:35.0575015Z 
+2026-09-19T17:50:35.0575279Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-09-19T17:50:35.0575642Z 
+2026-09-19T17:50:35.0576051Z HEAD is now at ec2fa61 Merge f6f4005e3e3702121682dbc9c783cfb018516075 into 3c43a453fc1746024964705119d789cf01fa971a
+2026-09-19T17:50:35.0582076Z ##[endgroup]
+2026-09-19T17:50:35.0623767Z [command]/usr/bin/git log -1 --format=%H
+2026-09-19T17:50:35.0650325Z ec2fa61a319e6beead7261d976eab0f2bc21f67e
+2026-09-19T17:50:35.0930615Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:50:35.0932393Z ##[group]Run actions/setup-java@v4
+2026-09-19T17:50:35.0932666Z with:
+2026-09-19T17:50:35.0932858Z   java-version: 21
+2026-09-19T17:50:35.0933069Z   distribution: temurin
+2026-09-19T17:50:35.0933289Z   cache: gradle
+2026-09-19T17:50:35.0933495Z   java-package: jdk
+2026-09-19T17:50:35.0933710Z   check-latest: false
+2026-09-19T17:50:35.0933921Z   server-id: github
+2026-09-19T17:50:35.0934130Z   server-username: GITHUB_ACTOR
+2026-09-19T17:50:35.0934383Z   server-password: GITHUB_TOKEN
+2026-09-19T17:50:35.0934628Z   overwrite-settings: true
+2026-09-19T17:50:35.0934853Z   job-status: success
+2026-09-19T17:50:35.0937634Z   token: ***
+2026-09-19T17:50:35.0937942Z ##[endgroup]
+2026-09-19T17:50:35.2590964Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-09-19T17:50:35.2598234Z ##[group]Installed distributions
+2026-09-19T17:50:35.2635405Z Resolved Java 21.0.12+1 from tool-cache
+2026-09-19T17:50:35.2636018Z Setting Java 21.0.12+1 as the default
+2026-09-19T17:50:35.2648000Z (node:2284) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-19T17:50:35.2649476Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-19T17:50:35.2651386Z Creating toolchains.xml for JDK version 21 from temurin
+2026-09-19T17:50:35.2729232Z Writing to /home/runner/.m2/toolchains.xml
+2026-09-19T17:50:35.2729867Z 
+2026-09-19T17:50:35.2730164Z Java configuration:
+2026-09-19T17:50:35.2730736Z   Distribution: temurin
+2026-09-19T17:50:35.2731299Z   Version: 21.0.12+1
+2026-09-19T17:50:35.2732023Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:35.2732443Z 
+2026-09-19T17:50:35.2732991Z ##[endgroup]
+2026-09-19T17:50:35.2749913Z Creating settings.xml with server-id: github
+2026-09-19T17:50:35.2789295Z Writing to /home/runner/.m2/settings.xml
+2026-09-19T17:50:35.4934730Z Cache hit for: setup-java-Linux-x64-gradle-87e51af2600f5197bd269666b8e9b5cdc5ccb56a98a0b52314df3cb6580ff735
+2026-09-19T17:50:35.5041625Z (node:2284) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-09-19T17:50:36.4067967Z Received 71896100 of 71896100 (100.0%), 85.5 MBs/sec
+2026-09-19T17:50:36.4069135Z Cache Size: ~69 MB (71896100 B)
+2026-09-19T17:50:36.4100010Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ba676302-174e-4d62-ad1d-663202ca3a74/cache.tzst -P -C /home/runner/work/Pulse-Music/Pulse-Music --use-compress-program unzstd
+2026-09-19T17:50:36.6545975Z Cache restored successfully
+2026-09-19T17:50:36.6581390Z Cache restored from key: setup-java-Linux-x64-gradle-87e51af2600f5197bd269666b8e9b5cdc5ccb56a98a0b52314df3cb6580ff735
+2026-09-19T17:50:36.6994557Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:50:36.6995933Z ##[group]Run gradle/actions/setup-gradle@v4
+2026-09-19T17:50:36.6996231Z with:
+2026-09-19T17:50:36.6996441Z   gradle-version: 9.3.1
+2026-09-19T17:50:36.6996678Z   cache-disabled: false
+2026-09-19T17:50:36.6996910Z   cache-read-only: true
+2026-09-19T17:50:36.6997155Z   cache-write-only: false
+2026-09-19T17:50:36.6997736Z   cache-overwrite-existing: false
+2026-09-19T17:50:36.6998032Z   cache-cleanup: on-success
+2026-09-19T17:50:36.6998355Z   gradle-home-cache-includes: caches
+notifications
+
+2026-09-19T17:50:36.6998714Z   add-job-summary: always
+2026-09-19T17:50:36.6998983Z   add-job-summary-as-pr-comment: never
+2026-09-19T17:50:36.6999310Z   dependency-graph: disabled
+2026-09-19T17:50:36.6999626Z   dependency-graph-report-dir: dependency-graph-reports
+2026-09-19T17:50:36.7000009Z   dependency-graph-continue-on-failure: true
+2026-09-19T17:50:36.7000322Z   build-scan-publish: false
+2026-09-19T17:50:36.7000575Z   validate-wrappers: true
+2026-09-19T17:50:36.7000831Z   allow-snapshot-wrappers: false
+2026-09-19T17:50:36.7001107Z   gradle-home-cache-strict-match: false
+2026-09-19T17:50:36.7001394Z   workflow-job-context: null
+2026-09-19T17:50:36.7003992Z   github-token: ***
+2026-09-19T17:50:36.7004219Z env:
+2026-09-19T17:50:36.7004538Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:36.7005049Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:36.7005455Z ##[endgroup]
+2026-09-19T17:50:37.1382152Z Gradle User Home already exists at /home/runner/.gradle
+2026-09-19T17:50:37.1399186Z Gradle User Home already exists: will not restore from cache.
+2026-09-19T17:50:37.1413007Z Merged default JDK locations into /home/runner/.m2/toolchains.xml
+2026-09-19T17:50:37.3079626Z Fetched 10 of 63 checksums
+2026-09-19T17:50:37.3715464Z Fetched 20 of 63 checksums
+2026-09-19T17:50:37.4379461Z Fetched 30 of 63 checksums
+2026-09-19T17:50:37.5001262Z Fetched 40 of 63 checksums
+2026-09-19T17:50:37.5963294Z Fetched 50 of 63 checksums
+2026-09-19T17:50:37.6661712Z Fetched 60 of 63 checksums
+2026-09-19T17:50:37.7440000Z Fetched 63 of 63 checksums
+2026-09-19T17:50:37.7443040Z ##[group]All Gradle Wrapper jars are valid
+2026-09-19T17:50:37.7444610Z ✓ Found known Gradle Wrapper JAR files:
+2026-09-19T17:50:37.7445604Z   14dfa961b6704bb3decdea06502781edaa796a82e6da41cd2e1962b14fbe21a3 ytm-kt/gradle/wrapper/gradle-wrapper.jar
+2026-09-19T17:50:37.7446635Z   b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13 gradle/wrapper/gradle-wrapper.jar
+2026-09-19T17:50:37.7447600Z ##[endgroup]
+2026-09-19T17:50:37.7858852Z ##[group]Provision Gradle 9.3.1
+2026-09-19T17:50:40.6536770Z Cache hit for: gradle-9.3.1
+2026-09-19T17:50:41.7581582Z Received 134217728 of 136943103 (98.0%), 127.9 MBs/sec
+2026-09-19T17:50:41.7741083Z Received 136943103 of 136943103 (100.0%), 128.4 MBs/sec
+2026-09-19T17:50:41.7744266Z Cache Size: ~131 MB (136943103 B)
+2026-09-19T17:50:41.7782022Z [command]/usr/bin/tar -xf /home/runner/work/_temp/96aa2639-2691-4cdd-b8a1-37a5c97dd767/cache.tzst -P -C /home/runner/work/Pulse-Music/Pulse-Music --use-compress-program unzstd
+2026-09-19T17:50:41.9468261Z Cache restored successfully
+2026-09-19T17:50:41.9528722Z Restored Gradle distribution gradle-9.3.1 from cache to /home/runner/work/_temp/.gradle-actions/gradle-installations/downloads/gradle-9.3.1-bin.zip
+2026-09-19T17:50:41.9548123Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/.gradle-actions/gradle-installations/downloads/gradle-9.3.1-bin.zip
+2026-09-19T17:50:42.9243322Z Extracted Gradle 9.3.1 to /home/runner/work/_temp/.gradle-actions/gradle-installations/installs/gradle-9.3.1
+2026-09-19T17:50:42.9245877Z Provisioned Gradle executable /home/runner/work/_temp/.gradle-actions/gradle-installations/installs/gradle-9.3.1/bin/gradle
+2026-09-19T17:50:42.9247828Z ##[endgroup]
+2026-09-19T17:50:42.9432072Z ##[group]Run if [ -f release.keystore.base64 ]; then
+2026-09-19T17:50:42.9432545Z [36;1mif [ -f release.keystore.base64 ]; then[0m
+2026-09-19T17:50:42.9432990Z [36;1m  base64 -d release.keystore.base64 > release.keystore[0m
+2026-09-19T17:50:42.9433355Z [36;1mfi[0m
+2026-09-19T17:50:42.9471953Z shell: /usr/bin/bash -e {0}
+2026-09-19T17:50:42.9472234Z env:
+2026-09-19T17:50:42.9472565Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9473099Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9473541Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:50:42.9473868Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:50:42.9474167Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:50:42.9474473Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:50:42.9474980Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:50:42.9475522Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:50:42.9475854Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:50:42.9476135Z ##[endgroup]
+2026-09-19T17:50:42.9605399Z ##[group]Run chmod +x gradlew
+2026-09-19T17:50:42.9605714Z [36;1mchmod +x gradlew[0m
+2026-09-19T17:50:42.9640099Z shell: /usr/bin/bash -e {0}
+2026-09-19T17:50:42.9640364Z env:
+2026-09-19T17:50:42.9640680Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9641234Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9641691Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:50:42.9642021Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:50:42.9642330Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:50:42.9642638Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:50:42.9643089Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:50:42.9643592Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:50:42.9643917Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:50:42.9644205Z ##[endgroup]
+2026-09-19T17:50:42.9734510Z ##[group]Run ./gradlew :app:testDebugUnitTest --no-daemon
+2026-09-19T17:50:42.9734957Z [36;1m./gradlew :app:testDebugUnitTest --no-daemon[0m
+2026-09-19T17:50:42.9766609Z shell: /usr/bin/bash -e {0}
+2026-09-19T17:50:42.9766871Z env:
+2026-09-19T17:50:42.9767191Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9767933Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:50:42.9768399Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:50:42.9768732Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:50:42.9769039Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:50:42.9769347Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:50:42.9769989Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:50:42.9770495Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:50:42.9770869Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:50:42.9771145Z ##[endgroup]
+2026-09-19T17:50:43.0908894Z Downloading https://services.gradle.org/distributions/gradle-9.3.1-bin.zip
+2026-09-19T17:50:45.7009774Z .............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+2026-09-19T17:50:46.8870820Z 
+2026-09-19T17:50:46.8871569Z Welcome to Gradle 9.3.1!
+2026-09-19T17:50:46.8872209Z 
+2026-09-19T17:50:46.8874564Z Here are the highlights of this release:
+2026-09-19T17:50:46.8880952Z  - Test reporting improvements
+2026-09-19T17:50:46.8883624Z  - Error and warning improvements
+2026-09-19T17:50:46.8884498Z  - Build authoring improvements
+2026-09-19T17:50:46.8887775Z 
+2026-09-19T17:50:46.8888438Z For more details see https://docs.gradle.org/9.3.1/release-notes.html
+2026-09-19T17:50:46.8889280Z 
+2026-09-19T17:50:46.9879870Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-09-19T17:50:48.4879401Z Daemon will be stopped at the end of the build 
+2026-09-19T17:50:50.0868926Z Calculating task graph as no cached configuration is available for tasks: :app:testDebugUnitTest
+2026-09-19T17:51:41.6918552Z > Task :app:generateDebugAssets UP-TO-DATE
+2026-09-19T17:51:41.6919608Z > Task :app:preBuild UP-TO-DATE
+2026-09-19T17:51:41.6948082Z > Task :app:preDebugUnitTestBuild UP-TO-DATE
+2026-09-19T17:51:41.6977970Z > Task :app:preDebugBuild UP-TO-DATE
+2026-09-19T17:51:41.7896942Z > Task :app:generateDebugBuildConfig FROM-CACHE
+2026-09-19T17:51:41.7918072Z > Task :app:generateDebugResources FROM-CACHE
+2026-09-19T17:51:41.7918789Z > Task :app:processDebugGoogleServices FROM-CACHE
+2026-09-19T17:51:41.8865882Z > Task :app:packageDebugResources FROM-CACHE
+2026-09-19T17:51:41.8910516Z > Task :app:javaPreCompileDebug FROM-CACHE
+2026-09-19T17:51:41.9864924Z > Task :app:mapDebugSourceSetPaths
+2026-09-19T17:51:44.4938669Z > Task :app:processDebugNavigationResources FROM-CACHE
+2026-09-19T17:51:44.4939822Z > Task :app:checkDebugAarMetadata
+2026-09-19T17:51:44.4948480Z > Task :app:compileDebugNavigationResources FROM-CACHE
+2026-09-19T17:51:44.5878757Z > Task :app:createDebugCompatibleScreenManifests
+2026-09-19T17:51:44.5908082Z > Task :app:extractDeepLinksDebug FROM-CACHE
+2026-09-19T17:51:44.5908971Z > Task :app:mergeDebugResources FROM-CACHE
+2026-09-19T17:51:44.6865283Z > Task :app:javaPreCompileDebugUnitTest FROM-CACHE
+2026-09-19T17:51:46.0869165Z > Task :app:parseDebugLocalResources FROM-CACHE
+2026-09-19T17:51:46.0888703Z > Task :app:generateDebugRFile FROM-CACHE
+2026-09-19T17:51:47.2868370Z > Task :app:mergeDebugAssets
+2026-09-19T17:51:47.3878421Z > Task :app:processDebugMainManifest FROM-CACHE
+2026-09-19T17:51:47.3907968Z > Task :app:processDebugManifest FROM-CACHE
+2026-09-19T17:51:47.3938065Z > Task :app:processDebugManifestForPackage FROM-CACHE
+2026-09-19T17:51:47.8866826Z > Task :app:processDebugUnitTestManifest
+2026-09-19T17:51:48.8865401Z > Task :app:processDebugResources FROM-CACHE
+2026-09-19T17:51:49.0873668Z > Task :app:packageDebugUnitTestForUnitTest
+2026-09-19T17:51:49.0898300Z > Task :app:generateDebugUnitTestConfig
+2026-09-19T17:51:57.7881250Z > Task :app:kspDebugKotlin
+2026-09-19T17:52:27.7867066Z > Task :app:compileDebugKotlin
+2026-09-19T17:52:31.1876454Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/local/MusicDatabase.kt:53:18 'fun fallbackToDestructiveMigration(): RoomDatabase.Builder<MusicDatabase>' is deprecated. Replace by overloaded version with parameter to indicate if all tables should be dropped or not.
+2026-09-19T17:52:31.1900124Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:12:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.1931940Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.1978255Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.1979786Z 
+2026-09-19T17:52:31.2008772Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2039391Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:13:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2061002Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2078391Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2137914Z 
+2026-09-19T17:52:31.2168402Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2175990Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:14:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2226084Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2227892Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2228542Z 
+2026-09-19T17:52:31.2228916Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2230882Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:19:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2233431Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2234848Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2235466Z 
+2026-09-19T17:52:31.2235840Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2238075Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:20:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2240463Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2241862Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2242479Z 
+2026-09-19T17:52:31.2242834Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2316903Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:21:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2319675Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2321132Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2321766Z 
+2026-09-19T17:52:31.2322136Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2324073Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:26:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2326817Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2415661Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2416309Z 
+2026-09-19T17:52:31.2416696Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2418972Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:27:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2421393Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2422834Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2423480Z 
+2026-09-19T17:52:31.2423860Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2425842Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:28:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2428561Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2430019Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2430622Z 
+2026-09-19T17:52:31.2431002Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2433052Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:29:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2435455Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2436884Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2477765Z 
+2026-09-19T17:52:31.2478199Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2480186Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:30:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2482611Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2484040Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2484675Z 
+2026-09-19T17:52:31.2485052Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2487323Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:31:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2490089Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2491509Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2492123Z 
+2026-09-19T17:52:31.2492493Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2494415Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:36:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2497143Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2498819Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2499409Z 
+2026-09-19T17:52:31.2499726Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2533574Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:37:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2536005Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2537627Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2538301Z 
+2026-09-19T17:52:31.2538668Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2540681Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:38:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2543096Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2544480Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2545092Z 
+2026-09-19T17:52:31.2545460Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2567897Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:39:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2570465Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2571934Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2572574Z 
+2026-09-19T17:52:31.2572941Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2575024Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:40:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2590845Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2592368Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2592994Z 
+2026-09-19T17:52:31.2593372Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2595591Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:41:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2598210Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2599551Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2600197Z 
+2026-09-19T17:52:31.2600577Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2602607Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:42:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2605302Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2606655Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2607285Z 
+2026-09-19T17:52:31.2607914Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2609835Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:43:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2612195Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2613605Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2617879Z 
+2026-09-19T17:52:31.2618272Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2620298Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:44:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2622687Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2624111Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2624757Z 
+2026-09-19T17:52:31.2625106Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2627073Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:45:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2629787Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2631222Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2631849Z 
+2026-09-19T17:52:31.2632203Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2634243Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:46:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2636609Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2638309Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2638917Z 
+2026-09-19T17:52:31.2639286Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2641534Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:47:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2643999Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2645399Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2646035Z 
+2026-09-19T17:52:31.2646416Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2706548Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:48:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2709341Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2711342Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2712001Z 
+2026-09-19T17:52:31.2712386Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2714386Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:49:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2716855Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2718474Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2719113Z 
+2026-09-19T17:52:31.2719468Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2721444Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:50:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2723866Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2725282Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2725907Z 
+2026-09-19T17:52:31.2726277Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2742264Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:51:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2751679Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2753560Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2754204Z 
+2026-09-19T17:52:31.2754584Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2756515Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:52:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2761312Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2762728Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2763353Z 
+2026-09-19T17:52:31.2763734Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2765935Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:53:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2769195Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2774974Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2775639Z 
+2026-09-19T17:52:31.2776016Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2780386Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:54:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2785069Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2786810Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2787712Z 
+2026-09-19T17:52:31.2788100Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2790084Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:55:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2792515Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2793909Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2794531Z 
+2026-09-19T17:52:31.2794897Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2796809Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:56:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2799465Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2800821Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2801384Z 
+2026-09-19T17:52:31.2801678Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2803179Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:221:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2805437Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2806798Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2810004Z 
+2026-09-19T17:52:31.2810433Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2818636Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:222:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2824798Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2826239Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2826863Z 
+2026-09-19T17:52:31.2827222Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2829404Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:223:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2832075Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2833568Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2834195Z 
+2026-09-19T17:52:31.2834564Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2836527Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:224:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2839172Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2840859Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2841485Z 
+2026-09-19T17:52:31.2841853Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2843810Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:225:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2846209Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2847905Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2848564Z 
+2026-09-19T17:52:31.2848940Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2850861Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:226:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2861642Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2865216Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2868355Z 
+2026-09-19T17:52:31.2868760Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2872797Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:227:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2875254Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2876663Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2877298Z 
+2026-09-19T17:52:31.2877953Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2879907Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:232:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2882326Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2883751Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2884373Z 
+2026-09-19T17:52:31.2884725Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2886658Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:233:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2896460Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2902129Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2904785Z 
+2026-09-19T17:52:31.2905193Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2911423Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:234:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2913875Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2918179Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2920812Z 
+2026-09-19T17:52:31.2921217Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2923195Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:235:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2925643Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2927070Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2927952Z 
+2026-09-19T17:52:31.2928307Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2930243Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:236:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2932728Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2934131Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2934739Z 
+2026-09-19T17:52:31.2935079Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2937007Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:237:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2939672Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2941062Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2941672Z 
+2026-09-19T17:52:31.2942028Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2944005Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:238:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2946285Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2950440Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2951099Z 
+2026-09-19T17:52:31.2951478Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2962558Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:239:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2965460Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2966914Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2967775Z 
+2026-09-19T17:52:31.2968157Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2970181Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:240:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2972616Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2974046Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2974941Z 
+2026-09-19T17:52:31.2975315Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2977308Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:241:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2987173Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.2992899Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.2993570Z 
+2026-09-19T17:52:31.2993938Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.2995899Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:274:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.2998611Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3000029Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3000640Z 
+2026-09-19T17:52:31.3001005Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3002938Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:275:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3005377Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3006794Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3007652Z 
+2026-09-19T17:52:31.3008031Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3023569Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:276:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3029948Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3031372Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3031995Z 
+2026-09-19T17:52:31.3032381Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3034407Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:277:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3036872Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3038784Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3039437Z 
+2026-09-19T17:52:31.3039807Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3041792Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:278:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3044198Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3045629Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3046576Z 
+2026-09-19T17:52:31.3046949Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3056070Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:279:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3066881Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3070735Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3071351Z 
+2026-09-19T17:52:31.3071716Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3077874Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:280:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3080509Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3081957Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3082595Z 
+2026-09-19T17:52:31.3082954Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3084937Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:281:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3087622Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3089074Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3089715Z 
+2026-09-19T17:52:31.3090090Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3092069Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:309:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3094483Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3095920Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3096536Z 
+2026-09-19T17:52:31.3096910Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3105654Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:310:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3112663Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3114331Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3114971Z 
+2026-09-19T17:52:31.3115334Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3117300Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:311:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3126351Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3128058Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3128664Z 
+2026-09-19T17:52:31.3129258Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3131255Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:312:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3133770Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3135191Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3135800Z 
+2026-09-19T17:52:31.3136154Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3142363Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:313:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3149088Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3155061Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3156119Z 
+2026-09-19T17:52:31.3156527Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3158726Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:314:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3163827Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3168033Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3168675Z 
+2026-09-19T17:52:31.3169049Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3171067Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:315:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3173551Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3174978Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3175626Z 
+2026-09-19T17:52:31.3175999Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3182507Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:316:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3185036Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3186740Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3187713Z 
+2026-09-19T17:52:31.3188115Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3196398Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:317:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3201276Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3202718Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3203341Z 
+2026-09-19T17:52:31.3203702Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3206034Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:318:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3208670Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3210074Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3210708Z 
+2026-09-19T17:52:31.3211061Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3212997Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:319:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3215510Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3216963Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3217844Z 
+2026-09-19T17:52:31.3218239Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3220228Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:320:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3222642Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3224064Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3224684Z 
+2026-09-19T17:52:31.3225043Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3227016Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:360:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3229794Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3231213Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3231844Z 
+2026-09-19T17:52:31.3232221Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3234230Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:361:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3236640Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3238319Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3239223Z 
+2026-09-19T17:52:31.3239623Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3241591Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:362:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3243986Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3245399Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3246062Z 
+2026-09-19T17:52:31.3246442Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3248993Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:367:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3251454Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3252919Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3253564Z 
+2026-09-19T17:52:31.3253931Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3256445Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:368:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3259470Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3260935Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3261538Z 
+2026-09-19T17:52:31.3262244Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3264255Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:369:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3266709Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3268346Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3268974Z 
+2026-09-19T17:52:31.3269324Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3271317Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:370:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:52:31.3273726Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:52:31.3275129Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:52:31.3275769Z 
+2026-09-19T17:52:31.3276142Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:52:31.3278149Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/service/MusicPlaybackService.kt:111:41 'static field FLAG_HANDLES_MEDIA_BUTTONS: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:52:31.3280770Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/service/MusicPlaybackService.kt:111:90 'static field FLAG_HANDLES_TRANSPORT_CONTROLS: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:52:31.3284072Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/FullScreenPlayerScreen.kt:574:44 'val Icons.Filled.QueueMusic: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.QueueMusic.
+2026-09-19T17:52:31.3287589Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:218:29 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3290676Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:245:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3293805Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:305:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3297210Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:336:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3300584Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:521:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3303667Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:705:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3306871Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:777:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:52:31.3310411Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:806:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:52:31.3313677Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:916:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:52:31.3316892Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:979:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:52:31.3320341Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:1002:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:52:31.3322960Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/theme/Theme.kt:57:20 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:52:31.3325127Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/theme/Theme.kt:58:20 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:52:31.7918036Z 
+2026-09-19T17:52:31.7943734Z > Task :app:processDebugJavaRes
+2026-09-19T17:52:34.5865065Z > Task :app:compileDebugJavaWithJavac
+2026-09-19T17:52:34.6864644Z > Task :app:bundleDebugClassesToCompileJar
+2026-09-19T17:52:34.6888545Z > Task :app:bundleDebugClassesToRuntimeJar
+2026-09-19T17:52:37.1887157Z ##[error]Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException: Cannot invoke "ksp.com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "ksp.com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+2026-09-19T17:52:37.1891775Z 	at ksp.com.intellij.openapi.fileEditor.FileDocumentManager.getInstance(FileDocumentManager.java:35)
+2026-09-19T17:52:37.1893445Z 	at ksp.com.intellij.openapi.fileTypes.BinaryFileTypeDecompilers.lambda$notifyDecompilerSetChange$1(BinaryFileTypeDecompilers.java:29)
+2026-09-19T17:52:37.1894949Z 	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:318)
+2026-09-19T17:52:37.1895905Z 	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+2026-09-19T17:52:37.1896714Z 	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+2026-09-19T17:52:37.1897652Z 	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+2026-09-19T17:52:37.1898814Z 	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+2026-09-19T17:52:37.1900115Z 	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
+2026-09-19T17:52:37.1901278Z 	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+2026-09-19T17:52:37.1902374Z 	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+2026-09-19T17:52:37.1903740Z 	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+2026-09-19T17:52:37.1905096Z 	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+2026-09-19T17:52:37.1906347Z 	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+2026-09-19T17:52:37.1907658Z 	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+2026-09-19T17:52:37.1908784Z 	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+2026-09-19T17:52:37.1909622Z > Task :app:kspDebugUnitTestKotlin
+2026-09-19T17:52:44.0939802Z > Task :app:compileDebugUnitTestKotlin
+2026-09-19T17:52:44.0959937Z > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+2026-09-19T17:52:44.1018021Z > Task :app:processDebugUnitTestJavaRes
+2026-09-19T17:52:55.5878792Z > Task :app:testDebugUnitTest
+2026-09-19T17:52:55.5888231Z > Task :app:finalizeTestRoborazziDebug SKIPPED
+2026-09-19T17:52:55.5895211Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1789840253006.json
+2026-09-19T17:52:55.5896315Z 
+2026-09-19T17:52:55.6664122Z BUILD SUCCESSFUL in 2m 12s
+2026-09-19T17:52:55.6671003Z 33 actionable tasks: 17 executed, 16 from cache
+2026-09-19T17:52:55.6678406Z Configuration cache entry stored.
+2026-09-19T17:52:55.8826513Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:52:55.8828139Z ##[group]Run actions/upload-artifact@v4
+2026-09-19T17:52:55.8828423Z with:
+2026-09-19T17:52:55.8828619Z   name: test-reports
+2026-09-19T17:52:55.8828897Z   path: app/build/reports/tests/testDebugUnitTest/
+2026-09-19T17:52:55.8829212Z   retention-days: 7
+2026-09-19T17:52:55.8829437Z   if-no-files-found: warn
+2026-09-19T17:52:55.8829673Z   compression-level: 6
+2026-09-19T17:52:55.8829894Z   overwrite: false
+2026-09-19T17:52:55.8830118Z   include-hidden-files: false
+2026-09-19T17:52:55.8830356Z env:
+2026-09-19T17:52:55.8830650Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:52:55.8831172Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:52:55.8831600Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:52:55.8831917Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:52:55.8832215Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:52:55.8832515Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:52:55.8832956Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:52:55.8833438Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:52:55.8833774Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:52:55.8834049Z ##[endgroup]
+2026-09-19T17:52:56.0512610Z (node:2779) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-19T17:52:56.0513358Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-19T17:52:56.0612279Z With the provided path, there will be 6 files uploaded
+2026-09-19T17:52:56.0613346Z Artifact name is valid!
+2026-09-19T17:52:56.0613788Z Root directory input is valid!
+2026-09-19T17:52:56.3073938Z Beginning upload of artifact content to blob storage
+2026-09-19T17:52:56.3351180Z (node:2779) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-09-19T17:52:56.4197092Z Uploaded bytes 6797
+2026-09-19T17:52:56.4497261Z Finished uploading artifact content to blob storage!
+2026-09-19T17:52:56.4499185Z SHA256 digest of uploaded artifact zip is d1c5e35b232d6b9dedc08a008eeda730628a997224b1fa2ec562d876a5663afd
+2026-09-19T17:52:56.4500586Z Finalizing artifact upload
+2026-09-19T17:52:56.6499060Z Artifact test-reports.zip successfully finalized. Artifact ID 10589317326
+2026-09-19T17:52:56.6500508Z Artifact test-reports has been successfully uploaded! Final size is 6797 bytes. Artifact ID is 10589317326
+2026-09-19T17:52:56.6508564Z Artifact download URL: https://github.com/chriz-3656/Pulse-Music/actions/runs/35459320284/artifacts/10589317326
+2026-09-19T17:52:56.6650173Z ##[group]Run ./gradlew :app:assembleRelease :app:assembleDebug --no-daemon
+2026-09-19T17:52:56.6650884Z [36;1m./gradlew :app:assembleRelease :app:assembleDebug --no-daemon[0m
+2026-09-19T17:52:56.6687089Z shell: /usr/bin/bash -e {0}
+2026-09-19T17:52:56.6687663Z env:
+2026-09-19T17:52:56.6688225Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:52:56.6688856Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:52:56.6689508Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:52:56.6700200Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:52:56.6700554Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:52:56.6700900Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:52:56.6701376Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:52:56.6701890Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:52:56.6702290Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:52:56.6702584Z ##[endgroup]
+2026-09-19T17:52:57.3748471Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-09-19T17:52:58.4733157Z Daemon will be stopped at the end of the build 
+2026-09-19T17:52:59.9746015Z Calculating task graph as no cached configuration is available for tasks: :app:assembleRelease :app:assembleDebug
+2026-09-19T17:53:12.3760682Z > Task :app:generateReleaseAssets UP-TO-DATE
+2026-09-19T17:53:12.3761957Z > Task :app:preBuild UP-TO-DATE
+2026-09-19T17:53:12.3762801Z > Task :app:preReleaseBuild UP-TO-DATE
+2026-09-19T17:53:12.4758526Z > Task :app:processDebugGoogleServices UP-TO-DATE
+2026-09-19T17:53:12.4816714Z > Task :app:processReleaseGoogleServices FROM-CACHE
+2026-09-19T17:53:12.4835217Z > Task :app:generateReleaseBuildConfig FROM-CACHE
+2026-09-19T17:53:12.4836112Z > Task :app:generateReleaseResources FROM-CACHE
+2026-09-19T17:53:12.5748464Z > Task :app:extractProguardFiles
+2026-09-19T17:53:12.5776848Z > Task :app:packageReleaseResources FROM-CACHE
+2026-09-19T17:53:13.2729099Z > Task :app:mergeReleaseJniLibFolders
+2026-09-19T17:53:14.1732219Z > Task :app:processReleaseNavigationResources FROM-CACHE
+2026-09-19T17:53:14.1734643Z > Task :app:parseReleaseLocalResources FROM-CACHE
+2026-09-19T17:53:14.1736160Z > Task :app:generateReleaseRFile FROM-CACHE
+2026-09-19T17:53:14.2782699Z > Task :app:javaPreCompileRelease FROM-CACHE
+2026-09-19T17:53:14.2808378Z > Task :app:mergeReleaseNativeLibs
+2026-09-19T17:53:14.8741715Z > Task :app:checkReleaseAarMetadata
+2026-09-19T17:53:14.8768091Z > Task :app:stripReleaseDebugSymbols
+2026-09-19T17:53:14.8809515Z > Task :app:checkReleaseDuplicateClasses
+2026-09-19T17:53:14.8838171Z > Task :app:extractReleaseNativeSymbolTables FROM-CACHE
+2026-09-19T17:53:14.8857959Z > Task :app:mapReleaseSourceSetPaths
+2026-09-19T17:53:14.8888835Z > Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+2026-09-19T17:53:14.8917990Z > Task :app:compileReleaseNavigationResources FROM-CACHE
+2026-09-19T17:53:14.8938110Z > Task :app:extractDeepLinksRelease FROM-CACHE
+2026-09-19T17:53:14.8968075Z > Task :app:createReleaseCompatibleScreenManifests
+2026-09-19T17:53:14.8997997Z > Task :app:desugarReleaseFileDependencies FROM-CACHE
+2026-09-19T17:53:14.8999505Z > Task :app:mergeReleaseStartupProfile
+2026-09-19T17:53:42.5728992Z > Task :app:kspReleaseKotlin
+2026-09-19T17:53:44.8728641Z > Task :app:mergeReleaseResources
+2026-09-19T17:53:44.8758176Z > Task :app:processReleaseMainManifest
+2026-09-19T17:53:44.8788116Z > Task :app:mergeExtDexRelease
+2026-09-19T17:54:13.3747101Z > Task :app:processReleaseMainManifest FROM-CACHE
+2026-09-19T17:54:13.3758143Z > Task :app:processReleaseManifest FROM-CACHE
+2026-09-19T17:54:13.3798725Z > Task :app:processReleaseManifestForPackage FROM-CACHE
+2026-09-19T17:54:14.5738934Z > Task :app:mergeReleaseResources FROM-CACHE
+2026-09-19T17:54:19.0738945Z > Task :app:processReleaseResources FROM-CACHE
+2026-09-19T17:54:19.2778659Z > Task :app:mergeReleaseArtProfile
+2026-09-19T17:54:19.3748483Z > Task :app:mergeReleaseAssets
+2026-09-19T17:54:19.3778320Z > Task :app:compressReleaseAssets FROM-CACHE
+2026-09-19T17:54:19.4771547Z > Task :app:optimizeReleaseResources FROM-CACHE
+2026-09-19T17:54:19.4798388Z > Task :app:validateSigningRelease
+2026-09-19T17:54:19.4828069Z > Task :app:extractReleaseVersionControlInfo
+2026-09-19T17:54:19.4858053Z > Task :app:writeReleaseAppMetadata
+2026-09-19T17:54:19.4858906Z > Task :app:preDebugBuild UP-TO-DATE
+2026-09-19T17:54:19.4904516Z > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+2026-09-19T17:54:19.4938095Z > Task :app:generateDebugBuildConfig UP-TO-DATE
+2026-09-19T17:54:19.4968084Z > Task :app:generateDebugResources UP-TO-DATE
+2026-09-19T17:54:19.5759745Z > Task :app:writeReleaseSigningConfigVersions
+2026-09-19T17:54:19.5798116Z > Task :app:packageDebugResources UP-TO-DATE
+2026-09-19T17:54:19.5828157Z > Task :app:processDebugNavigationResources UP-TO-DATE
+2026-09-19T17:54:19.5861146Z > Task :app:parseDebugLocalResources UP-TO-DATE
+2026-09-19T17:54:19.5904199Z > Task :app:generateDebugRFile UP-TO-DATE
+2026-09-19T17:54:19.6750467Z > Task :app:kspDebugKotlin UP-TO-DATE
+2026-09-19T17:54:19.6756658Z > Task :app:javaPreCompileDebug UP-TO-DATE
+2026-09-19T17:54:19.6757235Z > Task :app:generateDebugAssets UP-TO-DATE
+2026-09-19T17:54:19.6758138Z > Task :app:mergeDebugAssets UP-TO-DATE
+2026-09-19T17:54:19.6758897Z > Task :app:compressDebugAssets FROM-CACHE
+2026-09-19T17:54:19.7747606Z > Task :app:compileDebugKotlin UP-TO-DATE
+2026-09-19T17:54:19.8748625Z > Task :app:compileDebugJavaWithJavac UP-TO-DATE
+2026-09-19T17:54:19.8769377Z > Task :app:processDebugJavaRes UP-TO-DATE
+2026-09-19T17:54:19.9758554Z > Task :app:checkDebugDuplicateClasses
+2026-09-19T17:54:19.9808210Z > Task :app:desugarDebugFileDependencies FROM-CACHE
+2026-09-19T17:54:43.8748463Z > Task :app:compileReleaseKotlin
+2026-09-19T17:54:49.8728553Z > Task :app:mergeDebugJavaResource
+2026-09-19T17:54:49.9728154Z > Task :app:mergeExtDexDebug
+2026-09-19T17:55:01.9768430Z > Task :app:mergeExtDexRelease FROM-CACHE
+2026-09-19T17:55:01.9808620Z > Task :app:mergeLibDexDebug FROM-CACHE
+2026-09-19T17:55:31.9738568Z > Task :app:checkDebugAarMetadata
+2026-09-19T17:55:38.3747879Z 
+2026-09-19T17:55:38.3808301Z > Task :app:compileReleaseKotlin
+2026-09-19T17:55:38.3859989Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/local/MusicDatabase.kt:53:18 'fun fallbackToDestructiveMigration(): RoomDatabase.Builder<MusicDatabase>' is deprecated. Replace by overloaded version with parameter to indicate if all tables should be dropped or not.
+2026-09-19T17:55:38.4733125Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:12:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4838914Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.4878261Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.4958150Z 
+2026-09-19T17:55:38.4958924Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.4961082Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:13:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4963673Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.4965262Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.4966089Z 
+2026-09-19T17:55:38.4966974Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.4969437Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:14:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4972227Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.4974031Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.4974873Z 
+2026-09-19T17:55:38.4975439Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.4977858Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:19:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4980823Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.4983044Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.4983908Z 
+2026-09-19T17:55:38.4984505Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.4986754Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:20:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4989748Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.4991474Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.4992336Z 
+2026-09-19T17:55:38.4992892Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.4995431Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:21:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.4998383Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5000100Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5001003Z 
+2026-09-19T17:55:38.5001596Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5003850Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:26:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5006526Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5008815Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5009709Z 
+2026-09-19T17:55:38.5010298Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5012498Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:27:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5015227Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5068317Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5069237Z 
+2026-09-19T17:55:38.5073941Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5076444Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:28:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5079533Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5081269Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5082144Z 
+2026-09-19T17:55:38.5082743Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5085559Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:29:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5088413Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5089903Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5090657Z 
+2026-09-19T17:55:38.5091154Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5093139Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:30:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5095541Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5096993Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5097938Z 
+2026-09-19T17:55:38.5098440Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5100406Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:31:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5102817Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5104273Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5105008Z 
+2026-09-19T17:55:38.5105499Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5107661Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:36:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5110051Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5111520Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5112540Z 
+2026-09-19T17:55:38.5113040Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5114999Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:37:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5117546Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5119143Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5120224Z 
+2026-09-19T17:55:38.5120885Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5123396Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:38:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5126186Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5128078Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5128936Z 
+2026-09-19T17:55:38.5129505Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5131688Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:39:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5134451Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5136194Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5137076Z 
+2026-09-19T17:55:38.5137874Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5140114Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:40:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5142829Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5144504Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5145335Z 
+2026-09-19T17:55:38.5145879Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5148258Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:41:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5150780Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5152250Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5152988Z 
+2026-09-19T17:55:38.5153488Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5155466Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:42:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5158029Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5159507Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5160499Z 
+2026-09-19T17:55:38.5160977Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5162906Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:43:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5165298Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5166726Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5167649Z 
+2026-09-19T17:55:38.5168146Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5170322Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:44:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5172672Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5174099Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5174813Z 
+2026-09-19T17:55:38.5175275Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5177214Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:45:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5179963Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5181673Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5182531Z 
+2026-09-19T17:55:38.5183088Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5185887Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:46:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5188782Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5190402Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5191284Z 
+2026-09-19T17:55:38.5191837Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5194082Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:47:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5196832Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5198634Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5199368Z 
+2026-09-19T17:55:38.5199923Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5201884Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:48:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5204240Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5205676Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5206395Z 
+2026-09-19T17:55:38.5207099Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5209276Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:49:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5211615Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5213066Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5213779Z 
+2026-09-19T17:55:38.5214240Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5216329Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:50:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5218852Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5220272Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5220975Z 
+2026-09-19T17:55:38.5221440Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5223349Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:51:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5225678Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5227092Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5227970Z 
+2026-09-19T17:55:38.5228436Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5230379Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:52:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5232700Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5234108Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5234822Z 
+2026-09-19T17:55:38.5235293Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5237238Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:53:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5239769Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5241226Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5241934Z 
+2026-09-19T17:55:38.5242395Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5244325Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:54:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5246661Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5248323Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5249049Z 
+2026-09-19T17:55:38.5249545Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5251720Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:55:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5254109Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5255517Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5256228Z 
+2026-09-19T17:55:38.5256682Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5259014Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:56:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5261403Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5262841Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5263553Z 
+2026-09-19T17:55:38.5264021Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5265979Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:221:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5268675Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5270117Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5270834Z 
+2026-09-19T17:55:38.5271303Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5273241Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:222:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5275578Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5276998Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5277916Z 
+2026-09-19T17:55:38.5278382Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5280264Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:223:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5282587Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5284072Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5284837Z 
+2026-09-19T17:55:38.5285851Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5288067Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:224:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5290569Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5292089Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5292871Z 
+2026-09-19T17:55:38.5293397Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5295698Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:225:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5298465Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5300071Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5300858Z 
+2026-09-19T17:55:38.5301376Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5303537Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:226:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5306263Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5308035Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5308822Z 
+2026-09-19T17:55:38.5309342Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5311503Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:227:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5314082Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5315677Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5316453Z 
+2026-09-19T17:55:38.5316965Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5319251Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:232:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5321774Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5323344Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5324137Z 
+2026-09-19T17:55:38.5324629Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5326663Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:233:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5329351Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5330893Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5331648Z 
+2026-09-19T17:55:38.5332136Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5334167Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:234:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5336605Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5338270Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5338988Z 
+2026-09-19T17:55:38.5339491Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5341548Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:235:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5344372Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5345849Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5346620Z 
+2026-09-19T17:55:38.5347135Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5349437Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:236:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5352077Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5353586Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5354332Z 
+2026-09-19T17:55:38.5354823Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5356807Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:237:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5359432Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5360919Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5361648Z 
+2026-09-19T17:55:38.5362141Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5364190Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:238:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5366659Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5368386Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5369147Z 
+2026-09-19T17:55:38.5369676Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5371839Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:239:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5374343Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5375906Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5376678Z 
+2026-09-19T17:55:38.5377182Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5379690Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:240:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5382224Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5383761Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5384540Z 
+2026-09-19T17:55:38.5385047Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5387777Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:241:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5390524Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5392011Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5392790Z 
+2026-09-19T17:55:38.5393306Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5395297Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:274:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5398177Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5399783Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5400564Z 
+2026-09-19T17:55:38.5401059Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5403047Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:275:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5405498Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5407014Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5407937Z 
+2026-09-19T17:55:38.5408411Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5410407Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:276:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5412963Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5414523Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5415313Z 
+2026-09-19T17:55:38.5415818Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5418112Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:277:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5420715Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5422277Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5423073Z 
+2026-09-19T17:55:38.5423588Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5425683Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:278:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5428449Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5430085Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5430874Z 
+2026-09-19T17:55:38.5431391Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5433507Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:279:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5436309Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5438051Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5438651Z 
+2026-09-19T17:55:38.5438984Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5440779Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:280:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5443084Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5444090Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5444451Z 
+2026-09-19T17:55:38.5444664Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5445724Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:281:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5447022Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5450649Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5451268Z 
+2026-09-19T17:55:38.5451625Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5453520Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:309:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5455771Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5457104Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5458003Z 
+2026-09-19T17:55:38.5458616Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5460563Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:310:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5462995Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5464377Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5465012Z 
+2026-09-19T17:55:38.5465384Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5467301Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:311:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5470278Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5471709Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5472311Z 
+2026-09-19T17:55:38.5472673Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5474593Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:312:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5477627Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5479009Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5479618Z 
+2026-09-19T17:55:38.5479973Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5481901Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:313:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5484253Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5485794Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5486395Z 
+2026-09-19T17:55:38.5486755Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5488787Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:314:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5491118Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5492443Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5492991Z 
+2026-09-19T17:55:38.5493308Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5495106Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:315:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5497815Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5499117Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5499681Z 
+2026-09-19T17:55:38.5500019Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5501850Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:316:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5504115Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5505384Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5505946Z 
+2026-09-19T17:55:38.5506259Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5508426Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:317:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5510833Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5512215Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5512825Z 
+2026-09-19T17:55:38.5513183Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5515109Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:318:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5517908Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5519326Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5519939Z 
+2026-09-19T17:55:38.5520301Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5522242Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:319:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5524602Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5526182Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5526795Z 
+2026-09-19T17:55:38.5527158Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5529867Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:320:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5532353Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5533741Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5534356Z 
+2026-09-19T17:55:38.5534710Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5536637Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:360:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5539263Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5540594Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5541195Z 
+2026-09-19T17:55:38.5541514Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5543349Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:361:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5545671Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5546905Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5547654Z 
+2026-09-19T17:55:38.5547982Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5549864Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:362:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5552132Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5553412Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5554001Z 
+2026-09-19T17:55:38.5554329Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5556182Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:367:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5558943Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5560191Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5560793Z 
+2026-09-19T17:55:38.5561143Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5563066Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:368:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5565447Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5566817Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5567605Z 
+2026-09-19T17:55:38.5568134Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5570065Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:369:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5572410Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5573803Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5574409Z 
+2026-09-19T17:55:38.5574746Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5576636Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/data/remote/dto/MusicDto.kt:370:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+2026-09-19T17:55:38.5579223Z - To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+2026-09-19T17:55:38.5580589Z - To keep applying to the value parameter only, use the '@param:' annotation target.
+2026-09-19T17:55:38.5581195Z 
+2026-09-19T17:55:38.5581549Z See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+2026-09-19T17:55:38.5583327Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/service/MusicPlaybackService.kt:111:41 'static field FLAG_HANDLES_MEDIA_BUTTONS: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:55:38.5585999Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/service/MusicPlaybackService.kt:111:90 'static field FLAG_HANDLES_TRANSPORT_CONTROLS: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:55:38.5589371Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/FullScreenPlayerScreen.kt:574:44 'val Icons.Filled.QueueMusic: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.QueueMusic.
+2026-09-19T17:55:38.5592469Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:218:29 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5595480Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:245:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5598667Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:305:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5601669Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:336:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5604973Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:521:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5608204Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:705:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5611525Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:777:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:55:38.5614757Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:806:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:55:38.5618309Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:916:21 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+2026-09-19T17:55:38.5621463Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:979:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:55:38.5624669Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/screens/SettingsScreen.kt:1002:52 'val Icons.Filled.OpenInNew: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.OpenInNew.
+2026-09-19T17:55:38.5627299Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/theme/Theme.kt:57:20 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:55:38.5629617Z w: file:///home/runner/work/Pulse-Music/Pulse-Music/app/src/main/java/com/example/ui/theme/Theme.kt:58:20 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+2026-09-19T17:55:40.5757887Z 
+2026-09-19T17:55:40.5778459Z > Task :app:processReleaseJavaRes
+2026-09-19T17:55:40.8748487Z > Task :app:checkDebugAarMetadata UP-TO-DATE
+2026-09-19T17:55:40.8778068Z > Task :app:mapDebugSourceSetPaths UP-TO-DATE
+2026-09-19T17:55:40.8838177Z > Task :app:compileDebugNavigationResources UP-TO-DATE
+2026-09-19T17:55:41.8728698Z > Task :app:compileReleaseJavaWithJavac
+2026-09-19T17:55:41.9727843Z > Task :app:mergeDebugResources UP-TO-DATE
+2026-09-19T17:55:42.8748595Z > Task :app:mergeReleaseJavaResource
+2026-09-19T17:55:44.0728135Z > Task :app:generateReleaseLintVitalReportModel
+2026-09-19T17:55:44.1738544Z > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+2026-09-19T17:55:44.1768182Z > Task :app:extractDeepLinksDebug UP-TO-DATE
+2026-09-19T17:55:47.5758498Z > Task :app:processDebugMainManifest UP-TO-DATE
+2026-09-19T17:55:47.5848454Z > Task :app:processDebugManifest UP-TO-DATE
+2026-09-19T17:55:47.5878175Z > Task :app:processDebugManifestForPackage UP-TO-DATE
+2026-09-19T17:55:47.6738509Z > Task :app:processDebugResources UP-TO-DATE
+2026-09-19T17:55:48.7748458Z > Task :app:dexBuilderRelease
+2026-09-19T17:55:52.3769920Z > Task :app:dexBuilderDebug
+2026-09-19T17:55:52.9728470Z > Task :app:mergeReleaseGlobalSynthetics FROM-CACHE
+2026-09-19T17:55:54.8739362Z > Task :app:mergeProjectDexDebug
+2026-09-19T17:55:54.8812336Z > Task :app:mergeDebugJniLibFolders
+2026-09-19T17:55:54.9758589Z > Task :app:mergeDebugNativeLibs
+2026-09-19T17:55:55.0738773Z > Task :app:stripDebugDebugSymbols
+2026-09-19T17:55:57.0728064Z > Task :app:validateSigningDebug
+2026-09-19T17:55:57.0758204Z > Task :app:writeDebugAppMetadata
+2026-09-19T17:55:57.0798125Z > Task :app:writeDebugSigningConfigVersions
+2026-09-19T17:56:07.9748719Z > Task :app:mergeDexRelease
+2026-09-19T17:56:10.0727803Z > Task :app:compileReleaseArtProfile
+2026-09-19T17:56:12.8738540Z > Task :app:lintVitalAnalyzeRelease
+2026-09-19T17:56:29.6741252Z > Task :app:mergeExtDexDebug FROM-CACHE
+2026-09-19T17:56:30.8727745Z > Task :app:packageDebug
+2026-09-19T17:56:30.8728226Z > Task :app:assembleDebug
+2026-09-19T17:56:30.8728588Z > Task :app:createDebugApkListingFileRedirect
+2026-09-19T17:56:32.6753706Z > Task :app:lintVitalReportRelease
+2026-09-19T17:56:32.6798261Z > Task :app:lintVitalRelease
+2026-09-19T17:56:34.0731277Z > Task :app:packageRelease
+2026-09-19T17:56:34.0733624Z > Task :app:assembleRelease
+2026-09-19T17:56:34.0754027Z > Task :app:createReleaseApkListingFileRedirect
+2026-09-19T17:56:34.0788807Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1789840380800.json
+2026-09-19T17:56:34.0790090Z 
+2026-09-19T17:56:34.1425632Z BUILD SUCCESSFUL in 3m 37s
+2026-09-19T17:56:34.1450967Z 89 actionable tasks: 41 executed, 25 from cache, 23 up-to-date
+2026-09-19T17:56:34.1485866Z Configuration cache entry stored.
+2026-09-19T17:56:34.3229732Z ##[group]Run VERSION_TAG="${GITHUB_REF_NAME}"
+2026-09-19T17:56:34.3230412Z [36;1mVERSION_TAG="${GITHUB_REF_NAME}"[0m
+2026-09-19T17:56:34.3231260Z [36;1mif [ -z "$VERSION_TAG" ] || [ "$VERSION_TAG" = "main" ] || [ "$VERSION_TAG" = "master" ]; then[0m
+2026-09-19T17:56:34.3232098Z [36;1m  VERSION_TAG="latest"[0m
+2026-09-19T17:56:34.3232563Z [36;1mfi[0m
+2026-09-19T17:56:34.3232908Z [36;1m[0m
+2026-09-19T17:56:34.3233300Z [36;1mmkdir -p release-artifacts[0m
+2026-09-19T17:56:34.3233800Z [36;1m[0m
+2026-09-19T17:56:34.3234352Z [36;1m# Handle Release APK (fall back to debug if release not present)[0m
+2026-09-19T17:56:34.3235265Z [36;1mif [ -f app/build/outputs/apk/release/app-release.apk ]; then[0m
+2026-09-19T17:56:34.3236435Z [36;1m  cp app/build/outputs/apk/release/app-release.apk "release-artifacts/PulseMusic-${VERSION_TAG}.apk"[0m
+2026-09-19T17:56:34.3238045Z [36;1melif [ -f app/build/outputs/apk/release/app-release-unsigned.apk ]; then[0m
+2026-09-19T17:56:34.3239464Z [36;1m  cp app/build/outputs/apk/release/app-release-unsigned.apk "release-artifacts/PulseMusic-${VERSION_TAG}.apk"[0m
+2026-09-19T17:56:34.3240471Z [36;1mfi[0m
+2026-09-19T17:56:34.3240675Z [36;1m[0m
+2026-09-19T17:56:34.3240887Z [36;1m# Handle Debug APK[0m
+2026-09-19T17:56:34.3241239Z [36;1mif [ -f app/build/outputs/apk/debug/app-debug.apk ]; then[0m
+2026-09-19T17:56:34.3241864Z [36;1m  cp app/build/outputs/apk/debug/app-debug.apk "release-artifacts/PulseMusic-${VERSION_TAG}-debug.apk"[0m
+2026-09-19T17:56:34.3242378Z [36;1mfi[0m
+2026-09-19T17:56:34.3242569Z [36;1m[0m
+2026-09-19T17:56:34.3242778Z [36;1mls -lh release-artifacts/[0m
+2026-09-19T17:56:34.3279452Z shell: /usr/bin/bash -e {0}
+2026-09-19T17:56:34.3279723Z env:
+2026-09-19T17:56:34.3280061Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:56:34.3280623Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-09-19T17:56:34.3281078Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-09-19T17:56:34.3281402Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-09-19T17:56:34.3281707Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-09-19T17:56:34.3282017Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-09-19T17:56:34.3282482Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-09-19T17:56:34.3282979Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-09-19T17:56:34.3283315Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-09-19T17:56:34.3283592Z ##[endgroup]
+2026-09-19T17:56:34.3370300Z cp: cannot create regular file 'release-artifacts/PulseMusic-1/merge.apk': No such file or directory
+2026-09-19T17:56:34.3376972Z ##[error]Process completed with exit code 1.
+2026-09-19T17:56:34.3531028Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:56:34.3532301Z Post job cleanup.
+2026-09-19T17:56:34.5917350Z In post-action step
+2026-09-19T17:56:34.5928462Z Cache will not be saved: not restored in main action step.
+2026-09-19T17:56:34.5934000Z Generating Job Summary
+2026-09-19T17:56:34.5953990Z Completed post-action step
+2026-09-19T17:56:34.6082795Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:56:34.6084099Z Post job cleanup.
+2026-09-19T17:56:34.7493751Z (node:3140) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-19T17:56:34.7495132Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-19T17:56:34.7685945Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-19T17:56:34.7687231Z Post job cleanup.
+2026-09-19T17:56:34.8720204Z [command]/usr/bin/git version
+2026-09-19T17:56:34.8808228Z git version 2.55.0
+2026-09-19T17:56:34.8858272Z Temporarily overriding HOME='/home/runner/work/_temp/07b5751f-ab98-42a7-82f1-3262d8f5633e' before making global git config changes
+2026-09-19T17:56:34.8888366Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-19T17:56:34.8899312Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pulse-Music/Pulse-Music
+2026-09-19T17:56:34.8960697Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-19T17:56:34.9000105Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-19T17:56:34.9325509Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-19T17:56:34.9374213Z http.https://github.com/.extraheader
+2026-09-19T17:56:34.9379116Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-19T17:56:34.9432337Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-19T17:56:34.9770170Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-19T17:56:34.9827557Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-19T17:56:35.0271326Z Cleaning up orphan processes
+2026-09-19T17:56:35.0552894Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/upload-artifact@v4, gradle/actions/setup-gradle@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

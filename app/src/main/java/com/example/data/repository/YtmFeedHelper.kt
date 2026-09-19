@@ -1,61 +1,45 @@
 package com.example.data.repository
 
-import com.example.domain.model.*
+import com.example.domain.model.Album
+import com.example.domain.model.Playlist
+import com.example.domain.model.Song
 import dev.toastbits.ytmkt.model.YtmApi
-import dev.toastbits.ytmkt.model.external.mediaitem.*
+import dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist
+import dev.toastbits.ytmkt.model.external.mediaitem.YtmSong
+import dev.toastbits.ytmkt.endpoint.SearchType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import dev.toastbits.ytmkt.endpoint.SearchType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.random.Random
+
+private val DYNAMIC_SONG_QUERIES = listOf("Top Hits", "Global Top 50", "Viral 50", "Trending Music", "New Music Friday", "Pop Hits", "Lofi Beats", "EDM Dance", "Hip Hop Mixtape", "Acoustic Pop")
+private val DYNAMIC_ALBUM_QUERIES = listOf("New Albums", "Top Albums", "Essential Albums", "Trending Albums", "Best Albums 2024", "Classic Albums", "Live Albums")
+private val DYNAMIC_PLAYLIST_QUERIES = listOf("Trending Playlists", "Workout Mix", "Chill Vibes", "Focus Music", "Party Anthems", "Morning Coffee", "Late Night Drive")
 
 fun getTrendingSongsFlow(api: YtmApi): Flow<List<Song>> = flow {
     var songs = mutableListOf<Song>()
     try {
         try {
-            val feed = api.SongFeed.getSongFeed().getOrNull()
-            feed?.layouts?.forEach { layout ->
-                songs.addAll(layout.items.filterIsInstance<YtmSong>().map { 
-                    Song(
-                        id = it.id,
-                        title = it.name ?: "Unknown Title",
-                        artist = it.artists?.firstOrNull()?.name ?: "Unknown Artist",
-                        artistId = it.artists?.firstOrNull()?.id ?: "",
-                        album = it.album?.name ?: "",
-                        albumId = it.album?.id ?: "",
-                        durationSec = (it.duration ?: 0).toInt(),
-                        artworkUrl = it.thumbnail_provider?.getThumbnailUrl(dev.toastbits.ytmkt.model.external.ThumbnailProvider.Quality.HIGH) ?: ""
-                    )
-                })
-            }
-        } catch(e: Exception) {
+            val query = DYNAMIC_SONG_QUERIES.random()
+            val res = api.Search.search(query, SearchType.SONG.getDefaultParams()).getOrNull()
+            res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map {
+                Song(
+                    id = it.id,
+                    title = it.name ?: "Unknown Title",
+                    artist = it.artists?.firstOrNull()?.name ?: "Unknown Artist",
+                    artistId = it.artists?.firstOrNull()?.id ?: "",
+                    album = it.album?.name ?: "",
+                    albumId = it.album?.id ?: "",
+                    durationSec = (it.duration ?: 0).toInt(),
+                    artworkUrl = it.thumbnail_provider?.getThumbnailUrl(dev.toastbits.ytmkt.model.external.ThumbnailProvider.Quality.HIGH) ?: ""
+                )
+            }?.let { songs.addAll(it) }
+        } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        if (songs.isEmpty()) {
-            try {
-                val res = api.Search.search("Top Hits", SearchType.SONG.getDefaultParams()).getOrNull()
-                res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map {
-                    Song(
-                        id = it.id,
-                        title = it.name ?: "Unknown Title",
-                        artist = it.artists?.firstOrNull()?.name ?: "Unknown Artist",
-                        artistId = it.artists?.firstOrNull()?.id ?: "",
-                        album = it.album?.name ?: "",
-                        albumId = it.album?.id ?: "",
-                        durationSec = (it.duration ?: 0).toInt(),
-                        artworkUrl = it.thumbnail_provider?.getThumbnailUrl(dev.toastbits.ytmkt.model.external.ThumbnailProvider.Quality.HIGH) ?: ""
-                    )
-                }?.let { songs.addAll(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
         
-        // JioSaavn Charts & Trending Fallback
         if (songs.isEmpty()) {
             val jioSongs = fetchJioSaavnChartSongs()
             songs.addAll(jioSongs)
@@ -65,6 +49,7 @@ fun getTrendingSongsFlow(api: YtmApi): Flow<List<Song>> = flow {
             throw Exception("Unable to load trending tracks at this time. Please use Search.")
         }
         
+        songs.shuffle()
         emit(songs)
     } catch (e: Exception) {
         throw Exception("Failed to load trending: ${e.message}")
@@ -75,7 +60,8 @@ fun getFeaturedAlbumsFlow(api: YtmApi): Flow<List<Album>> = flow {
     try {
         var albums = emptyList<Album>()
         try {
-            val res = api.Search.search("New Albums", SearchType.ALBUM.getDefaultParams()).getOrNull()
+            val query = DYNAMIC_ALBUM_QUERIES.random()
+            val res = api.Search.search(query, SearchType.ALBUM.getDefaultParams()).getOrNull()
             albums = res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmPlaylist>()?.map {
                 Album(
                     id = it.id,
@@ -91,6 +77,8 @@ fun getFeaturedAlbumsFlow(api: YtmApi): Flow<List<Album>> = flow {
 
         if (albums.isEmpty()) {
             albums = fetchJioSaavnNewAlbums()
+        } else {
+            albums = albums.shuffled()
         }
         
         emit(albums)
@@ -103,7 +91,8 @@ fun getFeaturedPlaylistsFlow(api: YtmApi): Flow<List<Playlist>> = flow {
     try {
         var playlists = emptyList<Playlist>()
         try {
-            val res = api.Search.search("Trending Playlists", SearchType.PLAYLIST.getDefaultParams()).getOrNull()
+            val query = DYNAMIC_PLAYLIST_QUERIES.random()
+            val res = api.Search.search(query, SearchType.PLAYLIST.getDefaultParams()).getOrNull()
             playlists = res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmPlaylist>()?.map {
                 Playlist(
                     id = it.id,
@@ -118,6 +107,8 @@ fun getFeaturedPlaylistsFlow(api: YtmApi): Flow<List<Playlist>> = flow {
 
         if (playlists.isEmpty()) {
             playlists = fetchJioSaavnTopPlaylists()
+        } else {
+            playlists = playlists.shuffled()
         }
         
         emit(playlists)
@@ -146,7 +137,9 @@ private fun fetchJioSaavnChartSongs(): List<Song> {
             val json = JSONObject(body)
             val charts = json.optJSONArray("charts")
             if (charts != null && charts.length() > 0) {
-                val chartId = charts.getJSONObject(0).optString("id")
+                // Randomize which chart to fetch!
+                val randomChartIndex = Random.nextInt(charts.length())
+                val chartId = charts.getJSONObject(randomChartIndex).optString("id")
                 if (chartId.isNotBlank()) {
                     val pUrl = URL("https://www.jiosaavn.com/api.php?__call=playlist.getDetails&listid=$chartId&_format=json&_marker=0&ctx=web6dot0")
                     val pConn = pUrl.openConnection() as HttpURLConnection
@@ -180,7 +173,7 @@ private fun fetchJioSaavnChartSongs(): List<Song> {
                                     )
                                 }
                             }
-                            return list
+                            return list.shuffled()
                         }
                     }
                 }
@@ -222,7 +215,7 @@ private fun fetchJioSaavnNewAlbums(): List<Album> {
                         )
                     }
                 }
-                return list
+                return list.shuffled()
             }
         }
     } catch (e: Exception) {
@@ -260,7 +253,7 @@ private fun fetchJioSaavnTopPlaylists(): List<Playlist> {
                         )
                     }
                 }
-                return list
+                return list.shuffled()
             }
         }
     } catch (e: Exception) {
@@ -268,4 +261,3 @@ private fun fetchJioSaavnTopPlaylists(): List<Playlist> {
     }
     return emptyList()
 }
-
