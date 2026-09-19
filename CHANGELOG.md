@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-09-19
+
+### Added
+- **SoundCloud Infinite Radio**: Added seamless playback of related tracks from SoundCloud.
+- **JioSaavn Official Radio**: Refactored API client to fetch endless radio directly from JioSaavn.
+- **Dynamic Home Feed**: Rebuilt the Home screen to fetch randomized and shuffled search queries instead of static content.
+
+### Fixed
+- **GitHub Actions CI**: Fixed artifact upload paths that caused failures during branch builds.
+- **Data Loss Bug**: Removed destructive database migration flag to prevent loss of downloaded songs and playlists on app update.
+- **Settings UI**: Replaced hardcoded version strings with dynamic BuildConfig references.
+
+---
+
 ## [1.3.0] - 2026-09-18
 
 ### Added
