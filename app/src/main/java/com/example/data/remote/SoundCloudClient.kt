@@ -268,7 +268,7 @@ object SoundCloudClient {
                             title = title,
                             artist = artist,
                             album = "SoundCloud",
-                            durationSec = durationMs / 1000,
+                            durationSec = (durationMs / 1000).toInt(),
                             artworkUrl = artworkUrl
                         )
                     )
@@ -430,5 +430,84 @@ object SoundCloudClient {
         } catch (e: Exception) {
             Pair(false, 0L)
         }
+    }
+
+    /**
+     * Fetches related tracks for a given track ID to build an endless radio queue.
+     */
+    fun getRelatedTracks(trackId: String, limit: Int = 10): List<Song> {
+        val rawId = trackId.removePrefix("sc_")
+        if (!rawId.all { it.isDigit() }) return emptyList()
+
+        val songs = mutableListOf<Song>()
+        try {
+            val clientId = getClientId()
+            val url = "$API_BASE/tracks/$rawId/related?client_id=$clientId&limit=$limit"
+            val (code, body) = executeGet(url)
+            
+            if (code == 200 && !body.isNullOrBlank()) {
+                val json = JSONObject(body)
+                val collection = json.optJSONArray("collection") ?: return emptyList()
+
+                for (i in 0 until collection.length()) {
+                    val track = collection.optJSONObject(i) ?: continue
+                    val id = track.optLong("id").toString()
+                    val title = track.optString("title", "Unknown")
+                    val userObj = track.optJSONObject("user")
+                    val artist = userObj?.optString("username", "Unknown") ?: "Unknown"
+                    val durationMs = track.optLong("duration", 0L)
+                    val trackAuth = track.optString("track_authorization", "")
+                    
+                    var artworkUrl = track.optString("artwork_url", "")
+                    if (artworkUrl == "null" || artworkUrl.isBlank()) {
+                        artworkUrl = userObj?.optString("avatar_url", "") ?: ""
+                    }
+                    if (artworkUrl.isNotBlank()) {
+                        artworkUrl = artworkUrl.replace("-large", "-t500x500")
+                    }
+
+                    val mediaObj = track.optJSONObject("media")
+                    val transcodingsArr = mediaObj?.optJSONArray("transcodings")
+                    val transcodingsList = mutableListOf<TranscodingInfo>()
+                    if (transcodingsArr != null) {
+                        for (j in 0 until transcodingsArr.length()) {
+                            val tObj = transcodingsArr.getJSONObject(j)
+                            val tUrl = tObj.optString("url")
+                            val format = tObj.optJSONObject("format")
+                            val protocol = format?.optString("protocol") ?: ""
+                            val mimeType = format?.optString("mime_type") ?: ""
+                            val isPreview = tUrl.contains("/preview/")
+
+                            if (tUrl.isNotBlank()) {
+                                transcodingsList.add(TranscodingInfo(tUrl, protocol, mimeType, isPreview))
+                            }
+                        }
+                    }
+
+                    val scSongId = "sc_$id"
+                    trackCache[scSongId] = CachedTrackInfo(
+                        rawId = id,
+                        title = title,
+                        artist = artist,
+                        trackAuth = trackAuth,
+                        transcodings = transcodingsList
+                    )
+
+                    songs.add(
+                        Song(
+                            id = scSongId,
+                            title = title,
+                            artist = artist,
+                            album = "SoundCloud",
+                            durationSec = (durationMs / 1000).toInt(),
+                            artworkUrl = artworkUrl
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed fetching related tracks for ID $rawId", e)
+        }
+        return songs
     }
 }
