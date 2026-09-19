@@ -268,7 +268,7 @@ object SoundCloudClient {
                             title = title,
                             artist = artist,
                             album = "SoundCloud",
-                            durationSec = durationMs / 1000,
+                            durationSec = (durationMs / 1000).toInt(),
                             artworkUrl = artworkUrl
                         )
                     )
@@ -499,7 +499,7 @@ object SoundCloudClient {
                             title = title,
                             artist = artist,
                             album = "SoundCloud",
-                            durationSec = durationMs / 1000,
+                            durationSec = (durationMs / 1000).toInt(),
                             artworkUrl = artworkUrl
                         )
                     )
