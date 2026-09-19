@@ -70,7 +70,7 @@ jobs:
       - name: Prepare Release APK Artifacts
         id: prepare_apks
         run: |
-          VERSION_TAG="${GITHUB_REF_NAME}"
+          VERSION_TAG="${GITHUB_REF_NAME//\//-}"
           if [ -z "$VERSION_TAG" ] || [ "$VERSION_TAG" = "main" ] || [ "$VERSION_TAG" = "master" ]; then
             VERSION_TAG="latest"
           fi
