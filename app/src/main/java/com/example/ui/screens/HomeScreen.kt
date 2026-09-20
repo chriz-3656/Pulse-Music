@@ -286,7 +286,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.padding(vertical = 6.dp)
             ) {
-                items(uiState.trendingSongs) { song ->
+                items(uiState.trendingSongs, key = { it.id }) { song ->
                     TrendingSongCard(
                         song = song,
                         isCurrent = playerState.currentSong?.id == song.id,
@@ -310,7 +310,7 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
-                    items(uiState.featuredAlbums) { album ->
+                    items(uiState.featuredAlbums, key = { it.id }) { album ->
                         AlbumCard(
                             album = album,
                             onClick = { onAlbumClick(album.id) }
@@ -333,7 +333,7 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
-                    items(uiState.featuredPlaylists) { playlist ->
+                    items(uiState.featuredPlaylists, key = { it.id }) { playlist ->
                         PlaylistCard(
                             playlist = playlist,
                             onClick = { onPlaylistClick(playlist.id) }
@@ -352,7 +352,7 @@ fun HomeScreen(
             )
         }
 
-        items(uiState.trendingSongs) { song ->
+        items(uiState.trendingSongs, key = { it.id }) { song ->
             SongItemRow(
                 song = song,
                 isPlaying = playerState.isPlaying && playerState.currentSong?.id == song.id,

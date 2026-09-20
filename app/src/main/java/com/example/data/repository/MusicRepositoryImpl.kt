@@ -1299,9 +1299,9 @@ class MusicRepositoryImpl(
         }
     }
 
-    override fun getTrendingSongs(): Flow<List<Song>> = getTrendingSongsFlow(api)
-    override fun getFeaturedAlbums(): Flow<List<Album>> = getFeaturedAlbumsFlow(api)
-    override fun getFeaturedPlaylists(): Flow<List<Playlist>> = getFeaturedPlaylistsFlow(api)
+    override fun getTrendingSongs(): Flow<List<Song>> = getTrendingSongsFlow(api).flowOn(Dispatchers.IO)
+    override fun getFeaturedAlbums(): Flow<List<Album>> = getFeaturedAlbumsFlow(api).flowOn(Dispatchers.IO)
+    override fun getFeaturedPlaylists(): Flow<List<Playlist>> = getFeaturedPlaylistsFlow(api).flowOn(Dispatchers.IO)
 
     override fun getUserPlaylists(): Flow<List<Playlist>> = playlistDao.getAllPlaylists().map { it.map { entity -> Playlist(entity.id, entity.title, entity.description, entity.artworkUrl, 0, entity.creator, entity.createdAt) } }
     
