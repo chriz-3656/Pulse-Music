@@ -14,7 +14,7 @@
   <a href="#tech-stack"><img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" alt="Language: Kotlin" /></a>
   <a href="#tech-stack"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" /></a>
   <a href="#playback-engine"><img src="https://img.shields.io/badge/Engine-AndroidX%20Media3%20ExoPlayer-FF6F00" alt="AndroidX Media3" /></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.3.0-FFD600?logo=android" alt="Version: 1.3.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.4.1-FFD600?logo=android" alt="Version: 1.4.1" /></a>
   <a href="#license"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" /></a>
   <a href="#architecture"><img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-brightgreen" alt="Architecture" /></a>
 </p>
@@ -37,7 +37,7 @@ Stream high-bitrate audio from decentralized providers (SoundCloud, JioSaavn, an
 - **Hardware Media Controls**: Full integration with Bluetooth audio devices, headphone remotes, Android Lockscreen Media Controls, and MediaSession metadata.
 - **Audio Cache & Buffer Pipeline**: Pre-fetching and LRU chunk caching with `MediaCacheManager` for stutter-free playback even on fluctuating networks.
 
-### 🛡️ Security & Lifecycle (NEW in v1.3.0)
+### 🛡️ Security & Lifecycle (NEW in v1.4.1)
 - **In-App Auto-Updater**: Pulse Music dynamically polls the GitHub API to detect new releases, downloading and installing APKs seamlessly via native Android intents with a beautiful amber progress UI.
 - **Remote Emergency Kill Switch**: An advanced fail-safe wrapping the entire UI stack. In the event of legal takedowns, a remote JSON payload instantly blacks out the application, rendering all features inaccessible globally to enforce compliance.
 

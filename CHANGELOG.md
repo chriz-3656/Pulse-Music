@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - 2026-09-20
+
+### Added
+- **APK Cleanup**: The app now automatically detects obsolete downloaded update APKs in your storage and prompts you to delete them to save space after a successful installation.
+
+### Fixed
+- **ANR / Freezing Bug**: Fixed a critical bug where network requests were executed on the main UI thread, causing the app to freeze heavily when loading the Home Screen.
+- **UI Jank**: Added unique caching keys to Home Screen lists, resolving severe scrolling stutter (Compose recomposition loops).
+
+---
+
 ## [1.4.0] - 2026-09-19
 
 ### Added
