@@ -55,7 +55,7 @@ object AppUpdater {
                 }
                 
                 return@withContext UpdateInfo(
-                    isUpdateAvailable = isUpdateAvailable,
+                    isUpdateAvailable = isUpdateAvailable && downloadUrl.isNotBlank(),
                     latestVersion = tagName,
                     downloadUrl = downloadUrl,
                     releaseNotes = json.optString("body", "Bug fixes and improvements.")
@@ -82,35 +82,40 @@ object AppUpdater {
     }
 
     fun downloadAndInstall(context: Context, downloadUrl: String, fileName: String): Long {
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val uri = Uri.parse(downloadUrl)
-        
-        val request = DownloadManager.Request(uri)
-            .setTitle("Pulse Music Update")
-            .setDescription("Downloading latest update...")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-            .setAllowedOverMetered(true)
-            .setAllowedOverRoaming(true)
+        try {
+            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val uri = Uri.parse(downloadUrl)
+            
+            val request = DownloadManager.Request(uri)
+                .setTitle("Pulse Music Update")
+                .setDescription("Downloading latest update...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                .setAllowedOverMetered(true)
+                .setAllowedOverRoaming(true)
 
-        val downloadId = downloadManager.enqueue(request)
+            val downloadId = downloadManager.enqueue(request)
 
-        val onComplete = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                if (id == downloadId) {
-                    installApk(context, fileName)
-                    context.unregisterReceiver(this)
+            val onComplete = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                    if (id == downloadId) {
+                        installApk(context, fileName)
+                        context.unregisterReceiver(this)
+                    }
                 }
             }
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
+            } else {
+                context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+            }
+            return downloadId
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return -1L
         }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
-        } else {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-        }
-        return downloadId
     }
 
     private fun installApk(context: Context, fileName: String) {
