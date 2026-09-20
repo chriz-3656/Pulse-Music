@@ -102,11 +102,14 @@ fun HomeScreen(
     var updateInfo by remember { mutableStateOf<AppUpdater.UpdateInfo?>(null) }
     var activeDownloadId by remember { mutableStateOf<Long?>(null) }
     var downloadProgress by remember { mutableStateOf(0f) }
+    var obsoleteApks by remember { mutableStateOf<List<java.io.File>>(emptyList()) }
     
     LaunchedEffect(Unit) {
         val info = AppUpdater.checkForUpdates()
         if (info != null && info.isUpdateAvailable) {
             updateInfo = info
+        } else {
+            obsoleteApks = AppUpdater.getObsoleteApks()
         }
     }
 
@@ -144,6 +147,26 @@ fun HomeScreen(
                 kotlinx.coroutines.delay(100)
             }
         }
+    }
+
+    if (obsoleteApks.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = { obsoleteApks = emptyList() },
+            title = { Text("Update Successful", color = SkeuoTextPrimary) },
+            text = { Text("The app has been successfully updated! Would you like to delete the old downloaded APK file to save space?", color = SkeuoTextSecondary) },
+            confirmButton = {
+                TextButton(onClick = {
+                    obsoleteApks.forEach { AppUpdater.deleteApk(it) }
+                    obsoleteApks = emptyList()
+                }) {
+                    Text("Delete APK", color = SkeuoPeakRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { obsoleteApks = emptyList() }) { Text("Keep It", color = SkeuoTextSecondary) }
+            },
+            containerColor = SkeuoDeckDark
+        )
     }
 
     if (updateInfo != null && activeDownloadId == null) {

@@ -127,4 +127,16 @@ object AppUpdater {
         
         context.startActivity(intent)
     }
+
+    fun getObsoleteApks(): List<File> {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val files = downloadsDir.listFiles { _, name ->
+            name.startsWith("PulseMusic-") && name.endsWith(".apk")
+        }
+        return files?.toList() ?: emptyList()
+    }
+
+    fun deleteApk(file: File): Boolean {
+        return if (file.exists()) file.delete() else false
+    }
 }
