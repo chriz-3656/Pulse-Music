@@ -126,7 +126,7 @@ data class SearchUiState(
     val recentSearches: List<String> = emptyList(),
     val isSearching: Boolean = false,
     val errorMessage: String? = null,
-    val currentProvider: MusicProvider = MusicProvider.AUTO
+    val currentProvider: MusicProvider = MusicProvider.YOUTUBE
 )
 
 @OptIn(FlowPreview::class)

@@ -253,13 +253,6 @@ class MusicRepositoryImpl(
         if (existing.isNotBlank()) return@withContext existing
 
         // Direct SoundCloud stream extraction if song is from SoundCloud
-        if (song.id.startsWith("sc_")) {
-            val scUrl = SoundCloudClient.resolveStreamUrl(song.id, song.title, song.artist)
-            if (scUrl.isNotBlank()) {
-                val updated = song.copy(stream160Url = scUrl, stream320Url = scUrl)
-                songCache[song.id] = updated
-                return@withContext scUrl
-            }
         }
 
         val fetched = fetchStreamUrl(song.id, song.title, song.artist)
