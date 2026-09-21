@@ -155,7 +155,7 @@ class MusicRepositoryImpl(
             val artistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ARTIST.getDefaultParams()).getOrNull() }
             
             val songItems = songsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
-            val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmAlbum>()?.map { it.toDomain() } ?: emptyList()
+            val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainAlbum() } ?: emptyList()
             val artistItems = artistsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmArtist>()?.map { it.toDomain() } ?: emptyList()
             
             ytmResults = SearchResults(
