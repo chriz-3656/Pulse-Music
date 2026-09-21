@@ -125,14 +125,14 @@ class MusicRepositoryImpl(
         )
     }
 
-    override suspend fun searchSongs(query: String): List<Song> = withContext(Dispatchers.IO) {\
-        try {\
-            val res = api.Search.search(query, SearchType.SONG.getDefaultParams()).getOrNull()\
-            return@withContext res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()\
-        } catch (e: Exception) {\
-            e.printStackTrace()\
-            return@withContext emptyList()\
-        }\
+    override suspend fun searchSongs(query: String): List<Song> = withContext(Dispatchers.IO) {
+        try {
+            val res = api.Search.search(query, SearchType.SONG.getDefaultParams()).getOrNull()
+            return@withContext res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@withContext emptyList()
+        }
     }
 
 
@@ -218,8 +218,8 @@ class MusicRepositoryImpl(
             // SoundCloud track direct retrieval
             if (id.startsWith("sc_")) {
                 val cached = songCache[id]
-                val stream = SoundCloudClient.resolveStreamUrl(id, cached?.title ?: "", cached?.artist ?: "")
-                if (cached != null) {
+                val stream = fetchYouTubeStreamUrl(id)
+                    if (cached != null) {
                     val updated = cached.copy(stream160Url = stream, stream320Url = stream)
                     songCache[id] = updated
                     return@withContext Result.success(updated)
@@ -319,12 +319,7 @@ class MusicRepositoryImpl(
         var artistId = song.artistId?.trim() ?: ""
 
         // 1. SoundCloud Related Tracks (Infinite Radio)
-        if (seedId.startsWith("sc_")) {
-            val scRadio = SoundCloudClient.getRelatedTracks(seedId, 10)
-            if (scRadio.isNotEmpty()) {
-                list.addAll(scRadio)
-            }
-        }
+        
 
         // 2. If Deezer track or has Deezer artist ID
         if (seedId.startsWith("dz_") || artistId.isNotBlank()) {
@@ -370,18 +365,11 @@ class MusicRepositoryImpl(
                 val radioSongs = fetchDeezerArtistRadio(deezerArtistId)
                 list.addAll(radioSongs)
             }
-            if (list.isEmpty()) {
-                val artistSongs = searchDeezerSongs(artist)
-                list.addAll(artistSongs)
-            }
+            
         }
 
         // 5. JioSaavn artist / query search fallback
-        if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
-            val query = if (artist.isNotBlank()) artist else title
-            val saavnSongs = searchJioSaavnSongs(query)
-            list.addAll(saavnSongs)
-        }
+        
 
         // Distinct by ID and filter out seed song
         val seen = mutableSetOf<String>()
@@ -517,17 +505,9 @@ class MusicRepositoryImpl(
         val artists = mutableListOf<Artist>()
 
         // 1. Search JioSaavn Songs
-        songs.addAll(searchJioSaavnSongs(query))
-
+        
         // 2. Search SoundCloud Songs
-        if (songs.size < 10) {
-            val scSongs = searchSoundCloudSongs(query)
-            for (sc in scSongs) {
-                if (songs.none { it.title.equals(sc.title, ignoreCase = true) }) {
-                    songs.add(sc)
-                }
-            }
-        }
+        
 
         // 3. Search JioSaavn Autocomplete for Albums, Artists, Playlists
         try {
@@ -984,9 +964,7 @@ class MusicRepositoryImpl(
         }
     }
 
-    private fun fetchSoundCloudStreamUrl(title: String, artist: String): String {
-        return SoundCloudClient.resolveStreamUrl("", title, artist)
-    }
+    
 
     private fun fetchJioSaavnStreamUrl(title: String, artist: String): String {
         try {
@@ -1166,32 +1144,32 @@ class MusicRepositoryImpl(
         _userSettingsFlow.value = _userSettingsFlow.value.copy(apiProvider = provider.id)
     }
 
-    override suspend fun checkAllProviders(): Map<MusicProvider, ProviderStatus> = withContext(Dispatchers.IO) {\
-        val results = mutableMapOf<MusicProvider, ProviderStatus>()\
-        try {\
-            val start = System.currentTimeMillis()\
-            val url = java.net.URL("https://music.youtube.com")\
-            val conn = url.openConnection() as java.net.HttpURLConnection\
-            conn.connectTimeout = 3000\
-            conn.readTimeout = 3000\
-            conn.requestMethod = "HEAD"\
-            val code = conn.responseCode\
-            val latency = System.currentTimeMillis() - start\
-            results[MusicProvider.YOUTUBE] = ProviderStatus(\
-                provider = MusicProvider.YOUTUBE,\
-                isOnline = code == 200,\
-                latencyMs = latency,\
-                statusMessage = if(code==200) "Stable • Online" else "HTTP $code"\
-            )\
-        } catch (e: Exception) {\
-            results[MusicProvider.YOUTUBE] = ProviderStatus(\
-                provider = MusicProvider.YOUTUBE,\
-                isOnline = false,\
-                latencyMs = 0L,\
-                statusMessage = e.localizedMessage ?: "Connection error"\
-            )\
-        }\
-        results\
+    override suspend fun checkAllProviders(): Map<MusicProvider, ProviderStatus> = withContext(Dispatchers.IO) {
+        val results = mutableMapOf<MusicProvider, ProviderStatus>()
+        try {
+            val start = System.currentTimeMillis()
+            val url = java.net.URL("https://music.youtube.com")
+            val conn = url.openConnection() as java.net.HttpURLConnection
+            conn.connectTimeout = 3000
+            conn.readTimeout = 3000
+            conn.requestMethod = "HEAD"
+            val code = conn.responseCode
+            val latency = System.currentTimeMillis() - start
+            results[MusicProvider.YOUTUBE] = ProviderStatus(
+                provider = MusicProvider.YOUTUBE,
+                isOnline = code == 200,
+                latencyMs = latency,
+                statusMessage = if(code==200) "Stable • Online" else "HTTP $code"
+            )
+        } catch (e: Exception) {
+            results[MusicProvider.YOUTUBE] = ProviderStatus(
+                provider = MusicProvider.YOUTUBE,
+                isOnline = false,
+                latencyMs = 0L,
+                statusMessage = e.localizedMessage ?: "Connection error"
+            )
+        }
+        results
     }
 
     override fun getCacheSizeBytes(): Long = mediaCacheManager.getUsedCacheSizeBytes()
