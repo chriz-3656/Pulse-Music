@@ -120,10 +120,14 @@ enum class MusicProvider(
     val maxBitrate: String,
     val format: String
 ) {
+    AUTO("auto", "Auto (Multi-Source)", "Intelligent routing across all sources with automatic failover", "OPTIMAL", "320 kbps", "Dynamic"),
+    JIOSAAVN("jiosaavn", "JioSaavn CDN", "High-fidelity 320 kbps direct audio streams & global discography", "HQ 320K", "320 kbps", "MP4 / AAC"),
+    SOUNDCLOUD("soundcloud", "SoundCloud", "Direct progressive streams for EDM, indie, and creator mixes", "WEB DIRECT", "160 kbps", "MP3 / AAC"),
     YOUTUBE("youtube", "YouTube Music", "Comprehensive YouTube Music catalog, charts, & radio mixes", "UNIVERSAL", "256 kbps", "M4A / OPUS");
 
     companion object {
-        fun fromId(id: String): MusicProvider = YOUTUBE
+        fun fromId(id: String): MusicProvider =
+            entries.find { it.id.equals(id, ignoreCase = true) } ?: AUTO
     }
 }
 
@@ -144,7 +148,7 @@ data class UserSettings(
     val autoSkipFailedTracks: Boolean = true,
     val autoplayEnabled: Boolean = true,
     val customApiBaseUrl: String = "",
-    val apiProvider: String = "auto"
+    val apiProvider: String = "youtube"
 ) {
     val provider: MusicProvider get() = MusicProvider.fromId(apiProvider)
 }
