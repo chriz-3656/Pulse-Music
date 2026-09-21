@@ -436,6 +436,16 @@ class MusicRepositoryImpl(
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+            
+            if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
+                try {
+                    val searchRes = api.Search.search(if (artist.isNotBlank()) artist else title, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                    val artistSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                    list.addAll(artistSongs)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
 
         if (list.isEmpty() && (provider == MusicProvider.JIOSAAVN || provider == MusicProvider.AUTO)) {
