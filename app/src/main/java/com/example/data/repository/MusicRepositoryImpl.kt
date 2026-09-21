@@ -240,7 +240,8 @@ class MusicRepositoryImpl(
     override suspend fun resolveStreamUrl(song: Song): String = withContext(Dispatchers.IO) {
         songCache[song.id] = song
         val existing = song.getStreamUrl(preferHighQuality = true)
-        if (existing.isNotBlank()) return@withContext existingval fetched = fetchStreamUrl(song.id, song.title, song.artist)
+        if (existing.isNotBlank()) return@withContext existing
+        val fetched = fetchStreamUrl(song.id, song.title, song.artist)
         if (fetched.isNotBlank()) {
             songCache[song.id] = song.copy(stream160Url = fetched, stream320Url = fetched)
         }
