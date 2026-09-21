@@ -421,74 +421,34 @@ class MusicRepositoryImpl(
         val seedId = song.id
         val artist = song.artist.trim()
         val title = song.title.trim()
-        var artistId = song.artistId?.trim() ?: ""
+        val provider = _userSettingsFlow.value.provider
 
-        // 1. SoundCloud Related Tracks (Infinite Radio)
-        if (seedId.startsWith("sc_")) {
+        if (provider == MusicProvider.SOUNDCLOUD || seedId.startsWith("sc_")) {
             val scRadio = SoundCloudClient.getRelatedTracks(seedId, 10)
-            if (scRadio.isNotEmpty()) {
-                list.addAll(scRadio)
-            }
-        }
-
-        // 2. If Deezer track or has Deezer artist ID
-        if (seedId.startsWith("dz_") || artistId.isNotBlank()) {
-            if (artistId.isBlank() && artist.isNotBlank()) {
-                artistId = fetchDeezerArtistId(artist) ?: ""
-            }
-            if (artistId.isNotBlank()) {
-                val radioSongs = fetchDeezerArtistRadio(artistId)
-                list.addAll(radioSongs)
-                if (list.size < 10) {
-                    val topSongs = fetchDeezerArtistTop(artistId)
-                    list.addAll(topSongs)
-                }
-            }
-        }
-
-        // 2. YouTube Music SongRadio (if YTM ID or clean ID)
-        if (list.isEmpty() && !seedId.startsWith("dz_") && !seedId.startsWith("sc_")) {
+            if (scRadio.isNotEmpty()) list.addAll(scRadio)
+        } 
+        
+        if (list.isEmpty() && (provider == MusicProvider.YOUTUBE || (provider == MusicProvider.AUTO && !seedId.startsWith("sc_")))) {
             try {
                 val radio = api.SongRadio.getSongRadio(seedId, null).getOrNull()
                 val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
-                if (ytmSongs.isNotEmpty()) {
-                    list.addAll(ytmSongs)
-                }
+                if (ytmSongs.isNotEmpty()) list.addAll(ytmSongs)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
 
-        // 3. JioSaavn Radio by ID
-        if (list.isEmpty()) {
+        if (list.isEmpty() && (provider == MusicProvider.JIOSAAVN || provider == MusicProvider.AUTO)) {
             val saavnCleanId = seedId.removePrefix("dz_").removePrefix("sc_")
             val jioReco = fetchJioSaavnRadioTracks(saavnCleanId)
-            if (jioReco.isNotEmpty()) {
-                list.addAll(jioReco)
+            if (jioReco.isNotEmpty()) list.addAll(jioReco)
+            
+            if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
+                val query = if (artist.isNotBlank()) artist else title
+                list.addAll(searchJioSaavnSongs(query))
             }
         }
 
-        // 4. If still empty, search Deezer by artist to find artist tracks and similar tracks
-        if (list.isEmpty() && artist.isNotBlank()) {
-            val deezerArtistId = fetchDeezerArtistId(artist)
-            if (!deezerArtistId.isNullOrBlank()) {
-                val radioSongs = fetchDeezerArtistRadio(deezerArtistId)
-                list.addAll(radioSongs)
-            }
-            if (list.isEmpty()) {
-                val artistSongs = searchDeezerSongs(artist)
-                list.addAll(artistSongs)
-            }
-        }
-
-        // 5. JioSaavn artist / query search fallback
-        if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
-            val query = if (artist.isNotBlank()) artist else title
-            val saavnSongs = searchJioSaavnSongs(query)
-            list.addAll(saavnSongs)
-        }
-
-        // Distinct by ID and filter out seed song
         val seen = mutableSetOf<String>()
         val result = mutableListOf<Song>()
         for (item in list) {
