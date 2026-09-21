@@ -1380,19 +1380,14 @@ class MusicRepositoryImpl(
             )
         }
 
-        // 3. Check YouTube
+        // 3. Check YouTube Music (using simple HEAD since NewPipe handles extraction)
         try {
             val start = System.currentTimeMillis()
-            val url = java.net.URL("https://www.youtube.com/youtubei/v1/player?prettyPrint=false")
+            val url = java.net.URL("https://music.youtube.com")
             val conn = url.openConnection() as java.net.HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36")
-            conn.connectTimeout = 5000
-            conn.readTimeout = 5000
-            conn.doOutput = true
-            val payload = """{"context":{"client":{"clientName":"ANDROID_VR","clientVersion":"1.56.28","platform":"MOBILE","hl":"en-GB","androidSdkVersion":31}},"videoId":"kJQP7kiw5Fk"}"""
-            conn.outputStream.write(payload.toByteArray(Charsets.UTF_8))
+            conn.connectTimeout = 3000
+            conn.readTimeout = 3000
+            conn.requestMethod = "HEAD"
             val code = conn.responseCode
             val latency = System.currentTimeMillis() - start
             if (code == 200) {
@@ -1400,7 +1395,7 @@ class MusicRepositoryImpl(
                     provider = MusicProvider.YOUTUBE,
                     isOnline = true,
                     latencyMs = latency,
-                    statusMessage = "Global Catalog • Online"
+                    statusMessage = "Stable (NewPipe Engine) • Online"
                 )
             } else {
                 results[MusicProvider.YOUTUBE] = ProviderStatus(
