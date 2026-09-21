@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-09-21
+
+### Added
+- **NewPipe Extractor Engine**: Powered by the highly-stable NewPipe stream extraction engine, allowing ad-free background playback directly from YouTube Music.
+- **Dynamic Infinite Feed**: The Home screen automatically generates randomized Quick Picks, Trending Tracks, and curated Moods & Genres playlists every time you open the app.
+- **Smart Autoplay Queue**: Plays endless, curated, and fully randomized tracks based on your current song and selected provider.
+
+### Changed
+- **Intelligent Fallback Architecture**: Automatically switches to JioSaavn or SoundCloud if streams are geoblocked or unavailable.
+- **Scroll Lag Fixed**: Massive UI optimization with hardware-scaled image decoding.
+
+### Removed
+- **Deezer**: Completely purged deprecated Deezer modules and logic from the codebase.
+
+---
+
 ## [1.4.1] - 2026-09-20
 
 ### Added
