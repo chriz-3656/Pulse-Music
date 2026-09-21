@@ -69,7 +69,7 @@ googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.W
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
-  implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.24.4")
+  implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
   implementation("org.mozilla:rhino:1.7.14")
   implementation("org.jsoup:jsoup:1.17.2")
   implementation(platform(libs.androidx.compose.bom))
