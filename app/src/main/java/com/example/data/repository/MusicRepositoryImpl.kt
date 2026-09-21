@@ -5,7 +5,6 @@ import com.example.data.local.dao.*
 import com.example.data.player.MediaCacheManager
 import com.example.data.player.TrackDownloadManager
 import com.example.data.remote.MusicApiService
-import com.example.data.remote.SoundCloudClient
 import com.example.domain.model.*
 import com.example.domain.repository.MusicRepository
 import com.example.domain.repository.SearchResults
@@ -242,13 +241,6 @@ class MusicRepositoryImpl(
         if (existing.isNotBlank()) return@withContext existing
 
         // Direct SoundCloud stream extraction if song is from SoundCloud
-        if (song.id.startsWith("sc_")) {
-            val scUrl = SoundCloudClient.resolveStreamUrl(song.id, song.title, song.artist)
-            if (scUrl.isNotBlank()) {
-                val updated = song.copy(stream160Url = scUrl, stream320Url = scUrl)
-                songCache[song.id] = updated
-                return@withContext scUrl
-            }
         }
 
         val fetched = fetchStreamUrl(song.id, song.title, song.artist)
@@ -484,75 +476,6 @@ class MusicRepositoryImpl(
         return list
     }
 
-    private fun searchJioSaavnAndSoundCloudAll(query: String): SearchResults {
-        val songs = mutableListOf<Song>()
-        val albums = mutableListOf<Album>()
-        val playlists = mutableListOf<Playlist>()
-        val artists = mutableListOf<Artist>()
-
-        // 3. Search JioSaavn Autocomplete for Albums, Artists, Playlists
-        try {
-            val encoded = java.net.URLEncoder.encode(query, "UTF-8")
-            val autoUrl = URL("https://www.jiosaavn.com/api.php?__call=autocomplete.get&query=$encoded&_format=json&_marker=0&ctx=android")
-            val conn = autoUrl.openConnection() as HttpURLConnection
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-            conn.connectTimeout = 3000
-            conn.readTimeout = 3000
-            if (conn.responseCode == 200) {
-                val text = conn.inputStream.bufferedReader().readText()
-                val json = JSONObject(text)
-                val albObj = json.optJSONObject("albums")
-                val albData = albObj?.optJSONArray("data")
-                if (albData != null) {
-                    for (i in 0 until albData.length()) {
-                        val a = albData.getJSONObject(i)
-                        val id = a.optString("id")
-                        val title = cleanSaavnText(a.optString("title"))
-                        val img = a.optString("image").replace("150x150", "500x500")
-                        val desc = cleanSaavnText(a.optString("description"))
-                        if (id.isNotBlank() && title.isNotBlank()) {
-                            albums.add(Album(id = id, title = title, artist = desc, artworkUrl = img, trackCount = 0))
-                        }
-                    }
-                }
-                val artObj = json.optJSONObject("artists")
-                val artData = artObj?.optJSONArray("data")
-                if (artData != null) {
-                    for (i in 0 until artData.length()) {
-                        val a = artData.getJSONObject(i)
-                        val id = a.optString("id")
-                        val name = cleanSaavnText(a.optString("title"))
-                        val img = a.optString("image").replace("150x150", "500x500")
-                        if (id.isNotBlank() && name.isNotBlank()) {
-                            artists.add(Artist(id = id, name = name, imageUrl = img))
-                        }
-                    }
-                }
-                val playObj = json.optJSONObject("playlists")
-                val playData = playObj?.optJSONArray("data")
-                if (playData != null) {
-                    for (i in 0 until playData.length()) {
-                        val p = playData.getJSONObject(i)
-                        val id = p.optString("id")
-                        val title = cleanSaavnText(p.optString("title"))
-                        val img = p.optString("image").replace("150x150", "500x500")
-                        if (id.isNotBlank() && title.isNotBlank()) {
-                            playlists.add(Playlist(id = id, title = title, artworkUrl = img, trackCount = 0))
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return SearchResults(
-            songs = songs.take(30),
-            albums = albums.take(15),
-            playlists = playlists.take(15),
-            artists = artists.take(15)
-        )
-    }
 
     private fun fetchJioSaavnSongDetails(id: String): Song? {
         try {
