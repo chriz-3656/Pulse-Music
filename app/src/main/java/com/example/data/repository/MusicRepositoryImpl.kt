@@ -456,6 +456,7 @@ class MusicRepositoryImpl(
                 result.add(item)
             }
         }
+        result.shuffle()
         result
     }
 
