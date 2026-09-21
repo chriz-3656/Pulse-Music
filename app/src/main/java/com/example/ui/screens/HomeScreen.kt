@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
 import com.example.domain.model.Album
 import com.example.domain.model.PlayerState
 import com.example.domain.model.Playlist
@@ -543,7 +545,11 @@ fun TrendingSongCard(
                     .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
-                    model = song.artworkUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(song.artworkUrl)
+                        .crossfade(true)
+                        .size(300) // Hardware optimization: cap resolution
+                        .build(),
                     contentDescription = song.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -617,7 +623,11 @@ fun AlbumCard(
                     .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
-                    model = album.artworkUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(album.artworkUrl)
+                        .crossfade(true)
+                        .size(300)
+                        .build(),
                     contentDescription = album.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -667,7 +677,11 @@ fun PlaylistCard(
                     .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
-                    model = playlist.artworkUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(playlist.artworkUrl)
+                        .crossfade(true)
+                        .size(300)
+                        .build(),
                     contentDescription = playlist.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

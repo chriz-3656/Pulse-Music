@@ -29,6 +29,13 @@ Stream high-bitrate audio from decentralized providers (SoundCloud, JioSaavn, an
 
 ---
 
+## ✨ V2.0 Engine Rewrite
+
+- **NewPipe Extractor Engine**: Powered by the highly-stable NewPipe stream extraction engine, allowing ad-free background playback directly from YouTube Music.
+- **Intelligent Fallback Architecture**: Automatically switches to JioSaavn or SoundCloud if streams are geoblocked or unavailable.
+- **Dynamic Infinite Feed**: The Home screen automatically generates randomized "Quick Picks", "Trending Tracks", and curated "Moods & Genres" playlists every time you open the app.
+- **Smart Autoplay Queue**: Plays endless, curated, and fully randomized tracks based on your current song and selected provider.
+
 ## ✨ Key Features
 
 ### 🎧 Playback & Audio Engine
@@ -104,7 +111,7 @@ Pulse Music follows **Clean Architecture** and the **MVVM (Model-View-ViewModel)
 | **Audio Engine** | [AndroidX Media3](https://developer.android.com/media/media3) (ExoPlayer 1.4+, MediaSession, MediaNotification) |
 | **Local Persistence** | [Room Database](https://developer.android.com/training/data-storage/room) with [KSP](https://kotlinlang.org/docs/ksp-overview.html) |
 | **Asynchronous** | [Kotlin Coroutines](https://github.com/Kotlin/kotlinx.coroutines) & [StateFlow / SharedFlow](https://developer.android.com/kotlin/flow) |
-| **Networking** | [OkHttp 4](https://square.github.io/okhttp/) & [Retrofit](https://square.github.io/retrofit/) |
+| **Networking** | [OkHttp 4](https://square.github.io/okhttp/) & [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) |
 | **Image Loading** | [Coil 2](https://coil-kt.github.io/coil/) (Compose integration, disk caching) |
 | **Serialization** | [Kotlinx Serialization JSON](https://github.com/Kotlin/kotlinx.serialization) |
 
