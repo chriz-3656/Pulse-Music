@@ -1207,51 +1207,14 @@ class MusicRepositoryImpl(
     private fun fetchYouTubeStreamUrl(id: String): String {
         try {
             if (id.isBlank()) return ""
-            val url = java.net.URL("https://www.youtube.com/youtubei/v1/player?prettyPrint=false")
-            val conn = url.openConnection() as java.net.HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
-            conn.connectTimeout = 4000
-            conn.readTimeout = 4000
-            conn.doOutput = true
-            val payload = """{
-                "context": {
-                    "client": {
-                        "clientName": "ANDROID_VR",
-                        "clientVersion": "1.56.28",
-                        "platform": "MOBILE",
-                        "hl": "en-GB",
-                        "androidSdkVersion": 31
-                    }
-                },
-                "videoId": "${id}"
-            }"""
-            conn.outputStream.write(payload.toByteArray(Charsets.UTF_8))
-            
-            val responseCode = conn.responseCode
-            if (responseCode == 200) {
-                val resText = conn.inputStream.bufferedReader().readText()
-                val jsonObj = org.json.JSONObject(resText)
-                val streamingData = jsonObj.optJSONObject("streamingData")
-                if (streamingData != null) {
-                    val adaptiveFormats = streamingData.optJSONArray("adaptiveFormats")
-                    if (adaptiveFormats != null) {
-                        for (i in 0 until adaptiveFormats.length()) {
-                            val format = adaptiveFormats.getJSONObject(i)
-                            val mimeType = format.optString("mimeType", "")
-                            if (mimeType.contains("audio")) {
-                                val u = format.optString("url", "")
-                                if (u.isNotBlank()) return u
-                            }
-                        }
-                    }
-                    val formats = streamingData.optJSONArray("formats")
-                    if (formats != null && formats.length() > 0) {
-                        val u = formats.getJSONObject(0).optString("url", "")
-                        if (u.isNotBlank()) return u
-                    }
-                }
+            val url = "https://www.youtube.com/watch?v=$id"
+            val extractor = org.schabi.newpipe.extractor.NewPipe.getService(0).getStreamExtractor(url)
+            extractor.fetchPage()
+            val audioStreams = extractor.audioStreams
+            if (!audioStreams.isNullOrEmpty()) {
+                val bestStream = audioStreams.maxByOrNull { it.averageBitrate } ?: audioStreams.first()
+                val contentUrl = bestStream.content
+                if (!contentUrl.isNullOrBlank()) return contentUrl
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -1262,26 +1225,25 @@ class MusicRepositoryImpl(
     private suspend fun fetchStreamUrl(id: String, title: String = "", artist: String = ""): String {
         return withContext(Dispatchers.IO) {
             val provider = _userSettingsFlow.value.provider
+            
+            // NewPipe (YouTube) is the new primary engine.
+            val yt = fetchYouTubeStreamUrl(id)
+            if (yt.isNotBlank()) return@withContext yt
+            
             when (provider) {
                 MusicProvider.JIOSAAVN -> {
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
-                    val yt = fetchYouTubeStreamUrl(id)
-                    if (yt.isNotBlank()) return@withContext yt
                 }
                 MusicProvider.SOUNDCLOUD -> {
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
-                    val yt = fetchYouTubeStreamUrl(id)
-                    if (yt.isNotBlank()) return@withContext yt
                 }
                 MusicProvider.YOUTUBE -> {
-                    val yt = fetchYouTubeStreamUrl(id)
-                    if (yt.isNotBlank()) return@withContext yt
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
                     val sc = fetchSoundCloudStreamUrl(title, artist)
@@ -1292,7 +1254,6 @@ class MusicRepositoryImpl(
                     if (jio.isNotBlank()) return@withContext jio
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
-                    val yt = fetchYouTubeStreamUrl(id)
                     if (yt.isNotBlank()) return@withContext yt
                 }
             }

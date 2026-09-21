@@ -16,6 +16,7 @@ class PulseMusicApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        org.schabi.newpipe.extractor.NewPipe.init(com.example.util.NewPipeDownloader())
         appContainer = AppContainer(this)
         
         // Connect both song-level and id-level autoplay providers
