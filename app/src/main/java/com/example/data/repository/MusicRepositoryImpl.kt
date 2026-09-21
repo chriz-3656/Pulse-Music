@@ -126,14 +126,15 @@ class MusicRepositoryImpl(
 
     override suspend fun searchSongs(query: String): List<Song> = withContext(Dispatchers.IO) {
         try {
-            val res = api.Search.search(query, SearchType.SONG.getDefaultParams()).getOrNull()
-            return@withContext res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()
+            val res = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+            return@withContext res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
         } catch (e: Exception) {
             e.printStackTrace()
             return@withContext emptyList()
         }
     }
 
+    
 
     override suspend fun getSearchSuggestions(query: String): List<String> = withContext(Dispatchers.IO) {
         try {
@@ -152,6 +153,7 @@ class MusicRepositoryImpl(
             val songsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull() }
             val albumsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ALBUM.getDefaultParams()).getOrNull() }
             val artistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ARTIST.getDefaultParams()).getOrNull() }
+            val playlistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.PLAYLIST.getDefaultParams()).getOrNull() }
             
             val songItems = songsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
             val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainAlbum() } ?: emptyList()
@@ -238,12 +240,7 @@ class MusicRepositoryImpl(
     override suspend fun resolveStreamUrl(song: Song): String = withContext(Dispatchers.IO) {
         songCache[song.id] = song
         val existing = song.getStreamUrl(preferHighQuality = true)
-        if (existing.isNotBlank()) return@withContext existing
-
-        // Direct SoundCloud stream extraction if song is from SoundCloud
-        }
-
-        val fetched = fetchStreamUrl(song.id, song.title, song.artist)
+        if (existing.isNotBlank()) return@withContext existingval fetched = fetchStreamUrl(song.id, song.title, song.artist)
         if (fetched.isNotBlank()) {
             songCache[song.id] = song.copy(stream160Url = fetched, stream320Url = fetched)
         }
@@ -435,7 +432,9 @@ class MusicRepositoryImpl(
         emptyList()
     }
 
+    
 
+    
 
     private fun fetchJioSaavnSuggestions(query: String): List<String> {
         val list = mutableListOf<String>()
@@ -476,6 +475,7 @@ class MusicRepositoryImpl(
         return list
     }
 
+    
 
     private fun fetchJioSaavnSongDetails(id: String): Song? {
         try {
@@ -868,62 +868,9 @@ class MusicRepositoryImpl(
         }
     }
 
+    
 
-    private fun fetchJioSaavnStreamUrl(title: String, artist: String): String {
-        try {
-            if (title.isBlank()) return ""
-            val searchQueries = listOf(
-                "$title $artist".trim(),
-                title.trim()
-            ).distinct()
-
-            for (cleanQuery in searchQueries) {
-                val encodedQuery = java.net.URLEncoder.encode(cleanQuery, "UTF-8")
-                val searchUrl = java.net.URL("https://www.jiosaavn.com/api.php?__call=search.getResults&q=$encodedQuery&_format=json&_marker=0&api_version=4&ctx=android&n=5&p=1")
-                val searchConn = searchUrl.openConnection() as java.net.HttpURLConnection
-                searchConn.requestMethod = "GET"
-                searchConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                searchConn.setRequestProperty("Accept", "application/json")
-                searchConn.connectTimeout = 4000
-                searchConn.readTimeout = 4000
-
-                if (searchConn.responseCode == 200) {
-                    val searchRes = searchConn.inputStream.bufferedReader().readText()
-                    val jsonObj = org.json.JSONObject(searchRes)
-                    val results = jsonObj.optJSONArray("results")
-                    if (results != null && results.length() > 0) {
-                        for (i in 0 until results.length()) {
-                            val candidate = results.getJSONObject(i)
-                            val jioId = candidate.optString("id")
-                            if (jioId.isNotBlank()) {
-                                val detailsUrl = java.net.URL("https://www.jiosaavn.com/api.php?__call=song.getDetails&pids=$jioId&_format=json&_marker=0&ctx=android")
-                                val dConn = detailsUrl.openConnection() as java.net.HttpURLConnection
-                                dConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                                dConn.connectTimeout = 4000
-                                dConn.readTimeout = 4000
-                                if (dConn.responseCode == 200) {
-                                    val dRes = dConn.inputStream.bufferedReader().readText()
-                                    val dJson = org.json.JSONObject(dRes).optJSONObject(jioId)
-                                    if (dJson != null) {
-                                        val encMediaUrl = dJson.optString("encrypted_media_url")
-                                        if (encMediaUrl.isNotBlank()) {
-                                            val dec = decryptJioSaavnUrl(encMediaUrl)
-                                            if (dec.startsWith("http")) {
-                                                return dec.replace("_96.mp4", "_320.mp4").replace("_96.m4a", "_320.mp4")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return ""
-    }
+    
 
     private fun fetchYouTubeStreamUrl(id: String): String {
         try {
