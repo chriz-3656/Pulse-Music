@@ -24,7 +24,8 @@ class NewPipeDownloader : Downloader() {
         }
         
         if (request.httpMethod() == "POST") {
-            reqBuilder.post((request.dataToSend()?.joinToString("") ?: "").toRequestBody())
+            val bodyData = request.dataToSend() ?: ByteArray(0)
+            reqBuilder.post(bodyData.toRequestBody(null))
         }
 
         val response = client.newCall(reqBuilder.build()).execute()
