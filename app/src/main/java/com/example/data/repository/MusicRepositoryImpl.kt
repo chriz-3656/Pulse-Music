@@ -194,15 +194,18 @@ class MusicRepositoryImpl(
             val songsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull() }
             val albumsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ALBUM.getDefaultParams()).getOrNull() }
             val artistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ARTIST.getDefaultParams()).getOrNull() }
+            val playlistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.PLAYLIST.getDefaultParams()).getOrNull() }
 
             val songItems = songsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
-            val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmAlbum>()?.map { it.toDomain() } ?: emptyList()
+            val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainAlbum() } ?: emptyList()
             val artistItems = artistsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmArtist>()?.map { it.toDomain() } ?: emptyList()
+            val playlistItems = playlistsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainPlaylist() } ?: emptyList()
 
             ytmResults = SearchResults(
                 songs = songItems,
                 albums = albumItems,
-                artists = artistItems
+                artists = artistItems,
+                playlists = playlistItems
             )
         } catch (e: Exception) {
             e.printStackTrace()
