@@ -41,8 +41,10 @@ import kotlinx.coroutines.launch
 // -------------------------------------------------------------
 data class HomeUiState(
     val trendingSongs: List<Song> = emptyList(),
+    val quickPicks: List<Song> = emptyList(),
     val featuredAlbums: List<Album> = emptyList(),
     val featuredPlaylists: List<Playlist> = emptyList(),
+    val moodPlaylists: List<Playlist> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String? = null
 )
@@ -69,6 +71,11 @@ class HomeViewModel(
                     }
                 }
                 launch {
+                    getRecommendationsUseCase.getTrending().collectLatest { songs ->
+                        _uiState.update { it.copy(quickPicks = songs) }
+                    }
+                }
+                launch {
                     getRecommendationsUseCase.getAlbums().collectLatest { albums ->
                         _uiState.update { it.copy(featuredAlbums = albums) }
                     }
@@ -78,8 +85,13 @@ class HomeViewModel(
                         _uiState.update { it.copy(featuredPlaylists = playlists) }
                     }
                 }
+                launch {
+                    getRecommendationsUseCase.getPlaylists().collectLatest { playlists ->
+                        _uiState.update { it.copy(moodPlaylists = playlists) }
+                    }
+                }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
     }

@@ -348,8 +348,8 @@ fun HomeScreen(
             item {
                 Spacer(modifier = Modifier.height(10.dp))
                 SectionHeader(
-                    title = "Curated Mixtapes",
-                    subtitle = "Thematic audio archives"
+                    title = "Curated Mixes",
+                    subtitle = "Hand-picked for you"
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -357,6 +357,60 @@ fun HomeScreen(
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
                     items(uiState.featuredPlaylists, key = { it.id }) { playlist ->
+                        PlaylistCard(
+                            playlist = playlist,
+                            onClick = { onPlaylistClick(playlist.id) }
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Quick Picks Section
+        if (uiState.quickPicks.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                SectionHeader(
+                    title = "Quick Picks",
+                    subtitle = "Jump back in",
+                    actionText = "Play All",
+                    onActionClick = { 
+                        if (uiState.quickPicks.isNotEmpty()) {
+                            viewModel.playSong(uiState.quickPicks.first())
+                        }
+                    }
+                )
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(vertical = 6.dp)
+                ) {
+                    items(uiState.quickPicks, key = { it.id }) { song ->
+                        TrendingSongCard(
+                            song = song,
+                            isCurrent = playerState.currentSong?.id == song.id,
+                            isPlaying = playerState.isPlaying && playerState.currentSong?.id == song.id,
+                            onClick = { viewModel.playSong(song) }
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Mood Playlists Section
+        if (uiState.moodPlaylists.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                SectionHeader(
+                    title = "Moods & Genres",
+                    subtitle = "Discover something new"
+                )
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(vertical = 6.dp)
+                ) {
+                    items(uiState.moodPlaylists, key = { it.id }) { playlist ->
                         PlaylistCard(
                             playlist = playlist,
                             onClick = { onPlaylistClick(playlist.id) }
