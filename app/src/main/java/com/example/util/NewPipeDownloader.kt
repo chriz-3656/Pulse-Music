@@ -8,7 +8,7 @@ import org.schabi.newpipe.extractor.downloader.Request as NpRequest
 import org.schabi.newpipe.extractor.downloader.Response as NpResponse
 import java.util.concurrent.TimeUnit
 
-class NewPipeDownloader : Downloader {
+class NewPipeDownloader : Downloader() {
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
