@@ -134,323 +134,29 @@ class MusicRepositoryImpl(
             return@withContext emptyList()
         }
     }
-
-
-    override suspend fun getSearchSuggestions(query: String): List<String> = withContext(Dispatchers.IO) {
-        try {
-            val res = api.SearchSuggestions.getSearchSuggestions(query).getOrNull()
-            val list = res?.map { it.text } ?: emptyList()
-            if (list.isNotEmpty()) return@withContext list
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        fetchJioSaavnSuggestions(query)
-    }
-
-    override suspend fun searchAll(query: String): SearchResults = withContext(Dispatchers.IO) {
-        var ytmResults: SearchResults? = null
-        
-        try {
-            val songsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull() }
-            val albumsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ALBUM.getDefaultParams()).getOrNull() }
-            val artistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.ARTIST.getDefaultParams()).getOrNull() }
-            val playlistsDeferred = async { api.Search.search(query, params = dev.toastbits.ytmkt.endpoint.SearchType.PLAYLIST.getDefaultParams()).getOrNull() }
-
-            val songItems =  songsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
-            val albumItems = albumsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainAlbum() } ?: emptyList()
-            val artistItems = artistsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmArtist>()?.map { it.toDomain() } ?: emptyList()
-            val playlistItems = playlistsDeferred.await()?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmPlaylist>()?.map { it.toDomainPlaylist() } ?: emptyList()
-
-            if (songItems.isNotEmpty() || albumItems.isNotEmpty() || artistItems.isNotEmpty() || playlistItems.isNotEmpty()) {
-                ytmResults = SearchResults(
-                    songs = songItems.take(20),
-                    albums = albumItems.take(15),
-                    playlists = playlistItems.take(15),
-                    artists = artistItems.take(15)
-                )
+            MusicProvider.JIOSAAVN -> {
+                val jio = searchJioSaavnSongs(query)
+                if (jio.isNotEmpty()) return@withContext jio
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        if (ytmResults != null && ytmResults.songs.isNotEmpty()) {
-            return@withContext ytmResults
-        }
-
-        searchJioSaavnAndSoundCloudAll(query)
-    }
-
-    override fun getRecentSearches(): Flow<List<String>> = recentSearchDao.getRecentSearches().map { list -> list.map { it.query } }
-    override suspend fun saveSearchQuery(query: String) = recentSearchDao.insertSearch(com.example.data.local.entity.RecentSearchEntity(query))
-    override suspend fun deleteSearchQuery(query: String) = recentSearchDao.deleteSearch(query)
-    override suspend fun clearSearchHistory() = recentSearchDao.clearAll()
-
-    override suspend fun getSongDetails(id: String): Result<Song> = withContext(Dispatchers.IO) {
-        try {
-            // Check local DB first
-            val local = songDao.getSongById(id)
-            if (local != null) {
-                var streamUrl = if (local.stream320Url.isNotBlank()) local.stream320Url else local.stream160Url
-                if (streamUrl.isBlank()) {
-                    streamUrl = fetchStreamUrl(id, local.title, local.artist)
-                }
-                return@withContext Result.success(
-                    Song(
-                        id = local.id,
-                        title = local.title,
-                        artist = local.artist,
-                        album = local.album,
-                        durationSec = local.durationSec,
-                        artworkUrl = local.artworkUrl,
-                        stream160Url = streamUrl,
-                        stream320Url = streamUrl,
-                        lyrics = local.lyrics,
-                        isDownloaded = local.isDownloaded,
-                        isFavorite = local.isFavorite,
-                        localFilePath = local.localFilePath,
-                        year = local.year,
-                        artistId = local.artistId,
-                        albumId = local.albumId
-                    )
-                )
-            }
-
-            // SoundCloud track direct retrieval
-            if (id.startsWith("sc_")) {
-                val cached = songCache[id]
-                val stream = fetchYouTubeStreamUrl(id)
-                    if (cached != null) {
-                    val updated = cached.copy(stream160Url = stream, stream320Url = stream)
-                    songCache[id] = updated
-                    return@withContext Result.success(updated)
+            MusicProvider.YOUTUBE -> {
+                try {
+                    val res = api.Search.search(query, SearchType.SONG.getDefaultParams()).getOrNull()
+                    val ytmSongs = res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                    if (ytmSongs.isNotEmpty()) return@withContext ytmSongs
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
-
-            // Try YTM
-            val songRes = api.LoadSong.loadSong(id).getOrNull()
-            if (songRes != null) {
-                val title = songRes.name ?: ""
-                val artist = songRes.artists?.firstOrNull()?.name ?: ""
-                val streamUrl = fetchStreamUrl(id, title, artist)
-                return@withContext Result.success(songRes.toDomain(streamUrl))
-            }
-
-            // Fallback: JioSaavn song.getDetails by ID
-            val jioSong = fetchJioSaavnSongDetails(id)
-            if (jioSong != null) {
-                return@withContext Result.success(jioSong)
-            }
-
-            Result.failure(Exception("Song not found"))
-        } catch (e: Exception) {
-            Result.failure(e)
+            return@withContext emptyList()
         }
-    }
-
-    override suspend fun resolveStreamUrl(song: Song): String = withContext(Dispatchers.IO) {
-        songCache[song.id] = song
-        val existing = song.getStreamUrl(preferHighQuality = true)
-        if (existing.isNotBlank()) return@withContext existing
-
-        // Direct SoundCloud stream extraction if song is from SoundCloud
-        }
-
-        val fetched = fetchStreamUrl(song.id, song.title, song.artist)
-        if (fetched.isNotBlank()) {
-            songCache[song.id] = song.copy(stream160Url = fetched, stream320Url = fetched)
-        }
-        fetched
-    }
-
-    override suspend fun getSongsBatch(ids: List<String>): List<Song> = withContext(Dispatchers.IO) {
-        val list = mutableListOf<Song>()
-        for (id in ids) {
-            getSongDetails(id).getOrNull()?.let { list.add(it) }
-        }
-        list
-    }
-
-    override suspend fun getLyrics(id: String): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val lyricsBrowseId = api.LoadSong.loadSong(id).getOrNull()?.lyrics_browse_id
-            if (lyricsBrowseId != null) {
-                val lyricsResult = api.SongLyrics.getSongLyrics(lyricsBrowseId).getOrNull()
-                if (lyricsResult != null && lyricsResult.isNotBlank()) {
-                    return@withContext Result.success(lyricsResult)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // Check memory cache first, then local DB
-        val cached = songCache[id]
-        val localSong = songDao.getSongById(id)
-        val title = cached?.title ?: localSong?.title ?: ""
-        val artist = cached?.artist ?: localSong?.artist ?: ""
-
-        if (title.isNotBlank()) {
-            val lrcLyrics = fetchLrclibLyrics(title, artist)
-            if (lrcLyrics.isNotBlank()) {
-                return@withContext Result.success(lrcLyrics)
-            }
-        }
-
-        val jioLyrics = fetchJioSaavnLyrics(id)
-        if (jioLyrics.isNotBlank()) {
-            return@withContext Result.success(jioLyrics)
-        }
-
-        Result.failure(Exception("No lyrics found"))
-    }
-
-    override suspend fun getSongSuggestions(song: Song): List<Song> = withContext(Dispatchers.IO) {
-        val list = mutableListOf<Song>()
-        val seedId = song.id
-        val artist = song.artist.trim()
-        val title = song.title.trim()
-        var artistId = song.artistId?.trim() ?: ""
-
-        // 1. SoundCloud Related Tracks (Infinite Radio)
-        
-
-        // 2. If Deezer track or has Deezer artist ID
-        if (seedId.startsWith("dz_") || artistId.isNotBlank()) {
-            if (artistId.isBlank() && artist.isNotBlank()) {
-                artistId = fetchDeezerArtistId(artist) ?: ""
-            }
-            if (artistId.isNotBlank()) {
-                val radioSongs = fetchDeezerArtistRadio(artistId)
-                list.addAll(radioSongs)
-                if (list.size < 10) {
-                    val topSongs = fetchDeezerArtistTop(artistId)
-                    list.addAll(topSongs)
-                }
-            }
-        }
-
-        // 2. YouTube Music SongRadio (if YTM ID or clean ID)
-        if (list.isEmpty() && !seedId.startsWith("dz_") && !seedId.startsWith("sc_")) {
-            try {
-                val radio = api.SongRadio.getSongRadio(seedId, null).getOrNull()
-                val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
-                if (ytmSongs.isNotEmpty()) {
-                    list.addAll(ytmSongs)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        // 3. JioSaavn Radio by ID
-        if (list.isEmpty()) {
-            val saavnCleanId = seedId.removePrefix("dz_").removePrefix("sc_")
-            val jioReco = fetchJioSaavnRadioTracks(saavnCleanId)
-            if (jioReco.isNotEmpty()) {
-                list.addAll(jioReco)
-            }
-        }
-
-        // 4. If still empty, search Deezer by artist to find artist tracks and similar tracks
-        if (list.isEmpty() && artist.isNotBlank()) {
-            val deezerArtistId = fetchDeezerArtistId(artist)
-            if (!deezerArtistId.isNullOrBlank()) {
-                val radioSongs = fetchDeezerArtistRadio(deezerArtistId)
-                list.addAll(radioSongs)
-            }
-            
-        }
-
-        // 5. JioSaavn artist / query search fallback
-        
-
-        // Distinct by ID and filter out seed song
-        val seen = mutableSetOf<String>()
-        val result = mutableListOf<Song>()
-        for (item in list) {
-            if (item.id != seedId && item.title.isNotBlank() && seen.add(item.id)) {
-                result.add(item)
-            }
-        }
-        result
-    }
-
-    override suspend fun getSongSuggestions(songId: String): List<Song> = withContext(Dispatchers.IO) {
-        val cached = songCache[songId] ?: songDao.getSongById(songId)?.let {
-            Song(
-                id = it.id,
-                title = it.title,
-                artist = it.artist,
-                album = it.album,
-                durationSec = it.durationSec,
-                artworkUrl = it.artworkUrl,
-                stream160Url = it.stream160Url,
-                stream320Url = it.stream320Url,
-                artistId = it.artistId,
-                albumId = it.albumId
-            )
-        }
-        if (cached != null) {
-            return@withContext getSongSuggestions(cached)
-        }
-        getSongSuggestions(Song(id = songId, title = "", artist = ""))
-    }
-
-    override suspend fun getAlbumDetails(id: String): Result<Album> = withContext(Dispatchers.IO) {
-        try {
-            val playlist = api.LoadPlaylist.loadPlaylist(id).getOrNull()
-            if (playlist != null) {
-                val songs = playlist.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()
-                return@withContext Result.success(playlist.toDomainAlbum().copy(songs = songs))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        val jioAlbum = fetchJioSaavnAlbumDetails(id)
-        if (jioAlbum != null) {
-            return@withContext Result.success(jioAlbum)
-        }
-        Result.failure(Exception("Album not found"))
-    }
-
-    override suspend fun getPlaylistDetails(id: String): Result<Playlist> = withContext(Dispatchers.IO) {
-        try {
-            val playlist = api.LoadPlaylist.loadPlaylist(id).getOrNull()
-            if (playlist != null) {
-                val songs = playlist.items?.filterIsInstance<YtmSong>()?.map { it.toDomain() } ?: emptyList()
-                return@withContext Result.success(playlist.toDomainPlaylist().copy(songs = songs))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        val jioPlaylist = fetchJioSaavnPlaylistDetails(id)
-        if (jioPlaylist != null) {
-            return@withContext Result.success(jioPlaylist)
-        }
-        Result.failure(Exception("Playlist not found"))
-    }
-
-    override suspend fun getArtistProfile(id: String): Result<Artist> = withContext(Dispatchers.IO) {
-        try {
-            val artist = api.LoadArtist.loadArtist(id).getOrNull()
-            if (artist != null) {
-                return@withContext Result.success(artist.toDomain())
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        Result.failure(Exception("Artist not found"))
-    }
-
-    override suspend fun getArtistSongs(artistId: String): List<Song> = withContext(Dispatchers.IO) {
-        emptyList()
-    }
 
     override suspend fun getArtistAlbums(artistId: String): List<Album> = withContext(Dispatchers.IO) {
         emptyList()
     }
 
+    
 
+    
 
     private fun fetchJioSaavnSuggestions(query: String): List<String> {
         val list = mutableListOf<String>()
@@ -496,11 +202,6 @@ class MusicRepositoryImpl(
         val albums = mutableListOf<Album>()
         val playlists = mutableListOf<Playlist>()
         val artists = mutableListOf<Artist>()
-
-        // 1. Search JioSaavn Songs
-        
-        // 2. Search SoundCloud Songs
-        
 
         // 3. Search JioSaavn Autocomplete for Albums, Artists, Playlists
         try {
@@ -1037,8 +738,30 @@ class MusicRepositoryImpl(
         return withContext(Dispatchers.IO) {
             val yt = fetchYouTubeStreamUrl(id)
             if (yt.isNotBlank()) return@withContext yt
-            
             return@withContext ""
+        }
+    }
+                MusicProvider.SOUNDCLOUD -> {
+                    val sc = fetchSoundCloudStreamUrl(title, artist)
+                    if (sc.isNotBlank()) return@withContext sc
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
+                }
+                MusicProvider.YOUTUBE -> {
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
+                    val sc = fetchSoundCloudStreamUrl(title, artist)
+                    if (sc.isNotBlank()) return@withContext sc
+                }
+                MusicProvider.AUTO -> {
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
+                    val sc = fetchSoundCloudStreamUrl(title, artist)
+                    if (sc.isNotBlank()) return@withContext sc
+                    if (yt.isNotBlank()) return@withContext yt
+                }
+            }
+            ""
         }
     }
 
@@ -1162,6 +885,99 @@ class MusicRepositoryImpl(
                 statusMessage = e.localizedMessage ?: "Connection error"
             )
         }
+        results
+    } else {
+                results[MusicProvider.JIOSAAVN] = ProviderStatus(
+                    provider = MusicProvider.JIOSAAVN,
+                    isOnline = false,
+                    latencyMs = latency,
+                    statusMessage = "HTTP $code"
+                )
+            }
+        } catch (e: Exception) {
+            results[MusicProvider.JIOSAAVN] = ProviderStatus(
+                provider = MusicProvider.JIOSAAVN,
+                isOnline = false,
+                latencyMs = 0L,
+                statusMessage = e.localizedMessage ?: "Connection error"
+            )
+        }
+
+        // 2. Check SoundCloud
+        try {
+            val (isOnline, latency) = SoundCloudClient.checkHealth()
+            if (isOnline) {
+                results[MusicProvider.SOUNDCLOUD] = ProviderStatus(
+                    provider = MusicProvider.SOUNDCLOUD,
+                    isOnline = true,
+                    latencyMs = latency,
+                    statusMessage = "HQ Progressive/HLS • Online"
+                )
+            } else {
+                results[MusicProvider.SOUNDCLOUD] = ProviderStatus(
+                    provider = MusicProvider.SOUNDCLOUD,
+                    isOnline = false,
+                    latencyMs = latency,
+                    statusMessage = "Offline / Connection error"
+                )
+            }
+        } catch (e: Exception) {
+            results[MusicProvider.SOUNDCLOUD] = ProviderStatus(
+                provider = MusicProvider.SOUNDCLOUD,
+                isOnline = false,
+                latencyMs = 0L,
+                statusMessage = e.localizedMessage ?: "Connection error"
+            )
+        }
+
+        // 3. Check YouTube
+        try {
+            val start = System.currentTimeMillis()
+            val url = java.net.URL("https://www.youtube.com/youtubei/v1/player?prettyPrint=false")
+            val conn = url.openConnection() as java.net.HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Content-Type", "application/json")
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36")
+            conn.connectTimeout = 5000
+            conn.readTimeout = 5000
+            conn.doOutput = true
+            val payload = """{"context":{"client":{"clientName":"ANDROID_VR","clientVersion":"1.56.28","platform":"MOBILE","hl":"en-GB","androidSdkVersion":31}},"videoId":"kJQP7kiw5Fk"}"""
+            conn.outputStream.write(payload.toByteArray(Charsets.UTF_8))
+            val code = conn.responseCode
+            val latency = System.currentTimeMillis() - start
+            if (code == 200) {
+                results[MusicProvider.YOUTUBE] = ProviderStatus(
+                    provider = MusicProvider.YOUTUBE,
+                    isOnline = true,
+                    latencyMs = latency,
+                    statusMessage = "Global Catalog • Online"
+                )
+            } else {
+                results[MusicProvider.YOUTUBE] = ProviderStatus(
+                    provider = MusicProvider.YOUTUBE,
+                    isOnline = false,
+                    latencyMs = latency,
+                    statusMessage = "HTTP $code"
+                )
+            }
+        } catch (e: Exception) {
+            results[MusicProvider.YOUTUBE] = ProviderStatus(
+                provider = MusicProvider.YOUTUBE,
+                isOnline = false,
+                latencyMs = 0L,
+                statusMessage = e.localizedMessage ?: "Connection error"
+            )
+        }
+
+        // 4. Auto is operational if at least one provider is operational
+        val operationalCount = results.count { it.value.isOnline }
+        results[MusicProvider.AUTO] = ProviderStatus(
+            provider = MusicProvider.AUTO,
+            isOnline = operationalCount > 0,
+            latencyMs = results.values.filter { it.isOnline }.map { it.latencyMs }.minOrNull() ?: 0L,
+            statusMessage = "Smart Routing ($operationalCount/3 providers online)"
+        )
+
         results
     }
 
