@@ -3,6 +3,11 @@ package com.example.util
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.pm.PackageManager
+import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import android.content.pm.PackageInfo
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -118,9 +123,58 @@ object AppUpdater {
         }
     }
 
+
+    private fun isSignatureMatching(context: Context, apkFile: File): Boolean {
+        try {
+            val pm = context.packageManager
+            
+            // Current App Signature
+            val currentInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pm.getPackageInfo(context.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageInfo(context.packageName, PackageManager.GET_SIGNATURES)
+            }
+            
+            val currentSigs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                currentInfo.signingInfo?.apkContentsSigners?.map { it.toByteArray().contentHashCode() }
+            } else {
+                @Suppress("DEPRECATION")
+                currentInfo.signatures?.map { it.toByteArray().contentHashCode() }
+            } ?: return false
+
+            // Downloaded APK Signature
+            val downloadedInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pm.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.GET_SIGNING_CERTIFICATES)
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.GET_SIGNATURES)
+            } ?: return false
+            
+            val downloadedSigs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                downloadedInfo.signingInfo?.apkContentsSigners?.map { it.toByteArray().contentHashCode() }
+            } else {
+                @Suppress("DEPRECATION")
+                downloadedInfo.signatures?.map { it.toByteArray().contentHashCode() }
+            } ?: return false
+
+            return currentSigs.any { downloadedSigs.contains(it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return true
+        }
+    }
+
     private fun installApk(context: Context, fileName: String) {
         val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
         if (!file.exists()) return
+
+        if (!isSignatureMatching(context, file)) {
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, "⚠️ Update Failed: Signature Mismatch. Please uninstall the current app first to install the cloud update.", Toast.LENGTH_LONG).show()
+            }
+            return
+        }
 
         val apkUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         
