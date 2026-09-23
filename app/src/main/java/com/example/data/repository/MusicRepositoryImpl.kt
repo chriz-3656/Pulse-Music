@@ -442,6 +442,14 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getPlaylistDetails(id: String): Result<Playlist> = withContext(Dispatchers.IO) {
+        val localPlaylist = playlistDao.getPlaylistById(id)
+        if (localPlaylist != null) {
+            val localSongs = playlistDao.getSongsForPlaylistSync(id)
+            val songs = localSongs.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.durationSec, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) }
+            val playlist = Playlist(localPlaylist.id, localPlaylist.title, localPlaylist.description, localPlaylist.artworkUrl, songs.size, localPlaylist.creator, localPlaylist.createdAt, songs)
+            return@withContext Result.success(playlist)
+        }
+
         try {
             val playlist = api.LoadPlaylist.loadPlaylist(id).getOrNull()
             if (playlist != null) {
