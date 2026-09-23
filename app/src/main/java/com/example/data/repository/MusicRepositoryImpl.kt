@@ -1314,7 +1314,8 @@ class MusicRepositoryImpl(
                 connection.inputStream.bufferedReader().use { it.readText() }
             }
 
-            val jsonMatch = Regex("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").find(html)\n            if (jsonMatch == null) {
+            val jsonMatch = Regex("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").find(html)
+            if (jsonMatch == null) {
                 emit(ImportProgress(1f, "Could not find playlist data", isComplete = true, error = "Failed to parse Spotify embed page."))
                 return@flow
             }

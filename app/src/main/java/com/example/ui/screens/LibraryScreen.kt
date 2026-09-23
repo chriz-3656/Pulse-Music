@@ -193,6 +193,7 @@ fun LibraryScreen(
             when (uiState.selectedTab) {
                 LibraryTab.PLAYLISTS -> {
                     PlaylistsTabContent(
+                        onImportSpotifyClick = { showSpotifyDialog = true },
                         playlists = uiState.playlists,
                         onCreateClick = { viewModel.showCreatePlaylistDialog(true) },
                         onPlaylistClick = { playlist -> onPlaylistClick(playlist.id) },
@@ -386,6 +387,8 @@ fun LibraryScreen(
 
 @Composable
 fun PlaylistsTabContent(
+                        onImportSpotifyClick = { showSpotifyDialog = true },
+    onImportSpotifyClick: () -> Unit,
     playlists: List<Playlist>,
     onCreateClick: () -> Unit,
     onPlaylistClick: (Playlist) -> Unit,
@@ -450,7 +453,7 @@ fun PlaylistsTabContent(
             SkeuoBevelCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showSpotifyDialog = true },
+                    .clickable { onImportSpotifyClick() },
                 shape = RoundedCornerShape(22.dp)
             ) {
                 Row(
