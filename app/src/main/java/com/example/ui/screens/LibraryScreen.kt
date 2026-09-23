@@ -36,9 +36,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.LinearProgressIndicatorButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,7 +68,8 @@ import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow\nimport com.example.ui.theme.SkeuoPeakRed
+import com.example.ui.theme.SkeuoAmberGlow
+import com.example.ui.theme.SkeuoPeakRed
 import com.example.ui.theme.SkeuoBevelHighlight
 import com.example.ui.theme.SkeuoBevelShadow
 import com.example.ui.theme.SkeuoCardSurface
