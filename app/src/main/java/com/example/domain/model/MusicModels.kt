@@ -152,3 +152,11 @@ data class UserSettings(
 ) {
     val provider: MusicProvider get() = MusicProvider.fromId(apiProvider)
 }
+
+data class ImportProgress(
+    val progress: Float,
+    val message: String,
+    val isComplete: Boolean = false,
+    val playlistId: String? = null,
+    val error: String? = null
+)

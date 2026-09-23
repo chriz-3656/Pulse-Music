@@ -413,15 +413,13 @@ class PlayerViewModel(
 enum class LibraryTab { PLAYLISTS, FAVORITES, DOWNLOADS }
 
 data class LibraryUiState(
+    val selectedTab: LibraryTab = LibraryTab.PLAYLISTS,
     val playlists: List<Playlist> = emptyList(),
     val favoriteSongs: List<Song> = emptyList(),
     val downloadedSongs: List<Song> = emptyList(),
-    val importProgress: ImportProgress? = null
-),
-    val favoriteSongs: List<Song> = emptyList(),
-    val downloadedSongs: List<Song> = emptyList(),
     val showCreateDialog: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val importProgress: ImportProgress? = null
 )
 
 class LibraryViewModel(
