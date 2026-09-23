@@ -48,7 +48,8 @@ Stream high-bitrate audio from decentralized providers (SoundCloud, JioSaavn, an
 - **In-App Auto-Updater**: Pulse Music dynamically polls the GitHub API to detect new releases, downloading and installing APKs seamlessly via native Android intents with a beautiful amber progress UI.
 - **Remote Emergency Kill Switch**: An advanced fail-safe wrapping the entire UI stack. In the event of legal takedowns, a remote JSON payload instantly blacks out the application, rendering all features inaccessible globally to enforce compliance.
 
-### 💾 Offline Downloads & Storage
+### 💾 Offline Downloads ### 💾 Offline Downloads & Storage Storage
+- **Spotify Playlist Import (NEW in v2.1.0)**: Seamlessly migrate your public Spotify playlists directly into native offline Pulse crates via URL scraper.
 - **Atomic Background Downloader**: Dedicated `TrackDownloadManager` with OkHttp streaming pipeline and direct Room database synchronization.
 - **Instant Offline Priority**: Playback engine automatically prioritizes locally downloaded audio files—zero network latency and full offline support in airplane mode.
 - **Offline Library Management**: Dedicated Downloads tab in the Library screen to browse, play offline queues, and manage storage.
