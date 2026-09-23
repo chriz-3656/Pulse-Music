@@ -1288,7 +1288,7 @@ class MusicRepositoryImpl(
     override fun importSpotifyPlaylist(url: String): Flow<ImportProgress> = kotlinx.coroutines.flow.flow {
         try {
             emit(ImportProgress(0.0f, "Extracting Spotify Playlist ID..."))
-            val idMatch = Regex("open\.spotify\.com/playlist/([a-zA-Z0-9]+)").find(url)
+            val idMatch = Regex("open\\.spotify\\.com/playlist/([a-zA-Z0-9]+)").find(url)
             val playlistId = idMatch?.groupValues?.get(1) ?: run {
                 emit(ImportProgress(1f, "Invalid Spotify URL", isComplete = true, error = "Could not parse playlist ID."))
                 return@flow
@@ -1314,8 +1314,7 @@ class MusicRepositoryImpl(
                 connection.inputStream.bufferedReader().use { it.readText() }
             }
 
-            val jsonMatch = Regex("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").find(html)
-            if (jsonMatch == null) {
+            val jsonMatch = Regex("<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)</script>").find(html)\n            if (jsonMatch == null) {
                 emit(ImportProgress(1f, "Could not find playlist data", isComplete = true, error = "Failed to parse Spotify embed page."))
                 return@flow
             }

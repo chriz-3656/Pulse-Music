@@ -478,6 +478,22 @@ class LibraryViewModel(
         playerController.playSong(song, queue)
     }
 
+    fun importSpotifyPlaylist(url: String) {
+        viewModelScope.launch {
+            managePlaylistUseCase.importSpotifyPlaylist(url).collect { progress ->
+                _uiState.update { it.copy(importProgress = progress) }
+                if (progress.isComplete) {
+                    kotlinx.coroutines.delay(3000)
+                    _uiState.update { it.copy(importProgress = null) }
+                }
+            }
+        }
+    }
+    
+    fun dismissImportDialog() {
+        _uiState.update { it.copy(importProgress = null) }
+    }
+
     fun playAll(queue: List<Song>) {
         if (queue.isNotEmpty()) {
             playerController.playQueue(queue, 0)
