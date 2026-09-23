@@ -61,6 +61,7 @@ interface MusicRepository {
     suspend fun deletePlaylist(playlistId: String)
     suspend fun addSongToPlaylist(playlistId: String, song: Song)
     suspend fun removeSongFromPlaylist(playlistId: String, songId: String)
+    fun importSpotifyPlaylist(url: String): Flow<com.example.domain.model.ImportProgress>
 
     // Favorites & Downloads
     fun getFavoriteSongs(): Flow<List<Song>>

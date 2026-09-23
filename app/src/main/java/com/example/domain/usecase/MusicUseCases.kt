@@ -40,6 +40,7 @@ class ManagePlaylistUseCase(private val repository: MusicRepository) {
     suspend fun deletePlaylist(playlistId: String) = repository.deletePlaylist(playlistId)
     suspend fun addSong(playlistId: String, song: Song) = repository.addSongToPlaylist(playlistId, song)
     suspend fun removeSong(playlistId: String, songId: String) = repository.removeSongFromPlaylist(playlistId, songId)
+    fun importSpotifyPlaylist(url: String) = repository.importSpotifyPlaylist(url)
 }
 
 class ManageFavoritesUseCase(private val repository: MusicRepository) {
