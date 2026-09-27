@@ -158,7 +158,7 @@ pulse-music/
 
 ---
 
-## ✨ Recent Bug Fixes (v2.1.2)
+## ✨ Recent Bug Fixes (v2.1.3)
 - **Global Duration Bug**: Fully resolved the widespread `0:00` display glitch by rewriting the duration parsing pipeline across the entire domain layer.
 - **HLS/ExoPlayer Polling**: `MusicPlaybackService` now proactively detects delayed media track lengths in real-time, instantaneously syncing the duration to the Android `MediaSession` and the app UI.
 - **ytm-kt Parsing Failover**: Added smart UX fallbacks (`--:--`) to seamlessly handle network APIs that fail to serialize stream duration.

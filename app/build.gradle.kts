@@ -13,8 +13,8 @@ android {
     applicationId = "com.aistudio.pulsemusic.kzvpmx"
     minSdk = 24
     targetSdk = 36
-    versionCode = 9
-    versionName = "2.1.2"
+    versionCode = 10
+    versionName = "2.1.3"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

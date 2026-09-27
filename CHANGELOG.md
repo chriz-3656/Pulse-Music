@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.3] - 2026-09-27
+
+### Fixed
+- **Database Migration Crash**: Fixed a severe crash (SQLiteException) occurring when users updated directly from v2.1.0 to v2.1.2. The app was failing to migrate the local Room database schema for cached tracks (`durationSec` to `duration`), causing an instant termination during playback. Added a deterministic SQL migration to cleanly convert all existing tracks to milliseconds without data loss.
+
+---
+
 ## [2.1.2] - 2026-09-27
 
 ### Fixed
