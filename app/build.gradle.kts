@@ -4,9 +4,6 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.google.devtools.ksp)
-  alias(libs.plugins.roborazzi)
-  alias(libs.plugins.secrets)
-  alias(libs.plugins.google.services)
 }
 
 android {
@@ -58,7 +55,6 @@ android {
 
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
 // to match the convention used in Web projects.
-secrets {
   propertiesFileName = ".env"
   defaultPropertiesFileName = ".env.example"
   ignoreList.add("FIREBASE_APPCHECK_DEBUG_TOKEN")
@@ -117,9 +113,6 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.robolectric)
-  // testImplementation(libs.roborazzi)
-  // testImplementation(libs.roborazzi.compose)
-  // testImplementation(libs.roborazzi.junit.rule)
   // androidTestImplementation(platform(libs.androidx.compose.bom))
   // androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   // androidTestImplementation(libs.androidx.espresso.core)
