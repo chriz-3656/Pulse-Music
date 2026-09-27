@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.1.1] - 2026-09-27
+## [2.1.2] - 2026-09-27
 
 ### Fixed
 - **Global 0:00 Duration Bug**: Resolved a critical issue where all tracks across the app (Search, Home Feed, Mini Player, and Android MediaSession) displayed a "0:00" duration.
