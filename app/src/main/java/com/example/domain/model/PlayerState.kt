@@ -24,6 +24,7 @@ data class PlayerState(
             val totalSec = currentPositionMs / 1000
             val min = totalSec / 60
             val sec = totalSec % 60
+            if (totalSec <= 0L) return "--:--"
             return String.format("%d:%02d", min, sec)
         }
 
@@ -32,6 +33,7 @@ data class PlayerState(
             val totalSec = if (totalDurationMs > 0) totalDurationMs / 1000 else ((currentSong?.duration ?: 0L) / 1000)
             val min = totalSec / 60
             val sec = totalSec % 60
+            if (totalSec <= 0L) return "--:--"
             return String.format("%d:%02d", min, sec)
         }
 

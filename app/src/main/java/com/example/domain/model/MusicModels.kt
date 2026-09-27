@@ -67,6 +67,7 @@ data class Song(
         get() {
             val minutes = (duration / 1000) / 60
             val seconds = (duration / 1000) % 60
+            if (duration <= 0L) return "--:--"
             return String.format("%d:%02d", minutes, seconds)
         }
 }

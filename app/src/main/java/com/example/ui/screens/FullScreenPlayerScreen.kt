@@ -432,7 +432,7 @@ fun FullScreenPlayerScreen(
                         textColor = SkeuoLcdCyan
                     )
                     LcdBadge(
-                        text = formatTimecode(totalDuration),
+                        text = if (totalDuration <= 0L) "--:--" else formatTimecode(totalDuration),
                         textColor = SkeuoTextSecondary
                     )
                 }

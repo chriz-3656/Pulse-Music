@@ -460,6 +460,17 @@ class MusicPlaybackService : Service() {
                     val dur = exoPlayer.duration
                     val buf = exoPlayer.bufferedPosition
                     playerController.updateProgress(cur, dur, buf)
+                    
+                    if (dur > 0) {
+                        playerController.playerState.value.currentSong?.let { song ->
+                            if (song.duration <= 0L || song.duration == 210000L || song.duration != dur) {
+                                playerController.updateCurrentSongDuration(dur)
+                                serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                    musicRepository.updateSongDuration(song.id, dur)
+                                }
+                            }
+                        }
+                    }
                 }
                 delay(250)
             }
