@@ -1,4 +1,3 @@
-import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
 
 plugins {
   alias(libs.plugins.android.application)
@@ -61,7 +60,6 @@ dependencies {
   implementation("org.mozilla:rhino:1.7.14")
   implementation("org.jsoup:jsoup:1.17.2")
   implementation(platform(libs.androidx.compose.bom))
-  implementation(platform(libs.firebase.bom))
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.compose.material.icons.core)
   implementation(libs.androidx.compose.material.icons.extended)
@@ -104,7 +102,6 @@ dependencies {
   testImplementation(libs.androidx.junit)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
-  testImplementation(libs.robolectric)
   // androidTestImplementation(platform(libs.androidx.compose.bom))
   // androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   // androidTestImplementation(libs.androidx.espresso.core)
