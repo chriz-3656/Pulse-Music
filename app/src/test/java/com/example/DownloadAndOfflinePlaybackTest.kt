@@ -23,7 +23,7 @@ class DownloadAndOfflinePlaybackTest {
                 title = "Offline Masterpiece",
                 artist = "Analog Unit",
                 album = "Vintage Vault",
-                durationSec = 240,
+                duration = 240,
                 stream160Url = "https://cdn.example.com/stream160.mp3",
                 stream320Url = "https://cdn.example.com/stream320.mp3",
                 isDownloaded = true,
@@ -50,7 +50,7 @@ class DownloadAndOfflinePlaybackTest {
             title = "Online Only Track",
             artist = "Streamer",
             album = "Cloud Tapes",
-            durationSec = 180,
+            duration = 180,
             stream160Url = "https://cdn.example.com/160.mp3",
             stream320Url = "https://cdn.example.com/320.mp3",
             isDownloaded = false,
@@ -75,7 +75,7 @@ class DownloadAndOfflinePlaybackTest {
                 id = "sc_123456",
                 title = "SoundCloud Offline",
                 artist = "Sound Artist",
-                durationSec = 210,
+                duration = 210,
                 isDownloaded = true,
                 localFilePath = tempAudio.absolutePath
             )
@@ -107,7 +107,7 @@ class DownloadAndOfflinePlaybackTest {
             title = "Hardware Groove",
             artist = "Synthesizer",
             album = "Deck A",
-            durationSec = 300,
+            duration = 300,
             artworkUrl = "https://example.com/art.jpg",
             stream160Url = "https://example.com/audio.mp3",
             stream320Url = "https://example.com/audio_hd.mp3",
@@ -120,7 +120,7 @@ class DownloadAndOfflinePlaybackTest {
         assertTrue("Song should be marked as downloaded", downloadedSong.isDownloaded)
         assertTrue("Song should be marked as favorite", downloadedSong.isFavorite)
         assertNotNull("Local file path should not be null", downloadedSong.localFilePath)
-        assertEquals("Duration should be 300 seconds", 300, downloadedSong.durationSec)
+        assertEquals("Duration should be 300 seconds", 300, downloadedSong.duration)
         assertEquals("Title should match", "Hardware Groove", downloadedSong.title)
     }
 }

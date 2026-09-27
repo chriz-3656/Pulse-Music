@@ -34,7 +34,7 @@ class AutoplayAndRadioTest {
         title = "Midnight Horizon",
         artist = "Synth Wave Ensemble",
         album = "Analog Dreams",
-        durationSec = 210
+        duration = 210
     )
 
     private val recommendedSong1 = Song(
@@ -42,7 +42,7 @@ class AutoplayAndRadioTest {
         title = "Neon Highway",
         artist = "Retrowave Unit",
         album = "Outrun 84",
-        durationSec = 195
+        duration = 195
     )
 
     private val recommendedSong2 = Song(
@@ -50,7 +50,7 @@ class AutoplayAndRadioTest {
         title = "Cyber Sunrise",
         artist = "Laser Matrix",
         album = "Future Past",
-        durationSec = 240
+        duration = 240
     )
 
     @Before
