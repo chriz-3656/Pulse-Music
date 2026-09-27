@@ -84,7 +84,7 @@ class MusicPlayerController(
                 isPlaying = true,
                 isBuffering = true,
                 currentPositionMs = 0L,
-                totalDurationMs = song.durationSec * 1000L,
+                totalDurationMs = song.duration,
                 playbackError = null
             )
         }
@@ -209,7 +209,7 @@ class MusicPlayerController(
                                     queue = newQueue,
                                     currentIndex = playIdx,
                                     currentPositionMs = 0L,
-                                    totalDurationMs = nextTrack.durationSec * 1000L,
+                                    totalDurationMs = nextTrack.duration,
                                     isPlaying = true,
                                     isBuffering = true,
                                     playbackError = null
@@ -236,7 +236,7 @@ class MusicPlayerController(
                 currentSong = nextSong,
                 currentIndex = nextIndex,
                 currentPositionMs = 0L,
-                totalDurationMs = nextSong.durationSec * 1000L,
+                totalDurationMs = nextSong.duration,
                 isPlaying = true,
                 isBuffering = true,
                 playbackError = null
@@ -286,7 +286,7 @@ class MusicPlayerController(
                 currentSong = prevSong,
                 currentIndex = prevIndex,
                 currentPositionMs = 0L,
-                totalDurationMs = prevSong.durationSec * 1000L,
+                totalDurationMs = prevSong.duration,
                 isPlaying = true,
                 isBuffering = true,
                 playbackError = null
@@ -392,6 +392,15 @@ class MusicPlayerController(
 
     fun setCrossfade(seconds: Int) {
         _playerState.update { it.copy(crossfadeSec = seconds) }
+    }
+
+    fun updateCurrentSongDuration(duration: Long) {
+        _playerState.update {
+            it.copy(
+                currentSong = it.currentSong?.copy(duration = duration),
+                totalDurationMs = duration
+            )
+        }
     }
 
     fun updateProgress(currentMs: Long, totalMs: Long, bufferedMs: Long) {

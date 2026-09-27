@@ -5,7 +5,7 @@ data class Song(
     val title: String,
     val artist: String,
     val album: String = "",
-    val durationSec: Int = 0,
+    val duration: Long = 0L,
     val artworkUrl: String = "",
     val stream160Url: String = "",
     val stream320Url: String = "",
@@ -65,8 +65,8 @@ data class Song(
 
     val formattedDuration: String
         get() {
-            val minutes = durationSec / 60
-            val seconds = durationSec % 60
+            val minutes = (duration / 1000) / 60
+            val seconds = (duration / 1000) % 60
             return String.format("%d:%02d", minutes, seconds)
         }
 }

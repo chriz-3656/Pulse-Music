@@ -119,7 +119,7 @@ class TrackDownloadManager(
                     title = song.title,
                     artist = song.artist,
                     album = song.album,
-                    durationSec = song.durationSec,
+                    duration = song.duration,
                     artworkUrl = song.artworkUrl,
                     stream160Url = song.stream160Url,
                     stream320Url = song.stream320Url,

@@ -219,7 +219,7 @@ fun MiniPlayerBar(
                     }
 
                     // Tactile Progress Line
-                    val totalDuration = if (playerState.totalDurationMs > 0L) playerState.totalDurationMs else (song.durationSec * 1000L)
+                    val totalDuration = if (playerState.totalDurationMs > 0L) playerState.totalDurationMs else (song.duration)
                     val progress = if (totalDuration > 0L) {
                         (playerState.currentPositionMs.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
                     } else 0f

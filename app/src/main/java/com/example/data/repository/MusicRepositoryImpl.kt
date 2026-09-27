@@ -69,17 +69,6 @@ class MusicRepositoryImpl(
     private val songCache = java.util.concurrent.ConcurrentHashMap<String, Song>()
 
     private fun YtmSong.toDomain(streamUrl: String = ""): Song {
-        val durationStr = this.duration?.toString() ?: "0"
-        val durationInt = if (durationStr.contains(":")) {
-            val parts = durationStr.split(":")
-            if (parts.size == 2) {
-                (parts[0].toIntOrNull() ?: 0) * 60 + (parts[1].toIntOrNull() ?: 0)
-            } else if (parts.size == 3) {
-                (parts[0].toIntOrNull() ?: 0) * 3600 + (parts[1].toIntOrNull() ?: 0) * 60 + (parts[2].toIntOrNull() ?: 0)
-            } else 0
-        } else {
-            durationStr.toIntOrNull() ?: 0
-        }
         val artwork = this.thumbnail_provider?.getThumbnailUrl(ThumbnailProvider.Quality.HIGH) ?: ""
         val artistName = this.artists?.firstOrNull()?.name ?: "Unknown Artist"
         val artistId = this.artists?.firstOrNull()?.id ?: ""
@@ -91,7 +80,7 @@ class MusicRepositoryImpl(
             artistId = artistId,
             album = this.album?.name ?: "",
             albumId = this.album?.id ?: "",
-            durationSec = durationInt,
+            duration = this.duration ?: 0L,
             artworkUrl = artwork,
             stream160Url = streamUrl,
             stream320Url = streamUrl
@@ -238,7 +227,7 @@ class MusicRepositoryImpl(
                         title = local.title,
                         artist = local.artist,
                         album = local.album,
-                        durationSec = local.durationSec,
+                        duration = local.duration,
                         artworkUrl = local.artworkUrl,
                         stream160Url = streamUrl,
                         stream320Url = streamUrl,
@@ -410,7 +399,7 @@ class MusicRepositoryImpl(
                 title = it.title,
                 artist = it.artist,
                 album = it.album,
-                durationSec = it.durationSec,
+                duration = it.duration,
                 artworkUrl = it.artworkUrl,
                 stream160Url = it.stream160Url,
                 stream320Url = it.stream320Url,
@@ -445,7 +434,7 @@ class MusicRepositoryImpl(
         val localPlaylist = playlistDao.getPlaylistById(id)
         if (localPlaylist != null) {
             val localSongs = playlistDao.getSongsForPlaylistSync(id)
-            val songs = localSongs.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.durationSec, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) }
+            val songs = localSongs.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) }
             val playlist = Playlist(localPlaylist.id, localPlaylist.title, localPlaylist.description, localPlaylist.artworkUrl, songs.size, localPlaylist.creator, localPlaylist.createdAt, songs)
             return@withContext Result.success(playlist)
         }
@@ -506,7 +495,7 @@ class MusicRepositoryImpl(
                         val title = cleanSaavnText(s.optString("song"))
                         val artist = cleanSaavnText(s.optString("primary_artists"))
                         val album = cleanSaavnText(s.optString("album"))
-                        val dur = s.optInt("duration", 0)
+                        val dur = s.optInt("duration", 0) * 1000L
                         val img = s.optString("image").replace("150x150", "500x500")
                         val encMedia = s.optString("encrypted_media_url")
                         var streamUrl = ""
@@ -523,7 +512,7 @@ class MusicRepositoryImpl(
                                     title = title,
                                     artist = if (artist.isNotBlank()) artist else "Popular Artist",
                                     album = album,
-                                    durationSec = dur,
+                                    duration = dur,
                                     artworkUrl = img,
                                     stream160Url = streamUrl,
                                     stream320Url = streamUrl
@@ -680,7 +669,7 @@ class MusicRepositoryImpl(
                     val title = cleanSaavnText(songObj.optString("song"))
                     val artist = cleanSaavnText(songObj.optString("primary_artists"))
                     val album = cleanSaavnText(songObj.optString("album"))
-                    val dur = songObj.optInt("duration", 0)
+                    val dur = songObj.optInt("duration", 0) * 1000L
                     val img = songObj.optString("image").replace("150x150", "500x500")
                     val encMedia = songObj.optString("encrypted_media_url")
                     var streamUrl = ""
@@ -695,7 +684,7 @@ class MusicRepositoryImpl(
                         title = title,
                         artist = if (artist.isNotBlank()) artist else "Popular Artist",
                         album = album,
-                        durationSec = dur,
+                        duration = dur,
                         artworkUrl = img,
                         stream160Url = streamUrl,
                         stream320Url = streamUrl
@@ -745,7 +734,7 @@ class MusicRepositoryImpl(
                                 title = sTitle,
                                 artist = if (sArtist.isNotBlank()) sArtist else artist,
                                 album = title,
-                                durationSec = sDur,
+                                duration = sDur,
                                 artworkUrl = sImg,
                                 stream160Url = sStream,
                                 stream320Url = sStream
@@ -805,7 +794,7 @@ class MusicRepositoryImpl(
                                 title = sTitle,
                                 artist = if (sArtist.isNotBlank()) sArtist else "Artist",
                                 album = sAlbum,
-                                durationSec = sDur,
+                                duration = sDur,
                                 artworkUrl = sImg,
                                 stream160Url = sStream,
                                 stream320Url = sStream
@@ -849,9 +838,9 @@ class MusicRepositoryImpl(
                             val title = cleanSaavnText(s.optString("song"))
                             val artist = cleanSaavnText(s.optString("primary_artists"))
                             val album = cleanSaavnText(s.optString("album"))
-                            val dur = s.optInt("duration", 0)
+                            val dur = s.optInt("duration", 0) * 1000L
                             val img = s.optString("image").replace("150x150", "500x500")
-                            list.add(Song(id = id, title = title, artist = artist, album = album, durationSec = dur, artworkUrl = img))
+                            list.add(Song(id = id, title = title, artist = artist, album = album, duration = dur, artworkUrl = img))
                         }
                     }
                 } else if (text.trim().startsWith("[")) {
@@ -862,9 +851,9 @@ class MusicRepositoryImpl(
                         val title = cleanSaavnText(s.optString("song"))
                         val artist = cleanSaavnText(s.optString("primary_artists"))
                         val album = cleanSaavnText(s.optString("album"))
-                        val dur = s.optInt("duration", 0)
+                        val dur = s.optInt("duration", 0) * 1000L
                         val img = s.optString("image").replace("150x150", "500x500")
-                        list.add(Song(id = id, title = title, artist = artist, album = album, durationSec = dur, artworkUrl = img))
+                        list.add(Song(id = id, title = title, artist = artist, album = album, duration = dur, artworkUrl = img))
                     }
                 }
                 return list
@@ -1071,7 +1060,8 @@ class MusicRepositoryImpl(
 
     override fun getUserPlaylists(): Flow<List<Playlist>> = playlistDao.getAllPlaylists().map { it.map { entity -> Playlist(entity.id, entity.title, entity.description, entity.artworkUrl, 0, entity.creator, entity.createdAt) } }
     
-    override fun getPlaylistSongs(playlistId: String): Flow<List<Song>> = playlistDao.getSongsForPlaylist(playlistId).map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.durationSec, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
+    override suspend fun updateSongDuration(id: String, duration: Long) { withContext(Dispatchers.IO) { songDao.updateDuration(id, duration) } }
+    override fun getPlaylistSongs(playlistId: String): Flow<List<Song>> = playlistDao.getSongsForPlaylist(playlistId).map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
     
     override suspend fun createPlaylist(title: String, description: String): String {
         val id = java.util.UUID.randomUUID().toString()
@@ -1082,21 +1072,21 @@ class MusicRepositoryImpl(
     override suspend fun deletePlaylist(playlistId: String) = playlistDao.deletePlaylist(playlistId)
     override suspend fun addSongToPlaylist(playlistId: String, song: Song) {
         playlistDao.insertPlaylistSong(com.example.data.local.entity.PlaylistSongCrossRef(playlistId, song.id, System.currentTimeMillis().toInt()))
-        songDao.insertSong(com.example.data.local.entity.SongEntity(song.id, song.title, song.artist, song.album, song.durationSec, song.artworkUrl, song.stream160Url, song.stream320Url, song.lyrics, song.isDownloaded, song.isFavorite, song.localFilePath, song.year, song.artistId, song.albumId, System.currentTimeMillis()))
+        songDao.insertSong(com.example.data.local.entity.SongEntity(song.id, song.title, song.artist, song.album, song.duration, song.artworkUrl, song.stream160Url, song.stream320Url, song.lyrics, song.isDownloaded, song.isFavorite, song.localFilePath, song.year, song.artistId, song.albumId, System.currentTimeMillis()))
     }
     override suspend fun removeSongFromPlaylist(playlistId: String, songId: String) = playlistDao.removeSongFromPlaylist(playlistId, songId)
     
-    override fun getFavoriteSongs(): Flow<List<Song>> = songDao.getFavoriteSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.durationSec, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
+    override fun getFavoriteSongs(): Flow<List<Song>> = songDao.getFavoriteSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
     override suspend fun toggleFavorite(song: Song) {
         val current = songDao.getSongById(song.id)
         if (current != null) {
             songDao.updateFavorite(song.id, !current.isFavorite)
         } else {
-            songDao.insertSong(com.example.data.local.entity.SongEntity(song.id, song.title, song.artist, song.album, song.durationSec, song.artworkUrl, song.stream160Url, song.stream320Url, song.lyrics, song.isDownloaded, true, song.localFilePath, song.year, song.artistId, song.albumId, System.currentTimeMillis()))
+            songDao.insertSong(com.example.data.local.entity.SongEntity(song.id, song.title, song.artist, song.album, song.duration, song.artworkUrl, song.stream160Url, song.stream320Url, song.lyrics, song.isDownloaded, true, song.localFilePath, song.year, song.artistId, song.albumId, System.currentTimeMillis()))
         }
     }
     
-    override fun getDownloadedSongs(): Flow<List<Song>> = songDao.getDownloadedSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.durationSec, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
+    override fun getDownloadedSongs(): Flow<List<Song>> = songDao.getDownloadedSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
     
     override suspend fun downloadSong(song: Song): Result<String> = withContext(Dispatchers.IO) {
         var targetSong = song
@@ -1367,7 +1357,7 @@ class MusicRepositoryImpl(
                     val bestMatch = searchResults.firstOrNull()
                     
                     if (bestMatch != null) {
-                        songDao.insertSong(com.example.data.local.entity.SongEntity(bestMatch.id, bestMatch.title, bestMatch.artist, bestMatch.album, bestMatch.durationSec, bestMatch.artworkUrl, bestMatch.stream160Url, bestMatch.stream320Url, bestMatch.lyrics, bestMatch.isDownloaded, bestMatch.isFavorite, bestMatch.localFilePath, bestMatch.year, bestMatch.artistId, bestMatch.albumId, System.currentTimeMillis()))
+                        songDao.insertSong(com.example.data.local.entity.SongEntity(bestMatch.id, bestMatch.title, bestMatch.artist, bestMatch.album, bestMatch.duration, bestMatch.artworkUrl, bestMatch.stream160Url, bestMatch.stream320Url, bestMatch.lyrics, bestMatch.isDownloaded, bestMatch.isFavorite, bestMatch.localFilePath, bestMatch.year, bestMatch.artistId, bestMatch.albumId, System.currentTimeMillis()))
                         playlistDao.insertPlaylistSong(com.example.data.local.entity.PlaylistSongCrossRef(dbPlaylistId, bestMatch.id, i))
                         matchedTracks++
                     }

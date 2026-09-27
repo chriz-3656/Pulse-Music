@@ -116,7 +116,7 @@ fun FullScreenPlayerScreen(
     var seekPositionMs by remember { mutableFloatStateOf(0f) }
 
     val currentPosition = if (isSeeking) seekPositionMs.toLong() else playerState.currentPositionMs
-    val totalDuration = if (playerState.totalDurationMs > 0L) playerState.totalDurationMs else (song.durationSec * 1000L)
+    val totalDuration = if (playerState.totalDurationMs > 0L) playerState.totalDurationMs else (song.duration)
     val sliderValue = if (totalDuration > 0L) (currentPosition.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f) else 0f
 
     // Hi-Fi Hardware Deck Canvas

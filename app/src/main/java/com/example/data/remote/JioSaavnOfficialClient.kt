@@ -120,7 +120,7 @@ object JioSaavnOfficialClient {
         var artist = item.optString("primary_artists")
         if (artist.isBlank()) artist = item.optString("singers", "Unknown")
         val album = item.optString("album", "Unknown")
-        val durationSec = item.optString("duration", "0").toLongOrNull()?.toInt() ?: 0
+        val duration = (item.optString("duration", "0").toLongOrNull() ?: 0L) * 1000L
         var imageUrl = item.optString("image", "")
         if (imageUrl.isNotBlank()) {
             imageUrl = imageUrl.replace("150x150", "500x500").replace("50x50", "500x500")
@@ -137,7 +137,7 @@ object JioSaavnOfficialClient {
             title = title.replace("&quot;", "\""),
             artist = artist.replace("&quot;", "\""),
             album = album.replace("&quot;", "\""),
-            durationSec = durationSec,
+            duration = duration,
             artworkUrl = imageUrl,
             stream320Url = encryptedMediaUrl // we'll decrypt this in repository
         )

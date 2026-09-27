@@ -48,6 +48,9 @@ interface SongDao {
     suspend fun insertSongs(songs: List<SongEntity>)
 
     @Query("UPDATE cached_songs SET isFavorite = :isFavorite WHERE id = :id")
+    @Query("UPDATE cached_songs SET duration = :duration WHERE id = :id")
+    suspend fun updateDuration(id: String, duration: Long)
+
     suspend fun updateFavorite(id: String, isFavorite: Boolean)
 
     @Query("UPDATE cached_songs SET isDownloaded = :isDownloaded, localFilePath = :localPath WHERE id = :id")

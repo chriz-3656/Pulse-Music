@@ -56,6 +56,7 @@ interface MusicRepository {
 
     // User Playlists
     fun getUserPlaylists(): Flow<List<Playlist>>
+    suspend fun updateSongDuration(id: String, duration: Long)
     fun getPlaylistSongs(playlistId: String): Flow<List<Song>>
     suspend fun createPlaylist(title: String, description: String): String
     suspend fun deletePlaylist(playlistId: String)

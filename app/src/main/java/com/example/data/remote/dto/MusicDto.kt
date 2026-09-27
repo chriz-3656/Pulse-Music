@@ -41,7 +41,7 @@ data class SongDto(
     @Json(name = "primaryArtists") val primaryArtists: Any? = null,
     @Json(name = "album") val album: Any? = null,
     @Json(name = "duration") val duration: Any? = null,
-    @Json(name = "duration_sec") val durationSec: Int? = null,
+    @Json(name = "duration_sec") val durationMs: Long? = null,
     @Json(name = "image") val image: Any? = null,
     @Json(name = "artwork") val artwork: String? = null,
     @Json(name = "cover_url") val coverUrl: String? = null,
@@ -62,7 +62,7 @@ data class SongDto(
         val songArtist = parseArtistString(primaryArtists, artists, artist)
         val (albumName, albumId) = parseAlbumInfo(album)
         
-        val durSec: Int = durationSec ?: when (duration) {
+        val dur: Long = durationMs ?: (when (duration) { is Number -> duration.toLong() * 1000L; is String -> (duration.toLongOrNull() ?: 210L) * 1000L; else -> 210000L }) {
             is Number -> duration.toInt()
             is String -> duration.toIntOrNull() ?: 210
             else -> 210
@@ -85,7 +85,7 @@ data class SongDto(
             title = songTitle,
             artist = songArtist,
             album = albumName,
-            durationSec = durSec,
+            duration = dur,
             artworkUrl = artUrl,
             stream160Url = s160,
             stream320Url = s320,

@@ -162,7 +162,18 @@ class MusicPlaybackService : Service() {
                 if (playbackState == Player.STATE_READY) {
                     val duration = exoPlayer.duration
                     if (duration > 0) {
+                        playerController.playerState.value.currentSong?.let { song ->
+                            if (song.duration <= 0L || song.duration == 210000L || song.duration != duration) {
+                                playerController.updateCurrentSongDuration(duration)
+                                serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                    musicRepository.updateSongDuration(song.id, duration)
+                                }
+                            }
+                        }
                         playerController.updateProgress(exoPlayer.currentPosition, duration, exoPlayer.bufferedPosition)
+                        playerController.playerState.value.currentSong?.let { song ->
+                            updateMediaMetadata(song)
+                        }
                     }
                     updateNotification()
                 } else if (playbackState == Player.STATE_ENDED) {
@@ -410,11 +421,12 @@ class MusicPlaybackService : Service() {
     }
 
     private fun updateMediaMetadata(song: Song) {
+        val actualDuration = if (exoPlayer.duration > 0) exoPlayer.duration else song.duration
         val metadata = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, song.album)
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.durationSec * 1000L)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, actualDuration)
             .apply {
                 if (currentArtworkBitmap != null) {
                     putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, currentArtworkBitmap)

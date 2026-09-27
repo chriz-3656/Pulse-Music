@@ -32,7 +32,7 @@ fun getTrendingSongsFlow(api: YtmApi): Flow<List<Song>> = flow {
                     artistId = it.artists?.firstOrNull()?.id ?: "",
                     album = it.album?.name ?: "",
                     albumId = it.album?.id ?: "",
-                    durationSec = (it.duration ?: 0).toInt(),
+                    duration = it.duration ?: 0L,
                     artworkUrl = it.thumbnail_provider?.getThumbnailUrl(dev.toastbits.ytmkt.model.external.ThumbnailProvider.Quality.HIGH) ?: ""
                 )
             }?.let { songs.addAll(it) }
@@ -167,7 +167,7 @@ private fun fetchJioSaavnChartSongs(): List<Song> {
                                             title = title,
                                             artist = if (artist.isNotBlank()) artist else "Popular Artist",
                                             album = album,
-                                            durationSec = dur,
+                                            duration = dur,
                                             artworkUrl = img
                                         )
                                     )
