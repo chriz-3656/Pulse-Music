@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.1] - 2026-09-27
+
+### Fixed
+- **Global 0:00 Duration Bug**: Resolved a critical issue where all tracks across the app (Search, Home Feed, Mini Player, and Android MediaSession) displayed a "0:00" duration.
+- **ExoPlayer Late Duration Discovery**: Implemented proactive timeline polling in the background service to correctly catch exact track durations from HLS and NewPipeExtractor streams (which initially report unknown lengths) and dynamically update the UI and Room database in real-time.
+- **ytm-kt Parsing Limitation**: Masked an underlying parser limitation in the YouTube Music library by intelligently rendering `--:--` for unknown tracks instead of `0:00`, which elegantly morphs into the actual timecode once playback initiates.
+- **Time Unit Standardization**: Audited and normalized the entire domain layer and provider mappers (JioSaavn, SoundCloud) to strictly utilize milliseconds, eliminating calculation mismatches that caused persistent `0:00` UI renders.
+- **Repository Cleanup CI Failures**: Fixed leftover syntax errors and orphaned Gradle DSL blocks (`roborazzi`, `firebase.bom`) from repository cleanup that were causing Cloud Build CI failures.
+- **Unit Tests SDK Crash**: Upgraded Robolectric SDK constraints in the test suite to resolve an `IllegalArgumentException` crash against Android API 36, restoring green CI pipelines.
+
+---
+
 ## [2.1.0] - 2026-09-23
 
 ### Added
