@@ -718,7 +718,7 @@ class MusicRepositoryImpl(
                         val sId = s.optString("id")
                         val sTitle = cleanSaavnText(s.optString("song"))
                         val sArtist = cleanSaavnText(s.optString("primary_artists"))
-                        val sDur = s.optInt("duration", 0)
+                        val sDur = s.optLong("duration", 0L) * 1000L
                         val sImg = s.optString("image").replace("150x150", "500x500")
                         val encMedia = s.optString("encrypted_media_url")
                         var sStream = ""
@@ -778,7 +778,7 @@ class MusicRepositoryImpl(
                         val sTitle = cleanSaavnText(s.optString("song"))
                         val sArtist = cleanSaavnText(s.optString("primary_artists"))
                         val sAlbum = cleanSaavnText(s.optString("album"))
-                        val sDur = s.optInt("duration", 0)
+                        val sDur = s.optLong("duration", 0L) * 1000L
                         val sImg = s.optString("image").replace("150x150", "500x500")
                         val encMedia = s.optString("encrypted_media_url")
                         var sStream = ""

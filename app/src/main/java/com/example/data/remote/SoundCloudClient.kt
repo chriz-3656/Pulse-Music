@@ -224,7 +224,7 @@ object SoundCloudClient {
 
                     val userObj = track.optJSONObject("user")
                     val artist = userObj?.optString("username") ?: "SoundCloud Artist"
-                    val durationMs = track.optInt("duration", 0)
+                    val durationMs = track.optLong("duration", 0L)
                     var artworkUrl = track.optString("artwork_url", "")
                     if (artworkUrl.isNotBlank() && artworkUrl.contains("-large.")) {
                         // High quality artwork upgrade

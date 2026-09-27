@@ -159,7 +159,7 @@ private fun fetchJioSaavnChartSongs(): List<Song> {
                                 val artist = cleanHtml(s.optString("primary_artists"))
                                 val album = cleanHtml(s.optString("album"))
                                 val img = s.optString("image").replace("150x150", "500x500")
-                                val dur = s.optInt("duration", 0)
+                                val dur = s.optLong("duration", 0L) * 1000L
                                 if (id.isNotBlank() && title.isNotBlank()) {
                                     list.add(
                                         Song(

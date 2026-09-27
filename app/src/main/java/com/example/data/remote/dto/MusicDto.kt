@@ -62,10 +62,10 @@ data class SongDto(
         val songArtist = parseArtistString(primaryArtists, artists, artist)
         val (albumName, albumId) = parseAlbumInfo(album)
         
-        val dur: Long = durationMs ?: (when (duration) { is Number -> duration.toLong() * 1000L; is String -> (duration.toLongOrNull() ?: 210L) * 1000L; else -> 210000L }) {
-            is Number -> duration.toInt()
-            is String -> duration.toIntOrNull() ?: 210
-            else -> 210
+        val dur: Long = durationMs ?: when (duration) {
+            is Number -> duration.toLong() * 1000L
+            is String -> (duration.toLongOrNull() ?: 210L) * 1000L
+            else -> 210000L
         }
         
         val artUrl = parseImageUrl(image, artwork, coverUrl, songId)
