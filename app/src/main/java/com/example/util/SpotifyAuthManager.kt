@@ -25,8 +25,8 @@ class SpotifyAuthManager(private val context: Context) {
     private val _accessToken = MutableStateFlow<String?>(prefs.getString("access_token", null))
     val accessToken: StateFlow<String?> = _accessToken
 
-    private fun saveToken(token: String?) {
-        saveToken(token)
+    fun saveToken(token: String?) {
+        _accessToken.value = token
         prefs.edit().putString("access_token", token).apply()
     }
 
