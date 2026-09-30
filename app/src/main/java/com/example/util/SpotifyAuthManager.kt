@@ -56,6 +56,5 @@ class SpotifyAuthManager(private val context: Context) {
     
     fun logout() {
         _accessToken.value = null
-        AuthorizationClient.clearCookies(context)
     }
 }
