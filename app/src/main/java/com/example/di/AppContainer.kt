@@ -71,6 +71,10 @@ class AppContainer(private val context: Context) {
     val playerController: MusicPlayerController by lazy {
         MusicPlayerController(context)
     }
+    
+    val spotifyAuthManager: com.example.util.SpotifyAuthManager by lazy {
+        com.example.util.SpotifyAuthManager(context)
+    }
 
     // Use cases
     val searchMusicUseCase by lazy { SearchMusicUseCase(musicRepository) }

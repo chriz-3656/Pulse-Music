@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import androidx.compose.runtime.collectAsState
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -149,6 +151,67 @@ fun SettingsScreen(
                 )
             }
             Spacer(modifier = Modifier.height(14.dp))
+        }
+
+        item {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val authManager = remember {
+                (context.applicationContext as com.example.PulseMusicApplication).appContainer.spotifyAuthManager
+            }
+            val accessToken by authManager.accessToken.collectAsState()
+            
+            SettingsSectionHeader(icon = androidx.compose.material.icons.Icons.Default.CloudSync, title = "Accounts & Cloud Sync")
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            SkeuoTactileButton(
+                onClick = { 
+                    if (accessToken != null) {
+                        authManager.logout()
+                    } else {
+                        val activity = context as? android.app.Activity
+                        if (activity != null) {
+                            authManager.authenticate(activity)
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (accessToken != null) androidx.compose.material.icons.Icons.Default.CheckCircle else androidx.compose.material.icons.Icons.Default.Login,
+                        contentDescription = null,
+                        tint = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (accessToken != null) "Spotify Linked" else "Link Spotify Account",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                            color = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan
+                        )
+                        Text(
+                            text = if (accessToken != null) "Ready to sync playlists and library" else "Sync your playlists and liked songs",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = SkeuoTextSecondary
+                        )
+                    }
+                    if (accessToken != null) {
+                        Text(
+                            text = "UNLINK",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = SkeuoPeakRed
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         // Section: Music Engine & Providers
