@@ -1,5 +1,6 @@
 package com.example.data.remote
 
+import com.squareup.moshi.JsonClass
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
@@ -33,10 +34,14 @@ interface SpotifyApiService {
     ): SpotifyTracksInfoResponse
 }
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyPlaylistResponse(
     val items: List<SpotifyPlaylistDto>
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyPlaylistDto(
     val id: String,
     val name: String,
@@ -44,22 +49,32 @@ data class SpotifyPlaylistDto(
     val tracks: SpotifyTracksInfo
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyImageDto(
     val url: String
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyTracksInfo(
     val total: Int
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyTracksResponse(
     val items: List<SpotifyTrackItemDto>
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyTrackItemDto(
     val track: SpotifyTrackDto
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyTrackDto(
     val id: String,
     val name: String,
@@ -68,15 +83,21 @@ data class SpotifyTrackDto(
     val duration_ms: Long
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyArtistDto(
     val name: String
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyAlbumDto(
     val name: String,
     val images: List<SpotifyImageDto>?
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyUserDto(
     val id: String,
     val display_name: String?,
@@ -84,6 +105,8 @@ data class SpotifyUserDto(
     val images: List<SpotifyImageDto>?
 )
 
+
+@JsonClass(generateAdapter = true)
 data class SpotifyTracksInfoResponse(
     val total: Int
 )

@@ -21,8 +21,14 @@ class SpotifyAuthManager(private val context: Context) {
         const val AUTH_REQUEST_CODE = 1337
     }
 
-    private val _accessToken = MutableStateFlow<String?>(null)
+    private val prefs = context.getSharedPreferences("spotify_auth", Context.MODE_PRIVATE)
+    private val _accessToken = MutableStateFlow<String?>(prefs.getString("access_token", null))
     val accessToken: StateFlow<String?> = _accessToken
+
+    private fun saveToken(token: String?) {
+        saveToken(token)
+        prefs.edit().putString("access_token", token).apply()
+    }
 
     fun authenticate(activity: Activity) {
         val builder = AuthorizationRequest.Builder(
@@ -44,7 +50,7 @@ class SpotifyAuthManager(private val context: Context) {
                     exchangeCodeForToken(response.code)
                 }
                 AuthorizationResponse.Type.TOKEN -> {
-                    _accessToken.value = response.accessToken
+                    saveToken(response.accessToken)
                     Log.d("SpotifyAuth", "Logged in successfully with implicit token")
                 }
                 AuthorizationResponse.Type.ERROR -> {
@@ -84,7 +90,7 @@ class SpotifyAuthManager(private val context: Context) {
                 if (response.isSuccessful && bodyStr != null) {
                     val json = org.json.JSONObject(bodyStr)
                     val token = json.getString("access_token")
-                    _accessToken.value = token
+                    saveToken(token)
                     Log.d("SpotifyAuth", "Successfully exchanged code for token")
                 } else {
                     Log.e("SpotifyAuth", "Failed to exchange token: $bodyStr")
@@ -96,6 +102,6 @@ class SpotifyAuthManager(private val context: Context) {
     }
     
     fun logout() {
-        _accessToken.value = null
+        saveToken(null)
     }
 }
