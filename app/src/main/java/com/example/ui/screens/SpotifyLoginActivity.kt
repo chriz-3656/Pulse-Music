@@ -56,14 +56,18 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 webViewClient = object : WebViewClient() {
                                     override fun onPageFinished(view: WebView, url: String) {
                                         super.onPageFinished(view, url)
-                                        val cookies = CookieManager.getInstance().getCookie("https://spotify.com")
+                                        val cookies = CookieManager.getInstance().getCookie("https://spotify.com") ?: CookieManager.getInstance().getCookie("https://open.spotify.com")
                                         if (cookies != null && cookies.contains("sp_dc=")) {
                                             val spDc = cookies.split(";").map { it.trim() }.firstOrNull { it.startsWith("sp_dc=") }?.substringAfter("=")
                                             if (!spDc.isNullOrBlank()) {
-                                                view.evaluateJavascript(
-                                                    "fetch('https://open.spotify.com/get_access_token?reason=transport&productType=web_player').then(r => r.text()).then(t => window.SpotifyAuth.onToken(t, '$spDc')).catch(e => window.SpotifyAuth.onToken('error', '$spDc'));",
-                                                    null
-                                                )
+                                                if (url.contains("get_access_token")) {
+                                                    view.evaluateJavascript(
+                                                        "window.SpotifyAuth.onToken(document.documentElement.innerText, '$spDc');",
+                                                        null
+                                                    )
+                                                } else {
+                                                    view.loadUrl("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
+                                                }
                                             }
                                         }
                                     }

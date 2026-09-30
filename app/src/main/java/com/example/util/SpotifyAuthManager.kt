@@ -19,7 +19,6 @@ class SpotifyAuthManager(private val context: Context) {
     val accessToken: StateFlow<String?> = _accessToken
 
     init {
-        // Automatically refresh token on startup if sp_dc is available
         val spDc = prefs.getString("sp_dc", null)
         if (!spDc.isNullOrBlank()) {
             fetchWebPlayerToken(spDc)
@@ -41,23 +40,18 @@ class SpotifyAuthManager(private val context: Context) {
             val spDc = intent?.getStringExtra("sp_dc")
             val tokenJson = intent?.getStringExtra("token_json")
             if (!spDc.isNullOrBlank() && !tokenJson.isNullOrBlank()) {
-                if (tokenJson == "error" || tokenJson.startsWith("<")) {
-                    // WAF blocked or JS failed, fallback to OkHttp
-                    fetchWebPlayerToken(spDc)
-                } else {
-                    try {
-                        val json = org.json.JSONObject(tokenJson)
-                        val token = json.optString("accessToken")
-                        if (token.isNotBlank()) {
-                            saveToken(token)
-                            prefs.edit().putString("sp_dc", spDc).apply()
-                            Log.d("SpotifyAuth", "Successfully fetched Web Player token via JS")
-                        } else {
-                            fetchWebPlayerToken(spDc)
-                        }
-                    } catch (e: Exception) {
+                try {
+                    val json = org.json.JSONObject(tokenJson)
+                    val token = json.optString("accessToken")
+                    if (token.isNotBlank()) {
+                        saveToken(token)
+                        prefs.edit().putString("sp_dc", spDc).apply()
+                        Log.d("SpotifyAuth", "Successfully fetched Web Player token via WebView")
+                    } else {
                         fetchWebPlayerToken(spDc)
                     }
+                } catch (e: Exception) {
+                    fetchWebPlayerToken(spDc)
                 }
             } else {
                 Log.e("SpotifyAuth", "sp_dc or token_json was null or blank")
@@ -66,36 +60,43 @@ class SpotifyAuthManager(private val context: Context) {
     }
     
     private fun fetchWebPlayerToken(spDc: String) {
-        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
             try {
-                val client = okhttp3.OkHttpClient()
-                val request = okhttp3.Request.Builder()
-                    .url("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
-                    .addHeader("Cookie", "sp_dc=$spDc")
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Accept-Language", "en-US,en;q=0.9")
-                    .addHeader("App-Platform", "WebPlayer")
-                    .build()
-                    
-                val response = client.newCall(request).execute()
-                val bodyStr = response.body?.string()
-                
-                if (response.isSuccessful && bodyStr != null) {
-                    val json = org.json.JSONObject(bodyStr)
-                    val token = json.optString("accessToken")
-                    if (token.isNotBlank()) {
-                        saveToken(token)
-                        prefs.edit().putString("sp_dc", spDc).apply()
-                        Log.d("SpotifyAuth", "Successfully fetched Web Player token")
-                    } else {
-                        Log.e("SpotifyAuth", "No accessToken in response: $bodyStr")
+                val webView = android.webkit.WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.userAgentString = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                    webViewClient = object : android.webkit.WebViewClient() {
+                        override fun onPageFinished(view: android.webkit.WebView, url: String) {
+                            if (url.contains("get_access_token")) {
+                                view.evaluateJavascript(
+                                    "document.documentElement.innerText;"
+                                ) { jsonStr ->
+                                    try {
+                                        // jsonStr comes surrounded by escaped quotes if it's a string, so we clean it up safely
+                                        val cleanJson = if (jsonStr != null && jsonStr.startsWith("\"") && jsonStr.endsWith("\"")) {
+                                            jsonStr.substring(1, jsonStr.length - 1).replace("\\\"", "\"").replace("\\\\", "\\")
+                                        } else {
+                                            jsonStr ?: ""
+                                        }
+                                        val json = org.json.JSONObject(cleanJson)
+                                        val token = json.optString("accessToken")
+                                        if (token.isNotBlank()) {
+                                            saveToken(token)
+                                            Log.d("SpotifyAuth", "Successfully refreshed Web Player token in background")
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("SpotifyAuth", "Failed to parse refresh token", e)
+                                    }
+                                }
+                            }
+                        }
                     }
-                } else {
-                    Log.e("SpotifyAuth", "Failed to fetch Web token: $bodyStr")
                 }
+                android.webkit.CookieManager.getInstance().setCookie("https://spotify.com", "sp_dc=$spDc")
+                android.webkit.CookieManager.getInstance().flush()
+                webView.loadUrl("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
             } catch (e: Exception) {
-                Log.e("SpotifyAuth", "Error fetching Web token", e)
+                Log.e("SpotifyAuth", "Error starting background WebView", e)
             }
         }
     }
@@ -103,5 +104,6 @@ class SpotifyAuthManager(private val context: Context) {
     fun logout() {
         saveToken(null)
         prefs.edit().remove("sp_dc").apply()
+        android.webkit.CookieManager.getInstance().removeAllCookies(null)
     }
 }
