@@ -951,7 +951,12 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
                 ) as T
             }
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {
-                SettingsViewModel(appContainer.manageSettingsUseCase, appContainer.playerController) as T
+                SettingsViewModel(
+                    appContainer.manageSettingsUseCase, 
+                    appContainer.playerController,
+                    appContainer.spotifyAuthManager,
+                    appContainer.spotifyApiService
+                ) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

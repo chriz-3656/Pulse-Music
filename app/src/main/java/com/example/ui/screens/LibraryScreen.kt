@@ -225,8 +225,6 @@ fun LibraryScreen(
                         onRemoveDownload = { songId -> viewModel.removeDownload(songId) },
                         onFavoriteToggle = { song -> viewModel.toggleFavorite(song) }
                     )
-                        onPlaylistClick = { playlistId -> /* To be implemented in next step */ }
-                    )
                 }
             }
         }
@@ -578,7 +576,7 @@ fun PlaylistsTabContent(
             
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
+                androidx.compose.material3.Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

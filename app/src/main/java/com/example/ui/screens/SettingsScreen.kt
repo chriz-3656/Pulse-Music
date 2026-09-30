@@ -183,9 +183,10 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (uiState.spotifyUser?.images?.isNotEmpty() == true) {
+                    val user = uiState.spotifyUser
+                    if (user?.images?.isNotEmpty() == true) {
                         coil.compose.AsyncImage(
-                            model = uiState.spotifyUser.images.first().url,
+                            model = user.images.first().url,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp).clip(androidx.compose.foundation.shape.CircleShape)
                         )
@@ -200,12 +201,12 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = if (accessToken != null) uiState.spotifyUser?.display_name ?: "Spotify Linked" else "Link Spotify Account",
+                            text = if (accessToken != null) user?.display_name ?: "Spotify Linked" else "Link Spotify Account",
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                             color = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan
                         )
                         Text(
-                            text = if (accessToken != null) uiState.spotifyUser?.email ?: "Ready to sync playlists and library" else "Sync your playlists and liked songs",
+                            text = if (accessToken != null) user?.email ?: "Ready to sync playlists and library" else "Sync your playlists and liked songs",
                             style = MaterialTheme.typography.labelSmall,
                             color = SkeuoTextSecondary
                         )
@@ -980,8 +981,8 @@ fun SettingsScreen(
                     }
                 }
             }
-        }
             Spacer(modifier = Modifier.height(96.dp))
+        }
         }
     }
 
