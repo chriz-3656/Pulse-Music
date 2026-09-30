@@ -43,10 +43,10 @@ data class SpotifyPlaylistResponse(
 
 @JsonClass(generateAdapter = true)
 data class SpotifyPlaylistDto(
-    val id: String,
-    val name: String,
+    val id: String?,
+    val name: String?,
     val images: List<SpotifyImageDto>?,
-    val tracks: SpotifyTracksInfo
+    val tracks: SpotifyTracksInfo?
 )
 
 
@@ -76,8 +76,8 @@ data class SpotifyTrackItemDto(
 
 @JsonClass(generateAdapter = true)
 data class SpotifyTrackDto(
-    val id: String,
-    val name: String,
+    val id: String?,
+    val name: String?,
     val artists: List<SpotifyArtistDto>,
     val album: SpotifyAlbumDto,
     val duration_ms: Long
@@ -86,20 +86,20 @@ data class SpotifyTrackDto(
 
 @JsonClass(generateAdapter = true)
 data class SpotifyArtistDto(
-    val name: String
+    val name: String?
 )
 
 
 @JsonClass(generateAdapter = true)
 data class SpotifyAlbumDto(
-    val name: String,
+    val name: String?,
     val images: List<SpotifyImageDto>?
 )
 
 
 @JsonClass(generateAdapter = true)
 data class SpotifyUserDto(
-    val id: String,
+    val id: String?,
     val display_name: String?,
     val email: String?,
     val images: List<SpotifyImageDto>?

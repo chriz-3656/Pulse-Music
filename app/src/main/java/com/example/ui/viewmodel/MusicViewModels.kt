@@ -460,6 +460,8 @@ class LibraryViewModel(
                             _uiState.update { it.copy(spotifyPlaylists = playlists) }
                         } catch (e: Exception) {
                             android.util.Log.e("LibraryViewModel", "Failed to load Spotify Playlists", e)
+                            val errorPlaylist = com.example.data.remote.SpotifyPlaylistDto(id="error", name="Error: ${e.message}", images=null, tracks=null)
+                            _uiState.update { it.copy(spotifyPlaylists = listOf(errorPlaylist)) }
                         }
                     } else {
                         _uiState.update { it.copy(spotifyPlaylists = emptyList()) }
@@ -764,7 +766,7 @@ class SettingsViewModel(
                             _uiState.update { it.copy(spotifyUser = user) }
                         } catch (e: Exception) {
                             android.util.Log.e("SettingsVM", "Failed to fetch profile", e)
-                            _uiState.update { it.copy(spotifyUser = null) }
+                            _uiState.update { it.copy(spotifyUser = com.example.data.remote.SpotifyUserDto(id="error", display_name="Error: ${e.message}", email=null, images=emptyList())) }
                         }
                     } else {
                         _uiState.update { it.copy(spotifyUser = null) }

@@ -552,14 +552,14 @@ fun PlaylistsTabContent(
                                 ) {
                                     Column {
                                         Text(
-                                            text = playlist.name,
+                                            text = playlist.name ?: "Unknown",
                                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                                             color = androidx.compose.ui.graphics.Color.White,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
-                                            text = "${playlist.tracks.total} tracks",
+                                            text = "${playlist.tracks?.total ?: 0} tracks",
                                             style = MaterialTheme.typography.labelSmall,
                                             color = SkeuoLcdCyan
                                         )
@@ -830,14 +830,14 @@ fun SpotifyTabContent(
                         ) {
                             Column {
                                 Text(
-                                    text = playlist.name,
+                                    text = playlist.name ?: "Unknown",
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                                     color = androidx.compose.ui.graphics.Color.White,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
-                                    text = "${playlist.tracks.total} tracks",
+                                    text = "${playlist.tracks?.total ?: 0} tracks",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = SkeuoLcdCyan
                                 )
