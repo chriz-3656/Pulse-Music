@@ -17,6 +17,8 @@ android {
     versionName = "2.1.3"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    
+    buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${System.getenv("SPOTIFY_CLIENT_ID") ?: "default_client_id"}\"")
   }
 
   signingConfigs {
@@ -56,6 +58,7 @@ android {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  implementation("com.spotify.android:auth:2.1.1")
   implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
   implementation("org.mozilla:rhino:1.7.14")
   implementation("org.jsoup:jsoup:1.17.2")
