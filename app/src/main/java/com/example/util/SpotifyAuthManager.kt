@@ -1,5 +1,6 @@
 package com.example.util
 
+import kotlinx.coroutines.launch
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,7 @@ class SpotifyAuthManager(private val context: Context) {
 
     companion object {
         val CLIENT_ID = com.example.BuildConfig.SPOTIFY_CLIENT_ID
+        val CLIENT_SECRET = com.example.BuildConfig.SPOTIFY_CLIENT_SECRET
         const val REDIRECT_URI = "pulsemusic://callback"
         const val AUTH_REQUEST_CODE = 1337
     }
@@ -25,7 +27,7 @@ class SpotifyAuthManager(private val context: Context) {
     fun authenticate(activity: Activity) {
         val builder = AuthorizationRequest.Builder(
             CLIENT_ID,
-            AuthorizationResponse.Type.TOKEN,
+            AuthorizationResponse.Type.CODE,
             REDIRECT_URI
         )
         builder.setScopes(arrayOf("user-library-read", "playlist-read-private"))
@@ -37,19 +39,58 @@ class SpotifyAuthManager(private val context: Context) {
         if (requestCode == AUTH_REQUEST_CODE) {
             val response = AuthorizationClient.getResponse(resultCode, intent)
             when (response.type) {
+                AuthorizationResponse.Type.CODE -> {
+                    // Exchange code for token
+                    exchangeCodeForToken(response.code)
+                }
                 AuthorizationResponse.Type.TOKEN -> {
-                    // Successful response
                     _accessToken.value = response.accessToken
-                    Log.d("SpotifyAuth", "Logged in successfully")
+                    Log.d("SpotifyAuth", "Logged in successfully with implicit token")
                 }
                 AuthorizationResponse.Type.ERROR -> {
-                    // Handle error response
                     Log.e("SpotifyAuth", "Auth error: ${response.error}")
                 }
                 else -> {
-                    // Most likely auth flow was cancelled
                     Log.d("SpotifyAuth", "Auth cancelled or unknown response")
                 }
+            }
+        }
+    }
+    
+    private fun exchangeCodeForToken(code: String) {
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val client = okhttp3.OkHttpClient()
+                val authString = android.util.Base64.encodeToString(
+                    "$CLIENT_ID:$CLIENT_SECRET".toByteArray(),
+                    android.util.Base64.NO_WRAP
+                )
+                val requestBody = okhttp3.FormBody.Builder()
+                    .add("grant_type", "authorization_code")
+                    .add("code", code)
+                    .add("redirect_uri", REDIRECT_URI)
+                    .build()
+                    
+                val request = okhttp3.Request.Builder()
+                    .url("https://accounts.spotify.com/api/token")
+                    .post(requestBody)
+                    .addHeader("Authorization", "Basic $authString")
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build()
+                    
+                val response = client.newCall(request).execute()
+                val bodyStr = response.body?.string()
+                
+                if (response.isSuccessful && bodyStr != null) {
+                    val json = org.json.JSONObject(bodyStr)
+                    val token = json.getString("access_token")
+                    _accessToken.value = token
+                    Log.d("SpotifyAuth", "Successfully exchanged code for token")
+                } else {
+                    Log.e("SpotifyAuth", "Failed to exchange token: $bodyStr")
+                }
+            } catch (e: Exception) {
+                Log.e("SpotifyAuth", "Error exchanging token", e)
             }
         }
     }

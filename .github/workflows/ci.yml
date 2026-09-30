@@ -60,6 +60,7 @@ jobs:
       - name: Run JVM Unit Tests
         env:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: ./gradlew :app:testDebugUnitTest --no-daemon
 
       - name: Upload Test Reports
@@ -76,6 +77,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: ./gradlew :app:assembleRelease :app:assembleDebug --no-daemon
 
       - name: Prepare Release APK Artifacts
