@@ -19,6 +19,8 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     
     buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${System.getenv("SPOTIFY_CLIENT_ID") ?: "default_client_id"}\"")
+    manifestPlaceholders["redirectSchemeName"] = "pulsemusic"
+    manifestPlaceholders["redirectHostName"] = "callback"
   }
 
   signingConfigs {
