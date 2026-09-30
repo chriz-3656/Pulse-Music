@@ -54,19 +54,31 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 webChromeClient = WebChromeClient()
                                 
                                 webViewClient = object : WebViewClient() {
-                                    override fun onPageFinished(view: WebView?, url: String?) {
+                                    override fun onPageFinished(view: WebView, url: String) {
                                         super.onPageFinished(view, url)
                                         val cookies = CookieManager.getInstance().getCookie("https://spotify.com")
                                         if (cookies != null && cookies.contains("sp_dc=")) {
                                             val spDc = cookies.split(";").map { it.trim() }.firstOrNull { it.startsWith("sp_dc=") }?.substringAfter("=")
                                             if (!spDc.isNullOrBlank()) {
-                                                val result = Intent().apply { putExtra("sp_dc", spDc) }
-                                                setResult(Activity.RESULT_OK, result)
-                                                finish()
+                                                view.evaluateJavascript(
+                                                    "fetch('https://open.spotify.com/get_access_token?reason=transport&productType=web_player').then(r => r.text()).then(t => window.SpotifyAuth.onToken(t, '$spDc')).catch(e => window.SpotifyAuth.onToken('error', '$spDc'));",
+                                                    null
+                                                )
                                             }
                                         }
                                     }
                                 }
+                                addJavascriptInterface(object : Any() {
+                                    @android.webkit.JavascriptInterface
+                                    fun onToken(jsonStr: String, spDc: String) {
+                                        val result = Intent().apply { 
+                                            putExtra("sp_dc", spDc)
+                                            putExtra("token_json", jsonStr)
+                                        }
+                                        setResult(Activity.RESULT_OK, result)
+                                        finish()
+                                    }
+                                }, "SpotifyAuth")
                                 loadUrl("https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F")
                             }
                         },

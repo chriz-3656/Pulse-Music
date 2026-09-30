@@ -39,10 +39,28 @@ class SpotifyAuthManager(private val context: Context) {
     fun handleAuthResponse(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val spDc = intent?.getStringExtra("sp_dc")
-            if (!spDc.isNullOrBlank()) {
-                fetchWebPlayerToken(spDc)
+            val tokenJson = intent?.getStringExtra("token_json")
+            if (!spDc.isNullOrBlank() && !tokenJson.isNullOrBlank()) {
+                if (tokenJson == "error" || tokenJson.startsWith("<")) {
+                    // WAF blocked or JS failed, fallback to OkHttp
+                    fetchWebPlayerToken(spDc)
+                } else {
+                    try {
+                        val json = org.json.JSONObject(tokenJson)
+                        val token = json.optString("accessToken")
+                        if (token.isNotBlank()) {
+                            saveToken(token)
+                            prefs.edit().putString("sp_dc", spDc).apply()
+                            Log.d("SpotifyAuth", "Successfully fetched Web Player token via JS")
+                        } else {
+                            fetchWebPlayerToken(spDc)
+                        }
+                    } catch (e: Exception) {
+                        fetchWebPlayerToken(spDc)
+                    }
+                }
             } else {
-                Log.e("SpotifyAuth", "sp_dc was null or blank")
+                Log.e("SpotifyAuth", "sp_dc or token_json was null or blank")
             }
         }
     }
