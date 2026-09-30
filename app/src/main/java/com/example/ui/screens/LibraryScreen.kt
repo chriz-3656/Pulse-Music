@@ -165,13 +165,11 @@ fun LibraryScreen(
                         LibraryTab.PLAYLISTS -> uiState.playlists.size
                         LibraryTab.FAVORITES -> uiState.favoriteSongs.size
                         LibraryTab.DOWNLOADS -> uiState.downloadedSongs.size
-                        LibraryTab.SPOTIFY -> uiState.spotifyPlaylists.size
                     }
                     val label = when (tab) {
                         LibraryTab.PLAYLISTS -> "CRATES ($count)"
                         LibraryTab.FAVORITES -> "FAVORITES ($count)"
                         LibraryTab.DOWNLOADS -> "OFFLINE ($count)"
-                        LibraryTab.SPOTIFY -> "SPOTIFY ($count)"
                     }
 
                     SkeuoTactileButton(
@@ -204,6 +202,7 @@ fun LibraryScreen(
                     PlaylistsTabContent(
                         onImportSpotifyClick = { showSpotifyDialog = true },
                         playlists = uiState.playlists,
+                        spotifyPlaylists = uiState.spotifyPlaylists,
                         onCreateClick = { viewModel.showCreatePlaylistDialog(true) },
                         onPlaylistClick = { playlist -> onPlaylistClick(playlist.id) },
                         onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
@@ -226,11 +225,6 @@ fun LibraryScreen(
                         onRemoveDownload = { songId -> viewModel.removeDownload(songId) },
                         onFavoriteToggle = { song -> viewModel.toggleFavorite(song) }
                     )
-                }
-                LibraryTab.SPOTIFY -> {
-                    SpotifyTabContent(
-                        isSpotifyLinked = uiState.isSpotifyLinked,
-                        spotifyPlaylists = uiState.spotifyPlaylists,
                         onPlaylistClick = { playlistId -> /* To be implemented in next step */ }
                     )
                 }
@@ -405,6 +399,7 @@ fun LibraryScreen(
 fun PlaylistsTabContent(
     onImportSpotifyClick: () -> Unit,
     playlists: List<Playlist>,
+    spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto>,
     onCreateClick: () -> Unit,
     onPlaylistClick: (Playlist) -> Unit,
     onDeletePlaylist: (String) -> Unit
@@ -504,6 +499,87 @@ fun PlaylistsTabContent(
                         )
                     }
                 }
+            }
+        }
+
+        if (spotifyPlaylists.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "SPOTIFY SYNC",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                    color = SkeuoLcdCyan
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
+            items(spotifyPlaylists.chunked(2)) { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    for (playlist in row) {
+                        SkeuoBevelCard(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                val imageUrl = playlist.images?.firstOrNull()?.url
+                                if (imageUrl != null) {
+                                    coil.compose.AsyncImage(
+                                        model = imageUrl,
+                                        contentDescription = playlist.name,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(SkeuoRecessedTray),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoLcdCyan)
+                                    }
+                                }
+                                
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .align(Alignment.BottomCenter)
+                                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                                        .padding(8.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = playlist.name,
+                                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                            color = androidx.compose.ui.graphics.Color.White,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "${playlist.tracks.total} tracks",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = SkeuoLcdCyan
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (row.size == 1) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 

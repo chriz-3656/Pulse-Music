@@ -19,6 +19,18 @@ interface SpotifyApiService {
         @Query("limit") limit: Int = 50,
         @Query("offset") offset: Int = 0
     ): SpotifyTracksResponse
+
+    @GET("v1/me")
+    suspend fun getCurrentUserProfile(
+        @Header("Authorization") authHeader: String
+    ): SpotifyUserDto
+
+    @GET("v1/me/tracks")
+    suspend fun getMyLikedSongs(
+        @Header("Authorization") authHeader: String,
+        @Query("limit") limit: Int = 1,
+        @Query("offset") offset: Int = 0
+    ): SpotifyTracksInfoResponse
 }
 
 data class SpotifyPlaylistResponse(
@@ -63,4 +75,15 @@ data class SpotifyArtistDto(
 data class SpotifyAlbumDto(
     val name: String,
     val images: List<SpotifyImageDto>?
+)
+
+data class SpotifyUserDto(
+    val id: String,
+    val display_name: String?,
+    val email: String?,
+    val images: List<SpotifyImageDto>?
+)
+
+data class SpotifyTracksInfoResponse(
+    val total: Int
 )

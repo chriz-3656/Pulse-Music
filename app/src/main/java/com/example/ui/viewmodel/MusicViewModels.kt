@@ -410,7 +410,7 @@ class PlayerViewModel(
 // -------------------------------------------------------------
 // Library ViewModel
 // -------------------------------------------------------------
-enum class LibraryTab { PLAYLISTS, FAVORITES, DOWNLOADS, SPOTIFY }
+enum class LibraryTab { PLAYLISTS, FAVORITES, DOWNLOADS }
 
 data class LibraryUiState(
     val selectedTab: LibraryTab = LibraryTab.PLAYLISTS,
@@ -444,7 +444,20 @@ class LibraryViewModel(
                     if (token != null) {
                         try {
                             val response = spotifyApiService.getMyPlaylists("Bearer $token")
-                            _uiState.update { it.copy(spotifyPlaylists = response.items) }
+                            var playlists = response.items
+                            try {
+                                val likes = spotifyApiService.getMyLikedSongs("Bearer $token")
+                                val likesPlaylist = com.example.data.remote.SpotifyPlaylistDto(
+                                    id = "liked_songs",
+                                    name = "Liked Songs",
+                                    images = listOf(com.example.data.remote.SpotifyImageDto("https://misc.scdn.co/liked-songs/liked-songs-300.png")),
+                                    tracks = com.example.data.remote.SpotifyTracksInfo(total = likes.total)
+                                )
+                                playlists = listOf(likesPlaylist) + playlists
+                            } catch (e: Exception) {
+                                android.util.Log.e("LibraryViewModel", "Failed to load Liked Songs", e)
+                            }
+                            _uiState.update { it.copy(spotifyPlaylists = playlists) }
                         } catch (e: Exception) {
                             android.util.Log.e("LibraryViewModel", "Failed to load Spotify Playlists", e)
                         }
@@ -726,12 +739,16 @@ data class SettingsUiState(
     val customUrlDraft: String = "",
     val playerState: PlayerState = PlayerState(),
     val providerStatuses: Map<MusicProvider, ProviderStatus> = emptyMap(),
-    val isCheckingProviders: Boolean = false
+    val isCheckingProviders: Boolean = false,
+    val isDeveloperMode: Boolean = false,
+    val spotifyUser: com.example.data.remote.SpotifyUserDto? = null
 )
 
 class SettingsViewModel(
     private val manageSettingsUseCase: ManageSettingsUseCase,
-    private val playerController: MusicPlayerController
+    private val playerController: MusicPlayerController,
+    private val spotifyAuthManager: com.example.util.SpotifyAuthManager,
+    private val spotifyApiService: com.example.data.remote.SpotifyApiService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -739,6 +756,21 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
+            launch {
+                spotifyAuthManager.accessToken.collectLatest { token ->
+                    if (token != null) {
+                        try {
+                            val user = spotifyApiService.getCurrentUserProfile("Bearer $token")
+                            _uiState.update { it.copy(spotifyUser = user) }
+                        } catch (e: Exception) {
+                            android.util.Log.e("SettingsVM", "Failed to fetch profile", e)
+                            _uiState.update { it.copy(spotifyUser = null) }
+                        }
+                    } else {
+                        _uiState.update { it.copy(spotifyUser = null) }
+                    }
+                }
+            }
             manageSettingsUseCase.getSettings().collectLatest { settings ->
                 playerController.isAutoplayEnabled = settings.autoplayEnabled
                 _uiState.update {
@@ -815,6 +847,10 @@ class SettingsViewModel(
         viewModelScope.launch {
             manageSettingsUseCase.updateSettings(updated)
         }
+    }
+
+    fun setDeveloperMode(enabled: Boolean) {
+        _uiState.update { it.copy(isDeveloperMode = enabled) }
     }
 
     fun updateCustomUrlDraft(url: String) {

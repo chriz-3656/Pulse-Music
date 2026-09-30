@@ -30,7 +30,7 @@ class SpotifyAuthManager(private val context: Context) {
             AuthorizationResponse.Type.CODE,
             REDIRECT_URI
         )
-        builder.setScopes(arrayOf("user-library-read", "playlist-read-private"))
+        builder.setScopes(arrayOf("user-library-read", "playlist-read-private", "user-read-private", "user-read-email"))
         val request = builder.build()
         AuthorizationClient.openLoginActivity(activity, AUTH_REQUEST_CODE, request)
     }

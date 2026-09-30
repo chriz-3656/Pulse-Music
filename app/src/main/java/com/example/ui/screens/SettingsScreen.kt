@@ -183,21 +183,29 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (accessToken != null) Icons.Default.CheckCircle else Icons.Default.Person,
-                        contentDescription = null,
-                        tint = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    if (uiState.spotifyUser?.images?.isNotEmpty() == true) {
+                        coil.compose.AsyncImage(
+                            model = uiState.spotifyUser.images.first().url,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (accessToken != null) Icons.Default.CheckCircle else Icons.Default.Person,
+                            contentDescription = null,
+                            tint = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = if (accessToken != null) "Spotify Linked" else "Link Spotify Account",
+                            text = if (accessToken != null) uiState.spotifyUser?.display_name ?: "Spotify Linked" else "Link Spotify Account",
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                             color = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan
                         )
                         Text(
-                            text = if (accessToken != null) "Ready to sync playlists and library" else "Sync your playlists and liked songs",
+                            text = if (accessToken != null) uiState.spotifyUser?.email ?: "Ready to sync playlists and library" else "Sync your playlists and liked songs",
                             style = MaterialTheme.typography.labelSmall,
                             color = SkeuoTextSecondary
                         )
@@ -318,6 +326,44 @@ fun SettingsScreen(
         }
 
         // Section: Playback & Crossfade
+        item {
+            SkeuoBevelCard(
+                modifier = Modifier.fillMaxWidth().clickable { viewModel.setDeveloperMode(!uiState.isDeveloperMode) },
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Developer Mode",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            color = SkeuoTextPrimary
+                        )
+                        Text(
+                            text = "Show advanced streaming configurations and system info",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = SkeuoTextSecondary
+                        )
+                    }
+                    androidx.compose.material3.Switch(
+                        checked = uiState.isDeveloperMode,
+                        onCheckedChange = { viewModel.setDeveloperMode(it) },
+                        colors = androidx.compose.material3.SwitchDefaults.colors(
+                            checkedThumbColor = SkeuoPhosphorGreen,
+                            checkedTrackColor = SkeuoRecessedTray,
+                            uncheckedThumbColor = SkeuoChromeDark,
+                            uncheckedTrackColor = SkeuoRecessedTray
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        if (uiState.isDeveloperMode) {
         item {
             SettingsSectionHeader(icon = Icons.Default.Tune, title = "Hardware Playback Controls")
             Spacer(modifier = Modifier.height(8.dp))
@@ -934,6 +980,7 @@ fun SettingsScreen(
                     }
                 }
             }
+        }
             Spacer(modifier = Modifier.height(96.dp))
         }
     }
