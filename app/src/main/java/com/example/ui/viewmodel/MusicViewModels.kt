@@ -793,6 +793,7 @@ class SettingsViewModel(
     fun setProvider(provider: MusicProvider) {
         viewModelScope.launch {
             manageSettingsUseCase.setProvider(provider)
+            playerController.setAudioQuality(_uiState.value.userSettings.audioQuality)
         }
     }
 

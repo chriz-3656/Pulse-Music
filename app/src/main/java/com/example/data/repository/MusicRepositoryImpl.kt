@@ -1015,15 +1015,37 @@ class MusicRepositoryImpl(
         return ""
     }
 
+    private suspend fun fetchYoutubeStreamUrlFromSearch(title: String, artist: String): String {
+        try {
+            if (title.isBlank()) return ""
+            val query = "$title $artist".trim()
+            val res = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+            val ytmSongs = res?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()
+            val firstSongId = ytmSongs?.firstOrNull()?.id
+            if (firstSongId != null) {
+                return fetchYouTubeStreamUrl(firstSongId)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
     private suspend fun fetchStreamUrl(id: String, title: String = "", artist: String = ""): String {
         return withContext(Dispatchers.IO) {
             val provider = _userSettingsFlow.value.provider
             
-            // NewPipe (YouTube) is the new primary engine.
+            // Fast-path: if the ID itself resolves natively (e.g. YouTube ID), use it.
             val yt = fetchYouTubeStreamUrl(id)
             if (yt.isNotBlank()) return@withContext yt
             
             when (provider) {
+                MusicProvider.YOUTUBE -> {
+                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
+                    if (ytSearch.isNotBlank()) return@withContext ytSearch
+                    val sc = fetchSoundCloudStreamUrl(title, artist)
+                    if (sc.isNotBlank()) return@withContext sc
+                }
                 MusicProvider.JIOSAAVN -> {
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
@@ -1033,21 +1055,16 @@ class MusicRepositoryImpl(
                 MusicProvider.SOUNDCLOUD -> {
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
-                    val jio = fetchJioSaavnStreamUrl(title, artist)
-                    if (jio.isNotBlank()) return@withContext jio
-                }
-                MusicProvider.YOUTUBE -> {
-                    val jio = fetchJioSaavnStreamUrl(title, artist)
-                    if (jio.isNotBlank()) return@withContext jio
-                    val sc = fetchSoundCloudStreamUrl(title, artist)
-                    if (sc.isNotBlank()) return@withContext sc
+                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
+                    if (ytSearch.isNotBlank()) return@withContext ytSearch
                 }
                 MusicProvider.AUTO -> {
-                    val jio = fetchJioSaavnStreamUrl(title, artist)
-                    if (jio.isNotBlank()) return@withContext jio
+                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
+                    if (ytSearch.isNotBlank()) return@withContext ytSearch
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
-                    if (yt.isNotBlank()) return@withContext yt
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
                 }
             }
             ""
