@@ -204,7 +204,7 @@ fun LibraryScreen(
                         playlists = uiState.playlists,
                         spotifyPlaylists = uiState.spotifyPlaylists,
                         onCreateClick = { viewModel.showCreatePlaylistDialog(true) },
-                        onPlaylistClick = { playlist -> onPlaylistClick(playlist.id) },
+                        onPlaylistClick = { playlist -> playlist.id?.let { onPlaylistClick(it) } },
                         onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
                     )
                 }
@@ -798,7 +798,7 @@ fun SpotifyTabContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .clickable { onPlaylistClick(playlist.id) },
+                        .clickable { playlist.id?.let { onPlaylistClick(it) } },
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
