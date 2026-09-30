@@ -160,7 +160,7 @@ fun SettingsScreen(
             }
             val accessToken by authManager.accessToken.collectAsState()
             
-            SettingsSectionHeader(icon = androidx.compose.material.icons.Icons.Default.Person, title = "Accounts & Cloud Sync")
+            SettingsSectionHeader(icon = Icons.Default.Person, title = "Accounts & Cloud Sync")
             Spacer(modifier = Modifier.height(12.dp))
             
             SkeuoTactileButton(
@@ -184,7 +184,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (accessToken != null) androidx.compose.material.icons.Icons.Default.Done else androidx.compose.material.icons.Icons.Default.Add,
+                        imageVector = if (accessToken != null) Icons.Default.CheckCircle else Icons.Default.Person,
                         contentDescription = null,
                         tint = if (accessToken != null) SkeuoPhosphorGreen else SkeuoLcdCyan,
                         modifier = Modifier.size(24.dp)
