@@ -410,7 +410,7 @@ class PlayerViewModel(
 // -------------------------------------------------------------
 // Library ViewModel
 // -------------------------------------------------------------
-enum class LibraryTab { PLAYLISTS, FAVORITES, DOWNLOADS }
+enum class LibraryTab { PLAYLISTS, FAVORITES, DOWNLOADS, SPOTIFY }
 
 data class LibraryUiState(
     val selectedTab: LibraryTab = LibraryTab.PLAYLISTS,
@@ -419,14 +419,18 @@ data class LibraryUiState(
     val downloadedSongs: List<Song> = emptyList(),
     val showCreateDialog: Boolean = false,
     val isLoading: Boolean = false,
-    val importProgress: ImportProgress? = null
+    val importProgress: ImportProgress? = null,
+    val spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto> = emptyList(),
+    val isSpotifyLinked: Boolean = false
 )
 
 class LibraryViewModel(
     private val managePlaylistUseCase: ManagePlaylistUseCase,
     private val manageFavoritesUseCase: ManageFavoritesUseCase,
     private val manageDownloadsUseCase: ManageDownloadsUseCase,
-    private val playerController: MusicPlayerController
+    private val playerController: MusicPlayerController,
+    private val spotifyAuthManager: com.example.util.SpotifyAuthManager,
+    private val spotifyApiService: com.example.data.remote.SpotifyApiService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LibraryUiState())
@@ -434,6 +438,21 @@ class LibraryViewModel(
 
     init {
         viewModelScope.launch {
+            launch {
+                spotifyAuthManager.accessToken.collectLatest { token ->
+                    _uiState.update { it.copy(isSpotifyLinked = token != null) }
+                    if (token != null) {
+                        try {
+                            val response = spotifyApiService.getMyPlaylists("Bearer $token")
+                            _uiState.update { it.copy(spotifyPlaylists = response.items) }
+                        } catch (e: Exception) {
+                            android.util.Log.e("LibraryViewModel", "Failed to load Spotify Playlists", e)
+                        }
+                    } else {
+                        _uiState.update { it.copy(spotifyPlaylists = emptyList()) }
+                    }
+                }
+            }
             launch {
                 managePlaylistUseCase.getUserPlaylists().collectLatest { pls ->
                     _uiState.update { it.copy(playlists = pls) }
@@ -890,7 +909,9 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
                     appContainer.managePlaylistUseCase,
                     appContainer.manageFavoritesUseCase,
                     appContainer.manageDownloadsUseCase,
-                    appContainer.playerController
+                    appContainer.playerController,
+                    appContainer.spotifyAuthManager,
+                    appContainer.spotifyApiService
                 ) as T
             }
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {

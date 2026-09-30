@@ -163,11 +163,13 @@ fun LibraryScreen(
                         LibraryTab.PLAYLISTS -> uiState.playlists.size
                         LibraryTab.FAVORITES -> uiState.favoriteSongs.size
                         LibraryTab.DOWNLOADS -> uiState.downloadedSongs.size
+                        LibraryTab.SPOTIFY -> uiState.spotifyPlaylists.size
                     }
                     val label = when (tab) {
                         LibraryTab.PLAYLISTS -> "CRATES ($count)"
                         LibraryTab.FAVORITES -> "FAVORITES ($count)"
                         LibraryTab.DOWNLOADS -> "OFFLINE ($count)"
+                        LibraryTab.SPOTIFY -> "SPOTIFY ($count)"
                     }
 
                     SkeuoTactileButton(
@@ -221,6 +223,13 @@ fun LibraryScreen(
                         onSongClick = { song -> viewModel.playSong(song, uiState.downloadedSongs) },
                         onRemoveDownload = { songId -> viewModel.removeDownload(songId) },
                         onFavoriteToggle = { song -> viewModel.toggleFavorite(song) }
+                    )
+                }
+                LibraryTab.SPOTIFY -> {
+                    SpotifyTabContent(
+                        isSpotifyLinked = uiState.isSpotifyLinked,
+                        spotifyPlaylists = uiState.spotifyPlaylists,
+                        onPlaylistClick = { playlistId -> /* To be implemented in next step */ }
                     )
                 }
             }
@@ -677,6 +686,89 @@ fun DownloadsTabContent(
                     onFavoriteToggle = { onFavoriteToggle(song) },
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun SpotifyTabContent(
+    isSpotifyLinked: Boolean,
+    spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto>,
+    onPlaylistClick: (String) -> Unit
+) {
+    if (!isSpotifyLinked) {
+        EmptyStateView(
+            title = "Not Linked",
+            message = "Connect your Spotify account in Settings to view your playlists here.",
+            icon = Icons.Default.Add
+        )
+    } else if (spotifyPlaylists.isEmpty()) {
+        EmptyStateView(
+            title = "No Playlists Found",
+            message = "We couldn't find any public playlists in your Spotify account.",
+            icon = Icons.Default.MusicNote
+        )
+    } else {
+        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+            columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
+            contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 8.dp, bottom = 96.dp),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            androidx.compose.foundation.lazy.grid.items(spotifyPlaylists) { playlist ->
+                SkeuoBevelCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clickable { onPlaylistClick(playlist.id) },
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        val imageUrl = playlist.images?.firstOrNull()?.url
+                        if (imageUrl != null) {
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = playlist.name,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(SkeuoRecessedTray),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoLcdCyan)
+                            }
+                        }
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                                .padding(8.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = playlist.name,
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = androidx.compose.ui.graphics.Color.White,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = "${playlist.tracks.total} tracks",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = SkeuoLcdCyan
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

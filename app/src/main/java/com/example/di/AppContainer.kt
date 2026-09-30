@@ -45,6 +45,15 @@ class AppContainer(private val context: Context) {
         NetworkClient.createApiService(apiOkHttpClient, moshi)
     }
 
+    val spotifyApiService: com.example.data.remote.SpotifyApiService by lazy {
+        retrofit2.Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/")
+            .client(apiOkHttpClient)
+            .addConverterFactory(retrofit2.converter.moshi.MoshiConverterFactory.create(moshi))
+            .build()
+            .create(com.example.data.remote.SpotifyApiService::class.java)
+    }
+
     val mediaCacheManager: MediaCacheManager by lazy {
         MediaCacheManager(context, mediaOkHttpClient)
     }
