@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -717,7 +719,7 @@ fun SpotifyTabContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            androidx.compose.foundation.lazy.grid.items(spotifyPlaylists) { playlist ->
+            items(spotifyPlaylists) { playlist ->
                 SkeuoBevelCard(
                     modifier = Modifier
                         .fillMaxWidth()
