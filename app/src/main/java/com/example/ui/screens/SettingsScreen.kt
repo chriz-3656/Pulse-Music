@@ -365,6 +365,19 @@ fun SettingsScreen(
         }
 
         if (uiState.isDeveloperMode) {
+            item {
+                val logs by com.example.util.DebugLogger.logs.collectAsState()
+                Text("Debug Logs", style = MaterialTheme.typography.titleMedium, color = SkeuoLcdCyan, modifier = Modifier.padding(vertical = 8.dp))
+                SkeuoBevelCard(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+                    androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.padding(8.dp).fillMaxSize()) {
+                        item {
+                            androidx.compose.foundation.text.selection.SelectionContainer {
+                                Text(text = logs, color = SkeuoLcdCyan, style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+                }
+            }
         item {
             SettingsSectionHeader(icon = Icons.Default.Tune, title = "Hardware Playback Controls")
             Spacer(modifier = Modifier.height(8.dp))

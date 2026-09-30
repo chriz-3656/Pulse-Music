@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.util.DebugLogger
 
 class SpotifyLoginActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -56,18 +57,16 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 webViewClient = object : WebViewClient() {
                                     override fun onPageFinished(view: WebView, url: String) {
                                         super.onPageFinished(view, url)
+                                        DebugLogger.log("WebView onPageFinished: $url")
+                                        if (url == "https://open.spotify.com/auth_hack") return
+                                        
                                         val cookies = CookieManager.getInstance().getCookie("https://spotify.com") ?: CookieManager.getInstance().getCookie("https://open.spotify.com")
                                         if (cookies != null && cookies.contains("sp_dc=")) {
                                             val spDc = cookies.split(";").map { it.trim() }.firstOrNull { it.startsWith("sp_dc=") }?.substringAfter("=")
                                             if (!spDc.isNullOrBlank()) {
-                                                if (url.contains("get_access_token")) {
-                                                    view.evaluateJavascript(
-                                                        "window.SpotifyAuth.onToken(document.documentElement.innerText, '$spDc');",
-                                                        null
-                                                    )
-                                                } else {
-                                                    view.loadUrl("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
-                                                }
+                                                DebugLogger.log("Captured sp_dc, injecting fetch script")
+                                                val html = "<html><body><script>fetch('https://open.spotify.com/get_access_token?reason=transport&productType=web_player', {headers: {'Accept': 'application/json'}}).then(r=>r.text()).then(t=>window.SpotifyAuth.onToken(t, '$spDc')).catch(e=>window.SpotifyAuth.onToken('error: ' + e, '$spDc'));</script></body></html>"
+                                                view.loadDataWithBaseURL("https://open.spotify.com/", html, "text/html", "UTF-8", "https://open.spotify.com/auth_hack")
                                             }
                                         }
                                     }
@@ -75,6 +74,7 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 addJavascriptInterface(object : Any() {
                                     @android.webkit.JavascriptInterface
                                     fun onToken(jsonStr: String, spDc: String) {
+                                        DebugLogger.log("JS onToken received: $jsonStr")
                                         val result = Intent().apply { 
                                             putExtra("sp_dc", spDc)
                                             putExtra("token_json", jsonStr)
