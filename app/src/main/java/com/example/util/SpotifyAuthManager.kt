@@ -68,12 +68,28 @@ class SpotifyAuthManager(private val context: Context) {
                 DebugLogger.log("SpotifyAuth: starting background WebView for refresh")
                 val webView = android.webkit.WebView(context).apply {
                     settings.javaScriptEnabled = true
-                    settings.userAgentString = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                     
+                    var hasInjected = false
+                    webViewClient = object : android.webkit.WebViewClient() {
+                        override fun onPageFinished(view: android.webkit.WebView, url: String) {
+                            if (hasInjected) return
+                            if (url.startsWith("https://open.spotify.com")) {
+                                hasInjected = true
+                                view.evaluateJavascript(
+                                    "try { " +
+                                    "  var b64 = document.querySelector('script[data-testid=\"session\"]').innerText;" +
+                                    "  var jsonStr = atob(b64);" +
+                                    "  window.SpotifyAuth.onToken(jsonStr);" +
+                                    "} catch(e) { window.SpotifyAuth.onToken('error: ' + e.message); }"
+                                , null)
+                            }
+                        }
+                    }
                     addJavascriptInterface(object : Any() {
                         @android.webkit.JavascriptInterface
                         fun onToken(jsonStr: String) {
-                            DebugLogger.log("SpotifyAuth: background JS onToken received")
+                            DebugLogger.log("SpotifyAuth: background JS onToken received, length: ${jsonStr.length}")
                             try {
                                 val json = org.json.JSONObject(jsonStr)
                                 val token = json.optString("accessToken")
@@ -93,8 +109,7 @@ class SpotifyAuthManager(private val context: Context) {
                 android.webkit.CookieManager.getInstance().setCookie("https://open.spotify.com", "sp_dc=$spDc")
                 android.webkit.CookieManager.getInstance().flush()
                 
-                val html = "<html><body><script>fetch('https://open.spotify.com/get_access_token?reason=transport&productType=web_player', {headers: {'Accept': 'application/json'}}).then(r=>r.text()).then(t=>window.SpotifyAuth.onToken(t)).catch(e=>window.SpotifyAuth.onToken('error: ' + e));</script></body></html>"
-                webView.loadDataWithBaseURL("https://open.spotify.com/", html, "text/html", "UTF-8", "https://open.spotify.com/auth_hack")
+                webView.loadUrl("https://open.spotify.com/")
             } catch (e: Exception) {
                 DebugLogger.log("SpotifyAuth ERROR: Error starting background WebView: ${e.message}")
             }

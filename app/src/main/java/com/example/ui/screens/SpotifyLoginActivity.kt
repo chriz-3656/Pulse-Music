@@ -51,7 +51,7 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 )
                                 settings.javaScriptEnabled = true
                                 settings.domStorageEnabled = true
-                                settings.userAgentString = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                                settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                                 webChromeClient = WebChromeClient()
                                 
                                 var hasInjected = false
@@ -61,14 +61,21 @@ class SpotifyLoginActivity : ComponentActivity() {
                                         DebugLogger.log("WebView onPageFinished: $url")
                                         if (hasInjected) return
                                         
-                                        val cookies = CookieManager.getInstance().getCookie("https://spotify.com") ?: CookieManager.getInstance().getCookie("https://open.spotify.com")
-                                        if (cookies != null && cookies.contains("sp_dc=")) {
-                                            val spDc = cookies.split(";").map { it.trim() }.firstOrNull { it.startsWith("sp_dc=") }?.substringAfter("=")
-                                            if (!spDc.isNullOrBlank()) {
-                                                DebugLogger.log("Captured sp_dc, injecting fetch script")
-                                                hasInjected = true
-                                                val html = "<html><body><script>fetch('https://open.spotify.com/get_access_token?reason=transport&productType=web_player', {headers: {'Accept': 'application/json'}}).then(r=>r.text()).then(t=>window.SpotifyAuth.onToken(t, '$spDc')).catch(e=>window.SpotifyAuth.onToken('error: ' + e, '$spDc'));</script></body></html>"
-                                                view.loadDataWithBaseURL("https://open.spotify.com/", html, "text/html", "UTF-8", "https://open.spotify.com/auth_hack")
+                                        if (url.startsWith("https://open.spotify.com")) {
+                                            val cookies = CookieManager.getInstance().getCookie("https://spotify.com") ?: CookieManager.getInstance().getCookie("https://open.spotify.com")
+                                            if (cookies != null && cookies.contains("sp_dc=")) {
+                                                val spDc = cookies.split(";").map { it.trim() }.firstOrNull { it.startsWith("sp_dc=") }?.substringAfter("=")
+                                                if (!spDc.isNullOrBlank()) {
+                                                    DebugLogger.log("On open.spotify.com, extracting session from DOM")
+                                                    hasInjected = true
+                                                    view.evaluateJavascript(
+                                                        "try { " +
+                                                        "  var b64 = document.querySelector('script[data-testid=\"session\"]').innerText;" +
+                                                        "  var jsonStr = atob(b64);" +
+                                                        "  window.SpotifyAuth.onToken(jsonStr, '$spDc');" +
+                                                        "} catch(e) { window.SpotifyAuth.onToken('error: ' + e.message, '$spDc'); }"
+                                                    , null)
+                                                }
                                             }
                                         }
                                     }
@@ -76,7 +83,7 @@ class SpotifyLoginActivity : ComponentActivity() {
                                 addJavascriptInterface(object : Any() {
                                     @android.webkit.JavascriptInterface
                                     fun onToken(jsonStr: String, spDc: String) {
-                                        DebugLogger.log("JS onToken received: $jsonStr")
+                                        DebugLogger.log("JS onToken received, length: ${jsonStr.length}")
                                         val result = Intent().apply { 
                                             putExtra("sp_dc", spDc)
                                             putExtra("token_json", jsonStr)
