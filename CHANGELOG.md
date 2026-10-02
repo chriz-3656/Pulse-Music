@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.1.3] - 2026-10-02
+## [2.1.4] - 2026-10-02
 ### Added
 - **Auto-Scrolling Time-Synced Lyrics:** Beautiful Neumorphic animated lyrics injected right into the main player UI, automatically syncing and scrolling with the track.
 - **Sleep Timer:** Securely handles pausing playback and shutting down the music service after a customizable period (15m, 30m, 60m, 120m).

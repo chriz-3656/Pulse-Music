@@ -1,4 +1,4 @@
-# Pulse Music v2.1.3
+# Pulse Music v2.1.4
 
 Pulse Music is a highly immersive, aesthetically driven Android music player featuring a custom **Yellow Neumorphism** and **Skeuomorphic** hardware design language. 
 
@@ -14,5 +14,5 @@ Pulse Music is a highly immersive, aesthetically driven Android music player fea
 This app relies on GitHub Actions for compilation and CI/CD. The local Gradle environment may time out on dependency resolution due to limited resources. Please push to the repository to trigger the `build.yml` GitHub Actions workflow.
 
 ## Versioning
-- **Current Version:** v2.1.3
+- **Current Version:** v2.1.4
 - **Latest Changes:** Added time-synced lyrics, sleep timer, Poppins font, removed buggy Spotify integrations, and improved Neumorphic margins. See `CHANGELOG.md` for full details.
