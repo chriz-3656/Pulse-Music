@@ -122,7 +122,7 @@ fun FullScreenPlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Tactile Eject/Collapse Button
@@ -540,7 +540,7 @@ fun FullScreenPlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SkeuoTactileButton(
@@ -556,6 +556,27 @@ fun FullScreenPlayerScreen(
                         Icon(Icons.Default.FormatQuote, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("LYRICS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = MaterialTheme.colorScheme.onBackground)
+                    }
+                }
+
+                SkeuoTactileButton(
+                    onClick = { showTimerDialog = true },
+                    isPressedOrActive = playerState.sleepTimerTimeLeftMs != null,
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier.height(32.dp).testTag("player_timer_button")
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val timerText = if (playerState.sleepTimerTimeLeftMs != null) {
+                            val min = playerState.sleepTimerTimeLeftMs!! / 60000
+                            val sec = (playerState.sleepTimerTimeLeftMs!! % 60000) / 1000
+                            String.format("%d:%02d", min, sec)
+                        } else "TIMER"
+                        Icon(androidx.compose.material.icons.Icons.Default.Timer, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(timerText, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
 
@@ -576,6 +597,38 @@ fun FullScreenPlayerScreen(
                 }
             }
         }
+    }
+
+    if (showTimerDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showTimerDialog = false },
+            title = { Text("Sleep Timer") },
+            text = {
+                Column {
+                    val options = listOf(0, 15, 30, 60, 120)
+                    options.forEach { mins ->
+                        androidx.compose.material3.TextButton(
+                            onClick = { 
+                                viewModel.setSleepTimer(mins)
+                                showTimerDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (mins == 0) "Turn Off" else "$mins Minutes")
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showTimerDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface
+        )
     }
 
     // Queue Bottom Sheet

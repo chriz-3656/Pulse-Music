@@ -14,7 +14,8 @@ data class PlayerState(
     val audioQuality: AudioQuality = AudioQuality.HIGH,
     val crossfadeSec: Int = 2,
     val playbackError: String? = null,
-    val isAudioFocusLoss: Boolean = false
+    val isAudioFocusLoss: Boolean = false,
+    val sleepTimerTimeLeftMs: Long? = null
 ) {
     val progressFraction: Float
         get() = if (totalDurationMs > 0) (currentPositionMs.toFloat() / totalDurationMs.toFloat()).coerceIn(0f, 1f) else 0f
