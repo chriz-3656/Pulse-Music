@@ -2,64 +2,72 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ==========================================
-// Skeuomorphic Hi-Fi Analog Deck Palette
-// ==========================================
+// Light Mode Neumorphism Colors
+val NeuLightBackground = Color(0xFFE0E5EC)
+val NeuLightShadowLight = Color(0xFFFFFFFF)
+val NeuLightShadowDark = Color(0xFFA3B1C6)
+val NeuLightTextPrimary = Color(0xFF4A4E69)
+val NeuLightTextSecondary = Color(0xFF9FA8DA)
+val NeuLightAccent = Color(0xFF6C63FF)
 
-// Hardware Surfaces & Brushed Metal
-val SkeuoDeckDark = Color(0xFF141518)           // Main Hi-Fi chassis
-val SkeuoDeckElevated = Color(0xFF1E2024)       // Raised beveled faceplate
-val SkeuoRecessedTray = Color(0xFF0D0E10)       // Recessed audio tray / display bay
-val SkeuoCardSurface = Color(0xFF23252A)        // Tactile component card
-val SkeuoBevelHighlight = Color(0x38FFFFFF)      // Top-edge light reflection
-val SkeuoBevelShadow = Color(0x80000000)         // Bottom-edge drop bevel
+// Dark Mode Neumorphism Colors
+val NeuDarkBackground = Color(0xFF202124) // Base gray
+val NeuDarkShadowLight = Color(0xFF2A2B2F) // Top left
+val NeuDarkShadowDark = Color(0xFF161719) // Bottom right
+val NeuDarkTextPrimary = Color(0xFFE8EAED)
+val NeuDarkTextSecondary = Color(0xFF9AA0A6)
+val NeuDarkAccent = Color(0xFF8AB4F8)
 
-// Analog Knobs, Metallic Chrome & Aluminum
-val SkeuoChromeLight = Color(0xFFE8ECEF)        // Chrome button highlight
-val SkeuoChromeMid = Color(0xFF9EACB8)          // Brushed aluminum
-val SkeuoChromeDark = Color(0xFF4B535C)         // Anodized steel
-val SkeuoKnobGrip = Color(0xFF2E3137)           // Knurled grip texture
+// Aliases mapping old names to new standard names, so app compiles!
+val SkeuoDeckDark = NeuDarkBackground
+val SkeuoDeckElevated = NeuDarkBackground
+val SkeuoRecessedTray = NeuDarkBackground
+val SkeuoCardSurface = NeuDarkBackground
+val SkeuoBevelHighlight = NeuDarkShadowLight
+val SkeuoBevelShadow = NeuDarkShadowDark
 
-// Amber & Phosphor Illumination (LEDs & Displays)
-val SkeuoAmberGlow = Color(0xFFFFB300)          // Warm vintage analog indicator
-val SkeuoAmberDim = Color(0x66FFB300)           // Amber standby glow
-val SkeuoPhosphorGreen = Color(0xFF4CAF50)      // VU meter nominal peak
-val SkeuoPeakRed = Color(0xFFFF3D00)            // VU meter overdrive red
-val SkeuoLcdCyan = Color(0xFF00E5FF)            // Digital VFD display font
-val SkeuoLcdBg = Color(0xFF0A1216)              // Backlit LCD pane background
+val SkeuoChromeLight = NeuLightBackground
+val SkeuoChromeMid = NeuDarkTextSecondary
+val SkeuoChromeDark = NeuDarkBackground
+val SkeuoKnobGrip = NeuDarkBackground
 
-// High Contrast Text & Hardware Labels
-val SkeuoTextPrimary = Color(0xFFF2F4F7)        // Stamped silver text
-val SkeuoTextSecondary = Color(0xFFA2A8B5)      // Brushed metal label text
-val SkeuoTextTertiary = Color(0xFF6B7280)       // Engraved subtle markings
+val SkeuoAmberGlow = NeuDarkAccent
+val SkeuoAmberDim = Color(0x668AB4F8)
+val SkeuoPhosphorGreen = Color(0xFF81C995)
+val SkeuoPeakRed = Color(0xFFF28B82)
+val SkeuoLcdCyan = NeuDarkAccent
+val SkeuoLcdBg = NeuDarkBackground
 
-// Aliases for compatibility across existing screens
-val LilacPrimary = SkeuoAmberGlow
-val PurpleContainer = SkeuoCardSurface
-val OnPurpleContainer = SkeuoAmberGlow
-val DeepPurple = SkeuoDeckDark
-val DarkPurple = SkeuoRecessedTray
+val SkeuoTextPrimary = NeuDarkTextPrimary
+val SkeuoTextSecondary = NeuDarkTextSecondary
+val SkeuoTextTertiary = Color(0xFF5F6368)
 
-val DarkBackground = SkeuoDeckDark
-val DarkSurface = SkeuoDeckElevated
-val DarkSurfaceElevated = SkeuoCardSurface
-val DarkSurfaceCard = SkeuoCardSurface
-val DarkSurfaceVariant = Color(0xFF2C2F36)
-val PurplePrimary = SkeuoAmberGlow
+val LilacPrimary = NeuDarkAccent
+val PurpleContainer = NeuDarkBackground
+val OnPurpleContainer = NeuDarkAccent
+val DeepPurple = NeuDarkBackground
+val DarkPurple = NeuDarkBackground
 
-val TextPrimaryDark = SkeuoTextPrimary
-val TextSecondaryDark = SkeuoTextSecondary
+val DarkBackground = NeuDarkBackground
+val DarkSurface = NeuDarkBackground
+val DarkSurfaceElevated = NeuDarkBackground
+val DarkSurfaceCard = NeuDarkBackground
+val DarkSurfaceVariant = NeuDarkBackground
+val PurplePrimary = NeuDarkAccent
+
+val TextPrimaryDark = NeuDarkTextPrimary
+val TextSecondaryDark = NeuDarkTextSecondary
 val TextTertiaryDark = SkeuoTextTertiary
 
-val AccentLilac = SkeuoAmberGlow
+val AccentLilac = NeuDarkAccent
 val AccentPink = SkeuoPeakRed
-val AccentCyan = SkeuoLcdCyan
-val NeonCyan = SkeuoLcdCyan
-val ElectricViolet = SkeuoAmberGlow
+val AccentCyan = NeuDarkAccent
+val NeonCyan = NeuDarkAccent
+val ElectricViolet = NeuDarkAccent
 val CyberPink = SkeuoPeakRed
-val DeepMidnight = SkeuoDeckDark
+val DeepMidnight = NeuDarkBackground
 
-val CardBorder = Color(0x33A2A8B5)
-val GlassBackground = Color(0xE61E2024)
-val GradientStart = Color(0xFF23252A)
-val GradientEnd = Color(0xFF141518)
+val CardBorder = Color.Transparent
+val GlassBackground = Color.Transparent
+val GradientStart = NeuDarkBackground
+val GradientEnd = NeuDarkBackground

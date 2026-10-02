@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PulseMusicTheme(darkTheme = true) {
+            PulseMusicTheme {
                 KillSwitchWrapper {
                     PulseMusicApp()
                 }

@@ -52,22 +52,7 @@ import com.example.ui.components.LoadingView
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
 import com.example.ui.theme.SkeuoKnobGrip
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.AlbumDetailViewModel
 
 @Composable
@@ -83,7 +68,7 @@ fun AlbumDetailScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SkeuoDeckDark)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.isLoading) {
             LoadingView(message = "READING ALBUM DISK...", modifier = Modifier.fillMaxSize())
@@ -111,12 +96,12 @@ fun AlbumDetailScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = SkeuoChromeLight,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
-                        LcdBadge(text = "STUDIO ALBUM MASTER", textColor = SkeuoAmberGlow)
+                        LcdBadge(text = "STUDIO ALBUM MASTER", textColor = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -133,8 +118,8 @@ fun AlbumDetailScreen(
                                 .size(200.dp)
                                 .shadow(8.dp, CircleShape)
                                 .clip(CircleShape)
-                                .background(SkeuoRecessedTray)
-                                .border(BorderStroke(2.dp, SkeuoChromeDark), CircleShape),
+                                .background(MaterialTheme.colorScheme.background)
+                                .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outline), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             AsyncImage(
@@ -149,8 +134,8 @@ fun AlbumDetailScreen(
                                 modifier = Modifier
                                     .size(24.dp)
                                     .clip(CircleShape)
-                                    .background(SkeuoChromeMid)
-                                    .border(1.dp, SkeuoBevelHighlight, CircleShape)
+                                    .background(MaterialTheme.colorScheme.outlineVariant)
+                                    .border(1.dp, Color.Transparent, CircleShape)
                             )
                         }
 
@@ -161,7 +146,7 @@ fun AlbumDetailScreen(
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = SkeuoTextPrimary,
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -173,7 +158,7 @@ fun AlbumDetailScreen(
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = SkeuoAmberGlow,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
                                 .clickable {
                                     val idToUse = if (album.artistId.isNotBlank()) album.artistId else album.artist
@@ -194,7 +179,7 @@ fun AlbumDetailScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 11.sp
                             ),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -211,11 +196,11 @@ fun AlbumDetailScreen(
                                 Icon(
                                     imageVector = Icons.Filled.PlayArrow,
                                     contentDescription = null,
-                                    tint = SkeuoAmberGlow,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("PLAY FULL ALBUM", fontWeight = FontWeight.Bold, color = SkeuoAmberGlow, letterSpacing = 1.sp)
+                                Text("PLAY FULL ALBUM", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
                             }
                         }
 
@@ -260,7 +245,7 @@ private fun AlbumTrackItem(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 2.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(if (isCurrentPlaying) SkeuoCardSurface else Color.Transparent)
+            .background(if (isCurrentPlaying) MaterialTheme.colorScheme.surface else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(horizontal = 10.dp, vertical = 8.dp)
     ) {
@@ -278,7 +263,7 @@ private fun AlbumTrackItem(
                     Text(
                         text = "$trackNumber",
                         style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                        color = SkeuoTextTertiary
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -291,14 +276,14 @@ private fun AlbumTrackItem(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isCurrentPlaying) FontWeight.Bold else FontWeight.SemiBold
                     ),
-                    color = if (isCurrentPlaying) SkeuoAmberGlow else SkeuoTextPrimary,
+                    color = if (isCurrentPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = song.artist,
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                    color = SkeuoTextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -309,7 +294,7 @@ private fun AlbumTrackItem(
             Text(
                 text = song.formattedDuration,
                 style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                color = if (isCurrentPlaying) SkeuoAmberGlow else SkeuoTextTertiary
+                color = if (isCurrentPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
             )
         }
     }

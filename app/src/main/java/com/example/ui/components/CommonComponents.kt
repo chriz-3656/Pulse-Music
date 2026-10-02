@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import com.example.ui.theme.LocalNeuColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -67,27 +68,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.domain.model.AudioQuality
 import com.example.domain.model.Song
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoPeakRed
-import com.example.ui.theme.SkeuoPhosphorGreen
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 
 /**
  * Tactile Skeuomorphic Beveled Surface
  */
+
 @Composable
 fun SkeuoBevelCard(
     modifier: Modifier = Modifier,
@@ -95,33 +80,19 @@ fun SkeuoBevelCard(
     isRecessed: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val backgroundBrush = if (isRecessed) {
-        Brush.verticalGradient(
-            colors = listOf(SkeuoRecessedTray, SkeuoDeckDark)
-        )
-    } else {
-        Brush.verticalGradient(
-            colors = listOf(SkeuoCardSurface, SkeuoDeckElevated)
-        )
-    }
-
-    val topBorderColor = if (isRecessed) SkeuoBevelShadow else SkeuoBevelHighlight
-    val bottomBorderColor = if (isRecessed) SkeuoBevelHighlight.copy(alpha = 0.1f) else SkeuoBevelShadow
-
+    val neu = LocalNeuColors.current
+    val cornerSize = if (shape is RoundedCornerShape) 22.dp else 16.dp // Approximation
+    
     Box(
         modifier = modifier
-            .shadow(if (isRecessed) 0.dp else 4.dp, shape)
-            .clip(shape)
-            .background(backgroundBrush)
-            .border(
-                BorderStroke(
-                    1.dp,
-                    Brush.verticalGradient(
-                        colors = listOf(topBorderColor, bottomBorderColor)
-                    )
-                ),
-                shape
+            .neuShadow(
+                lightShadow = neu.lightShadow,
+                darkShadow = neu.darkShadow,
+                cornerRadius = cornerSize,
+                isPressed = isRecessed
             )
+            .clip(shape)
+            .background(neu.background)
     ) {
         content()
     }
@@ -136,35 +107,22 @@ fun SkeuoTactileButton(
     modifier: Modifier = Modifier,
     isPressedOrActive: Boolean = false,
     shape: Shape = RoundedCornerShape(20.dp),
-    accentColor: Color = SkeuoAmberGlow,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     content: @Composable () -> Unit
 ) {
-    val buttonBrush = if (isPressedOrActive) {
-        Brush.verticalGradient(
-            colors = listOf(SkeuoRecessedTray, SkeuoDeckDark)
-        )
-    } else {
-        Brush.verticalGradient(
-            colors = listOf(SkeuoChromeDark, SkeuoDeckElevated, SkeuoDeckDark)
-        )
-    }
-
-    val borderBrush = if (isPressedOrActive) {
-        Brush.verticalGradient(
-            colors = listOf(accentColor.copy(alpha = 0.8f), SkeuoBevelShadow)
-        )
-    } else {
-        Brush.verticalGradient(
-            colors = listOf(SkeuoBevelHighlight, SkeuoBevelShadow)
-        )
-    }
-
+    val neu = LocalNeuColors.current
+    val cornerSize = if (shape is RoundedCornerShape) 20.dp else 16.dp // Approximation
+    
     Box(
         modifier = modifier
-            .shadow(if (isPressedOrActive) 0.dp else 3.dp, shape)
+            .neuShadow(
+                lightShadow = neu.lightShadow,
+                darkShadow = neu.darkShadow,
+                cornerRadius = cornerSize,
+                isPressed = isPressedOrActive
+            )
             .clip(shape)
-            .background(buttonBrush)
-            .border(BorderStroke(1.dp, borderBrush), shape)
+            .background(neu.background)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -186,11 +144,11 @@ fun AnalogVUMeter(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val segmentColors = listOf(
-            SkeuoPhosphorGreen,
-            SkeuoPhosphorGreen,
-            SkeuoPhosphorGreen,
-            SkeuoAmberGlow,
-            SkeuoPeakRed
+            Color(0xFF81C995),
+            Color(0xFF81C995),
+            Color(0xFF81C995),
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.error
         )
 
         segmentColors.forEachIndexed { index, color ->
@@ -212,7 +170,7 @@ fun AnalogVUMeter(
 @Composable
 fun SkeuoLedLamp(
     isLit: Boolean,
-    color: Color = SkeuoAmberGlow,
+    color: Color = com.example.ui.theme.NeuDarkAccent,
     size: Dp = 8.dp,
     modifier: Modifier = Modifier
 ) {
@@ -223,14 +181,14 @@ fun SkeuoLedLamp(
             .background(
                 Brush.radialGradient(
                     colors = if (isLit) {
-                        listOf(color, color.copy(alpha = 0.8f), SkeuoDeckDark)
+                        listOf(color, color.copy(alpha = 0.8f), MaterialTheme.colorScheme.background)
                     } else {
-                        listOf(color.copy(alpha = 0.2f), SkeuoDeckDark)
+                        listOf(color.copy(alpha = 0.2f), MaterialTheme.colorScheme.background)
                     }
                 )
             )
             .border(
-                BorderStroke(0.75.dp, if (isLit) SkeuoBevelHighlight else SkeuoBevelShadow),
+                BorderStroke(0.75.dp, if (isLit) Color.Transparent else Color.Transparent),
                 CircleShape
             )
     )
@@ -243,14 +201,14 @@ fun SkeuoLedLamp(
 fun LcdBadge(
     text: String,
     modifier: Modifier = Modifier,
-    textColor: Color = SkeuoLcdCyan
+    textColor: Color = MaterialTheme.colorScheme.tertiary
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(SkeuoLcdBg)
+            .background(MaterialTheme.colorScheme.background)
             .border(
-                BorderStroke(1.dp, Brush.verticalGradient(listOf(SkeuoBevelShadow, SkeuoBevelHighlight.copy(alpha = 0.15f)))),
+                BorderStroke(1.dp, Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent.copy(alpha = 0.15f)))),
                 RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 8.dp, vertical = 3.dp)
@@ -276,7 +234,7 @@ fun QualityBadge(
     LcdBadge(
         text = "HI-FI • ${quality.bitrate}",
         modifier = modifier,
-        textColor = SkeuoAmberGlow
+        textColor = MaterialTheme.colorScheme.primary
     )
 }
 
@@ -302,7 +260,7 @@ fun SongItemRow(
     val itemShape = RoundedCornerShape(16.dp)
     val backgroundBrush = if (isCurrentTrack) {
         Brush.verticalGradient(
-            colors = listOf(SkeuoCardSurface, SkeuoDeckElevated)
+            colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surface)
         )
     } else {
         Brush.verticalGradient(
@@ -321,7 +279,7 @@ fun SongItemRow(
                         BorderStroke(
                             1.dp,
                             Brush.verticalGradient(
-                                listOf(SkeuoAmberGlow.copy(alpha = 0.6f), SkeuoBevelShadow)
+                                listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.6f), Color.Transparent)
                             )
                         ),
                         itemShape
@@ -343,8 +301,8 @@ fun SongItemRow(
                 modifier = Modifier
                     .size(46.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(14.dp))
             ) {
                 AsyncImage(
                     model = song.artworkUrl,
@@ -365,7 +323,7 @@ fun SongItemRow(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = "Current",
-                                tint = SkeuoAmberGlow,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -384,7 +342,7 @@ fun SongItemRow(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isCurrentTrack) FontWeight.Bold else FontWeight.SemiBold
                     ),
-                    color = if (isCurrentTrack) SkeuoAmberGlow else SkeuoTextPrimary,
+                    color = if (isCurrentTrack) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -394,7 +352,7 @@ fun SongItemRow(
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Downloaded",
-                            tint = SkeuoAmberGlow,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -402,7 +360,7 @@ fun SongItemRow(
                     Text(
                         text = "${song.artist} • ${song.album.ifBlank { "Single" }}",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                        color = SkeuoTextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -416,7 +374,7 @@ fun SongItemRow(
                     fontFamily = FontFamily.Monospace,
                     fontSize = 11.sp
                 ),
-                color = if (isCurrentTrack) SkeuoAmberGlow else SkeuoTextTertiary,
+                color = if (isCurrentTrack) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(horizontal = 6.dp)
             )
 
@@ -429,7 +387,7 @@ fun SongItemRow(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Options",
-                        tint = SkeuoTextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -438,17 +396,17 @@ fun SongItemRow(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                     modifier = Modifier
-                        .background(SkeuoCardSurface)
-                        .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
                 ) {
                     if (onFavoriteToggle != null) {
                         DropdownMenuItem(
-                            text = { Text(if (song.isFavorite) "Remove Favorite" else "Add Favorite", color = SkeuoTextPrimary) },
+                            text = { Text(if (song.isFavorite) "Remove Favorite" else "Add Favorite", color = MaterialTheme.colorScheme.onBackground) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = if (song.isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
                                     contentDescription = null,
-                                    tint = SkeuoAmberGlow
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             },
                             onClick = {
@@ -459,12 +417,12 @@ fun SongItemRow(
                     }
                     if (onDownloadClick != null) {
                         DropdownMenuItem(
-                            text = { Text(if (song.isDownloaded) "Remove Offline Copy" else "Download Track", color = SkeuoTextPrimary) },
+                            text = { Text(if (song.isDownloaded) "Remove Offline Copy" else "Download Track", color = MaterialTheme.colorScheme.onBackground) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = if (song.isDownloaded) Icons.Default.Delete else Icons.Default.Download,
                                     contentDescription = null,
-                                    tint = SkeuoAmberGlow
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             },
                             onClick = {
@@ -475,8 +433,8 @@ fun SongItemRow(
                     }
                     if (onPlayNext != null) {
                         DropdownMenuItem(
-                            text = { Text("Play Next", color = SkeuoTextPrimary) },
-                            leadingIcon = { Icon(Icons.Default.PlayArrow, contentDescription = null, tint = SkeuoAmberGlow) },
+                            text = { Text("Play Next", color = MaterialTheme.colorScheme.onBackground) },
+                            leadingIcon = { Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 menuExpanded = false
                                 onPlayNext()
@@ -485,8 +443,8 @@ fun SongItemRow(
                     }
                     if (onAddToQueue != null) {
                         DropdownMenuItem(
-                            text = { Text("Add to Queue", color = SkeuoTextPrimary) },
-                            leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoAmberGlow) },
+                            text = { Text("Add to Queue", color = MaterialTheme.colorScheme.onBackground) },
+                            leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 menuExpanded = false
                                 onAddToQueue()
@@ -495,8 +453,8 @@ fun SongItemRow(
                     }
                     if (onStartRadio != null) {
                         DropdownMenuItem(
-                            text = { Text("Start Radio", color = SkeuoTextPrimary) },
-                            leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = null, tint = SkeuoAmberGlow) },
+                            text = { Text("Start Radio", color = MaterialTheme.colorScheme.onBackground) },
+                            leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 menuExpanded = false
                                 onStartRadio()
@@ -505,8 +463,8 @@ fun SongItemRow(
                     }
                     if (onAddToPlaylist != null) {
                         DropdownMenuItem(
-                            text = { Text("Add to Playlist", color = SkeuoTextPrimary) },
-                            leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoAmberGlow) },
+                            text = { Text("Add to Playlist", color = MaterialTheme.colorScheme.onBackground) },
+                            leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 menuExpanded = false
                                 onAddToPlaylist()
@@ -556,7 +514,7 @@ fun SectionHeader(
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SkeuoLedLamp(isLit = true, size = 6.dp, color = SkeuoAmberGlow)
+                SkeuoLedLamp(isLit = true, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = title.uppercase(),
@@ -564,14 +522,14 @@ fun SectionHeader(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 1.sp
                     ),
-                    color = SkeuoTextPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                    color = SkeuoTextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 12.dp, top = 2.dp)
                 )
             }
@@ -590,7 +548,7 @@ fun SectionHeader(
                         fontSize = 10.sp,
                         letterSpacing = 0.5.sp
                     ),
-                    color = SkeuoAmberGlow,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
@@ -619,12 +577,12 @@ fun LoadingView(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressIndicator(
-                    color = SkeuoAmberGlow,
+                    color = MaterialTheme.colorScheme.primary,
                     strokeWidth = 2.5.dp,
                     modifier = Modifier.size(36.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                LcdBadge(text = message.uppercase(), textColor = SkeuoAmberGlow)
+                LcdBadge(text = message.uppercase(), textColor = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -654,20 +612,20 @@ fun ErrorView(
                 Icon(
                     imageVector = Icons.Default.ErrorOutline,
                     contentDescription = null,
-                    tint = SkeuoPeakRed,
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "DECK I/O ERROR",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = SkeuoPeakRed
+                    color = MaterialTheme.colorScheme.error
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = SkeuoTextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -680,9 +638,9 @@ fun ErrorView(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Refresh, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("RETRY", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = SkeuoAmberGlow)
+                        Text("RETRY", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -712,14 +670,14 @@ fun EmptyStateView(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), CircleShape),
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = SkeuoAmberGlow.copy(alpha = 0.6f),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -730,13 +688,13 @@ fun EmptyStateView(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 ),
-                color = SkeuoTextPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
-                color = SkeuoTextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -751,34 +709,18 @@ fun SkeuoAppLogo(
     modifier: Modifier = Modifier,
     size: Dp = 48.dp
 ) {
+    val neu = LocalNeuColors.current
     Box(
         modifier = modifier
             .size(size)
-            .clip(CircleShape)
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFF14151B),
-                        Color(0xFF070709),
-                        Color(0xFF000000)
-                    )
-                )
+            .neuShadow(
+                lightShadow = neu.lightShadow,
+                darkShadow = neu.darkShadow,
+                cornerRadius = size / 2,
+                isPressed = false
             )
-            .border(
-                BorderStroke(
-                    1.5.dp,
-                    Brush.sweepGradient(
-                        listOf(
-                            Color(0xFFFFEA00),
-                            Color(0xFFFFD600),
-                            Color(0xFFFFAB00),
-                            Color(0xFFFFD600),
-                            Color(0xFFFFEA00)
-                        )
-                    )
-                ),
-                CircleShape
-            ),
+            .clip(CircleShape)
+            .background(neu.background),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(size * 0.72f)) {

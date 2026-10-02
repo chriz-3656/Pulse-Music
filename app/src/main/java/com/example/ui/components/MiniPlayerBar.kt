@@ -40,6 +40,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.ui.theme.LocalNeuColors
+import com.example.ui.components.neuShadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
@@ -49,20 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.domain.model.PlayerState
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
 
 @Composable
 fun MiniPlayerBar(
@@ -87,18 +75,14 @@ fun MiniPlayerBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 5.dp)
-                    .shadow(10.dp, dockShape)
+                    .neuShadow(lightShadow = LocalNeuColors.current.lightShadow, darkShadow = LocalNeuColors.current.darkShadow, cornerRadius = 24.dp)
                     .clip(dockShape)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(SkeuoCardSurface, SkeuoDeckDark)
-                        )
-                    )
+                    .background(LocalNeuColors.current.background)
                     .border(
                         BorderStroke(
                             1.dp,
                             Brush.verticalGradient(
-                                listOf(SkeuoBevelHighlight, SkeuoBevelShadow)
+                                listOf(Color.Transparent, Color.Transparent)
                             )
                         ),
                         dockShape
@@ -118,8 +102,8 @@ fun MiniPlayerBar(
                             modifier = Modifier
                                 .size(42.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(SkeuoRecessedTray)
-                                .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(14.dp))
+                                .background(MaterialTheme.colorScheme.background)
+                                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(14.dp))
                         ) {
                             AsyncImage(
                                 model = song.artworkUrl,
@@ -139,7 +123,7 @@ fun MiniPlayerBar(
                                 SkeuoLedLamp(
                                     isLit = playerState.isPlaying,
                                     size = 6.dp,
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
@@ -148,7 +132,7 @@ fun MiniPlayerBar(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp
                                     ),
-                                    color = SkeuoTextPrimary,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -160,7 +144,7 @@ fun MiniPlayerBar(
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 10.sp
                                 ),
-                                color = SkeuoAmberGlow,
+                                color = MaterialTheme.colorScheme.primary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -187,13 +171,13 @@ fun MiniPlayerBar(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(18.dp),
                                     strokeWidth = 2.dp,
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             } else {
                                 Icon(
                                     imageVector = if (playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                                     contentDescription = if (playerState.isPlaying) "Pause" else "Play",
-                                    tint = if (playerState.isPlaying) SkeuoAmberGlow else SkeuoChromeLight,
+                                    tint = if (playerState.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -212,7 +196,7 @@ fun MiniPlayerBar(
                             Icon(
                                 imageVector = Icons.Default.SkipNext,
                                 contentDescription = "Next Track",
-                                tint = SkeuoChromeMid,
+                                tint = MaterialTheme.colorScheme.outlineVariant,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -229,8 +213,8 @@ fun MiniPlayerBar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(2.5.dp),
-                        color = SkeuoAmberGlow,
-                        trackColor = SkeuoRecessedTray
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.background
                     )
                 }
             }

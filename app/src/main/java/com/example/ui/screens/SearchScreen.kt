@@ -77,21 +77,6 @@ import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.SearchFilter
 import com.example.ui.viewmodel.SearchViewModel
 
@@ -131,7 +116,7 @@ fun SearchScreen(
                     Text(
                         "Search tracks, artists, albums...",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = SkeuoTextTertiary
+                        color = MaterialTheme.colorScheme.outline
                     )
                 },
                 leadingIcon = {
@@ -145,7 +130,7 @@ fun SearchScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = SkeuoAmberGlow
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -158,7 +143,7 @@ fun SearchScreen(
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Clear",
-                                tint = SkeuoTextSecondary
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -177,8 +162,8 @@ fun SearchScreen(
                     unfocusedContainerColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    focusedTextColor = SkeuoTextPrimary,
-                    unfocusedTextColor = SkeuoTextPrimary
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,7 +187,7 @@ fun SearchScreen(
                     fontSize = 9.sp,
                     letterSpacing = 0.5.sp
                 ),
-                color = SkeuoTextTertiary,
+                color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(end = 6.dp)
             )
             LazyRow(
@@ -225,7 +210,7 @@ fun SearchScreen(
                             SkeuoLedLamp(
                                 isLit = isSelected,
                                 size = 5.dp,
-                                color = if (isSelected) SkeuoAmberGlow else SkeuoChromeDark
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                             )
                             Text(
                                 text = provider.displayName.uppercase(),
@@ -233,7 +218,7 @@ fun SearchScreen(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                     fontSize = 9.sp
                                 ),
-                                color = if (isSelected) SkeuoAmberGlow else SkeuoTextSecondary
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -265,7 +250,7 @@ fun SearchScreen(
                             fontSize = 10.sp,
                             letterSpacing = 0.5.sp
                         ),
-                        color = if (selected) SkeuoAmberGlow else SkeuoTextSecondary,
+                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                     )
                 }
@@ -310,7 +295,7 @@ fun SearchScreen(
                                 Icon(
                                     imageVector = Icons.Default.Search,
                                     contentDescription = null,
-                                    tint = SkeuoTextTertiary,
+                                    tint = MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -320,7 +305,7 @@ fun SearchScreen(
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 14.sp
                                     ),
-                                    color = SkeuoTextPrimary
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         }
@@ -538,7 +523,7 @@ fun SearchScreen(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    LcdBadge(text = "NO TRACKS FOUND FOR \"${uiState.query.uppercase()}\"", textColor = SkeuoTextSecondary)
+                    LcdBadge(text = "NO TRACKS FOUND FOR \"${uiState.query.uppercase()}\"", textColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -562,7 +547,7 @@ fun SearchScreen(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.sp
                                 ),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "CLEAR ALL",
@@ -570,7 +555,7 @@ fun SearchScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 10.sp
                                 ),
-                                color = SkeuoAmberGlow,
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(10.dp))
                                     .clickable { viewModel.clearSearchHistory() }
@@ -600,7 +585,7 @@ fun SearchScreen(
                                         Icon(
                                             imageVector = Icons.Default.History,
                                             contentDescription = null,
-                                            tint = SkeuoAmberGlow,
+                                            tint = MaterialTheme.colorScheme.primary,
                                             modifier = Modifier.size(14.dp)
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
@@ -610,7 +595,7 @@ fun SearchScreen(
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Medium
                                             ),
-                                            color = SkeuoTextPrimary
+                                            color = MaterialTheme.colorScheme.onBackground
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         IconButton(
@@ -620,7 +605,7 @@ fun SearchScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Close,
                                                 contentDescription = "Delete",
-                                                tint = SkeuoTextTertiary,
+                                                tint = MaterialTheme.colorScheme.outline,
                                                 modifier = Modifier.size(12.dp)
                                             )
                                         }
@@ -640,7 +625,7 @@ fun SearchScreen(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         ),
-                        color = SkeuoTextPrimary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     val genres = listOf("Aura Synth", "Synthwave", "Cyberpunk", "Lo-Fi Master", "Acoustic Warmth", "Deep Hi-Fi", "Vintage Analog", "Chill Beats")
@@ -662,7 +647,7 @@ fun SearchScreen(
                                         fontSize = 11.sp,
                                         letterSpacing = 0.5.sp
                                     ),
-                                    color = SkeuoAmberGlow,
+                                    color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                                 )
                             }
@@ -694,8 +679,8 @@ private fun ArtistSearchCard(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), CircleShape)
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), CircleShape)
             ) {
                 AsyncImage(
                     model = artist.imageUrl.ifBlank { "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" },
@@ -708,7 +693,7 @@ private fun ArtistSearchCard(
             Text(
                 text = artist.name,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                color = SkeuoTextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -718,7 +703,7 @@ private fun ArtistSearchCard(
                     fontFamily = FontFamily.Monospace,
                     fontSize = 9.sp
                 ),
-                color = SkeuoAmberGlow
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -743,8 +728,8 @@ private fun DiscoverySectionHeader(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(SkeuoAmberGlow.copy(alpha = 0.15f))
-                    .border(BorderStroke(1.dp, SkeuoAmberGlow.copy(alpha = 0.5f)), RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)), RoundedCornerShape(10.dp))
                     .padding(horizontal = 8.dp, vertical = 3.dp)
             ) {
                 Text(
@@ -755,7 +740,7 @@ private fun DiscoverySectionHeader(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.8.sp
                     ),
-                    color = SkeuoAmberGlow
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Text(
@@ -764,7 +749,7 @@ private fun DiscoverySectionHeader(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp
                 ),
-                color = SkeuoTextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -776,7 +761,7 @@ private fun DiscoverySectionHeader(
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace
             ),
-            color = SkeuoTextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -804,8 +789,8 @@ private fun DiscoverySongCard(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
                     model = song.artworkUrl,
@@ -830,7 +815,7 @@ private fun DiscoverySongCard(
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Bold
                         ),
-                        color = SkeuoAmberGlow
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -844,7 +829,7 @@ private fun DiscoverySongCard(
                         Icon(
                             imageVector = if (isPlaying) Icons.Default.GraphicEq else Icons.Default.PlayArrow,
                             contentDescription = if (isPlaying) "Playing" else "Paused",
-                            tint = SkeuoAmberGlow,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -859,7 +844,7 @@ private fun DiscoverySongCard(
                     fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.SemiBold,
                     fontSize = 13.sp
                 ),
-                color = if (isCurrent) SkeuoAmberGlow else SkeuoTextPrimary,
+                color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -869,7 +854,7 @@ private fun DiscoverySongCard(
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace
                 ),
-                color = SkeuoTextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

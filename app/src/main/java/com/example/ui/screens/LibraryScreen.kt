@@ -71,22 +71,6 @@ import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoPeakRed
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.LibraryTab
 import com.example.ui.viewmodel.LibraryViewModel
 
@@ -120,7 +104,7 @@ fun LibraryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SkeuoLedLamp(isLit = true, size = 6.dp, color = SkeuoAmberGlow)
+                    SkeuoLedLamp(isLit = true, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "AUDIO ARCHIVE",
@@ -128,7 +112,7 @@ fun LibraryScreen(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp
                         ),
-                        color = SkeuoTextPrimary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
@@ -144,9 +128,9 @@ fun LibraryScreen(
                             modifier = Modifier.padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "New Playlist", tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Add, contentDescription = "New Playlist", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("NEW CRATE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 9.sp), color = SkeuoAmberGlow)
+                            Text("NEW CRATE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 9.sp), color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -188,7 +172,7 @@ fun LibraryScreen(
                                 fontSize = 9.5.sp,
                                 letterSpacing = 0.5.sp
                             ),
-                            color = if (selected) SkeuoAmberGlow else SkeuoTextSecondary
+                            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -232,7 +216,7 @@ fun LibraryScreen(
         if (showSpotifyDialog) {
             AlertDialog(
                 onDismissRequest = { showSpotifyDialog = false },
-                containerColor = SkeuoDeckElevated,
+                containerColor = MaterialTheme.colorScheme.surface,
                 title = {
                     Text(
                         "IMPORT SPOTIFY",
@@ -245,20 +229,20 @@ fun LibraryScreen(
                 },
                 text = {
                     Column {
-                        Text("Paste a public Spotify playlist link to import its tracks directly into Pulse Music.", color = SkeuoTextSecondary, fontSize = 14.sp)
+                        Text("Paste a public Spotify playlist link to import its tracks directly into Pulse Music.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedTextField(
                             value = spotifyUrl,
                             onValueChange = { spotifyUrl = it },
-                            label = { Text("Spotify URL", color = SkeuoTextSecondary) },
+                            label = { Text("Spotify URL", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xFF1DB954),
                                 focusedLabelColor = Color(0xFF1DB954),
-                                unfocusedBorderColor = SkeuoChromeDark,
-                                unfocusedLabelColor = SkeuoTextSecondary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 cursorColor = Color(0xFF1DB954),
-                                focusedTextColor = SkeuoTextPrimary,
-                                unfocusedTextColor = SkeuoTextPrimary
+                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -279,7 +263,7 @@ fun LibraryScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showSpotifyDialog = false }) {
-                        Text("CANCEL", color = SkeuoTextSecondary)
+                        Text("CANCEL", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             )
@@ -289,27 +273,27 @@ fun LibraryScreen(
         uiState.importProgress?.let { progress ->
             AlertDialog(
                 onDismissRequest = { if (progress.isComplete) viewModel.dismissImportDialog() },
-                containerColor = SkeuoDeckElevated,
-                title = { Text(if (progress.isComplete) "IMPORT COMPLETE" else "IMPORTING...", color = SkeuoTextPrimary) },
+                containerColor = MaterialTheme.colorScheme.surface,
+                title = { Text(if (progress.isComplete) "IMPORT COMPLETE" else "IMPORTING...", color = MaterialTheme.colorScheme.onBackground) },
                 text = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(progress.message, color = SkeuoTextSecondary, modifier = Modifier.padding(bottom = 16.dp))
+                        Text(progress.message, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 16.dp))
                         if (!progress.isComplete) {
                             LinearProgressIndicator(
                                 progress = { progress.progress },
                                 modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
                                 color = Color(0xFF1DB954),
-                                trackColor = SkeuoRecessedTray
+                                trackColor = MaterialTheme.colorScheme.background
                             )
                         } else if (progress.error != null) {
-                            Text(progress.error, color = SkeuoPeakRed)
+                            Text(progress.error, color = MaterialTheme.colorScheme.error)
                         }
                     }
                 },
                 confirmButton = {
                     if (progress.isComplete) {
                         TextButton(onClick = { viewModel.dismissImportDialog() }) {
-                            Text("OK", color = SkeuoAmberGlow)
+                            Text("OK", color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -320,7 +304,7 @@ fun LibraryScreen(
         if (uiState.showCreateDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.showCreatePlaylistDialog(false) },
-                containerColor = SkeuoDeckElevated,
+                containerColor = MaterialTheme.colorScheme.surface,
                 title = {
                     Text(
                         "NEW PLAYLIST CRATE",
@@ -328,7 +312,7 @@ fun LibraryScreen(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp
                         ),
-                        color = SkeuoAmberGlow
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 text = {
@@ -336,14 +320,14 @@ fun LibraryScreen(
                         OutlinedTextField(
                             value = newPlaylistTitle,
                             onValueChange = { newPlaylistTitle = it },
-                            label = { Text("Playlist Title", color = SkeuoTextSecondary) },
+                            label = { Text("Playlist Title", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             singleLine = true,
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = SkeuoTextPrimary,
-                                unfocusedTextColor = SkeuoTextPrimary,
-                                focusedBorderColor = SkeuoAmberGlow,
-                                unfocusedBorderColor = SkeuoChromeDark
+                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -351,14 +335,14 @@ fun LibraryScreen(
                         OutlinedTextField(
                             value = newPlaylistDesc,
                             onValueChange = { newPlaylistDesc = it },
-                            label = { Text("Description (Optional)", color = SkeuoTextSecondary) },
+                            label = { Text("Description (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             singleLine = true,
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = SkeuoTextPrimary,
-                                unfocusedTextColor = SkeuoTextPrimary,
-                                focusedBorderColor = SkeuoAmberGlow,
-                                unfocusedBorderColor = SkeuoChromeDark
+                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -377,14 +361,14 @@ fun LibraryScreen(
                         Text(
                             "CREATE",
                             fontWeight = FontWeight.Bold,
-                            color = SkeuoAmberGlow,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 14.dp)
                         )
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.showCreatePlaylistDialog(false) }) {
-                        Text("CANCEL", color = SkeuoTextSecondary, fontWeight = FontWeight.SemiBold)
+                        Text("CANCEL", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                     }
                 }
             )
@@ -422,14 +406,14 @@ fun PlaylistsTabContent(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(SkeuoRecessedTray)
-                            .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp)),
+                            .background(MaterialTheme.colorScheme.background)
+                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null,
-                            tint = SkeuoAmberGlow,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -441,12 +425,12 @@ fun PlaylistsTabContent(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             ),
-                            color = SkeuoTextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = "Organize customized audio selections",
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -470,8 +454,8 @@ fun PlaylistsTabContent(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(SkeuoRecessedTray)
-                            .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp)),
+                            .background(MaterialTheme.colorScheme.background)
+                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -486,12 +470,12 @@ fun PlaylistsTabContent(
                         Text(
                             "Import from Spotify",
                             style = MaterialTheme.typography.titleMedium,
-                            color = SkeuoTextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             "Sync external playlists",
                             style = MaterialTheme.typography.bodySmall,
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -514,8 +498,8 @@ fun PlaylistsTabContent(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(SkeuoRecessedTray)
-                            .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.background)
+                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
                     ) {
                         AsyncImage(
                             model = playlist.artworkUrl,
@@ -532,7 +516,7 @@ fun PlaylistsTabContent(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             ),
-                            color = SkeuoTextPrimary,
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -542,7 +526,7 @@ fun PlaylistsTabContent(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 11.sp
                             ),
-                            color = SkeuoAmberGlow,
+                            color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -552,7 +536,7 @@ fun PlaylistsTabContent(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete Playlist",
-                            tint = SkeuoTextTertiary
+                            tint = MaterialTheme.colorScheme.outline
                         )
                     }
                 }
@@ -587,7 +571,7 @@ fun FavoritesTabContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LcdBadge(text = "${favoriteSongs.size} STARRED TRACKS", textColor = SkeuoAmberGlow)
+                    LcdBadge(text = "${favoriteSongs.size} STARRED TRACKS", textColor = MaterialTheme.colorScheme.primary)
                     SkeuoTactileButton(
                         onClick = onPlayAll,
                         shape = RoundedCornerShape(18.dp),
@@ -599,9 +583,9 @@ fun FavoritesTabContent(
                             modifier = Modifier.padding(horizontal = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("PLAY ALL", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = SkeuoAmberGlow)
+                            Text("PLAY ALL", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -649,7 +633,7 @@ fun DownloadsTabContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LcdBadge(text = "${downloadedSongs.size} OFFLINE MASTER COPIES", textColor = SkeuoLcdCyan)
+                    LcdBadge(text = "${downloadedSongs.size} OFFLINE MASTER COPIES", textColor = MaterialTheme.colorScheme.tertiary)
                     SkeuoTactileButton(
                         onClick = onPlayAll,
                         shape = RoundedCornerShape(18.dp),
@@ -661,9 +645,9 @@ fun DownloadsTabContent(
                             modifier = Modifier.padding(horizontal = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("PLAY OFFLINE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = SkeuoAmberGlow)
+                            Text("PLAY OFFLINE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }

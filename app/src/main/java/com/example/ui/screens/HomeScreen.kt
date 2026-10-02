@@ -71,22 +71,6 @@ import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoPeakRed
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.HomeViewModel
 
 @Composable
@@ -154,68 +138,68 @@ fun HomeScreen(
     if (obsoleteApks.isNotEmpty()) {
         AlertDialog(
             onDismissRequest = { obsoleteApks = emptyList() },
-            title = { Text("Update Successful", color = SkeuoTextPrimary) },
-            text = { Text("The app has been successfully updated! Would you like to delete the old downloaded APK file to save space?", color = SkeuoTextSecondary) },
+            title = { Text("Update Successful", color = MaterialTheme.colorScheme.onBackground) },
+            text = { Text("The app has been successfully updated! Would you like to delete the old downloaded APK file to save space?", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 TextButton(onClick = {
                     obsoleteApks.forEach { AppUpdater.deleteApk(it) }
                     obsoleteApks = emptyList()
                 }) {
-                    Text("Delete APK", color = SkeuoPeakRed)
+                    Text("Delete APK", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { obsoleteApks = emptyList() }) { Text("Keep It", color = SkeuoTextSecondary) }
+                TextButton(onClick = { obsoleteApks = emptyList() }) { Text("Keep It", color = MaterialTheme.colorScheme.onSurfaceVariant) }
             },
-            containerColor = SkeuoDeckDark
+            containerColor = MaterialTheme.colorScheme.background
         )
     }
 
     if (updateInfo != null && activeDownloadId == null) {
         AlertDialog(
             onDismissRequest = { updateInfo = null },
-            title = { Text("Update Available", color = SkeuoTextPrimary) },
+            title = { Text("Update Available", color = MaterialTheme.colorScheme.onBackground) },
             text = {
                 Column {
-                    Text("Version ${updateInfo!!.latestVersion} is now available.", color = SkeuoTextSecondary)
+                    Text("Version ${updateInfo!!.latestVersion} is now available.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(updateInfo!!.releaseNotes, color = SkeuoTextTertiary, fontSize = 12.sp)
+                    Text(updateInfo!!.releaseNotes, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     activeDownloadId = AppUpdater.downloadAndInstall(context, updateInfo!!.downloadUrl, "PulseMusic-${updateInfo!!.latestVersion}.apk")
                 }) {
-                    Text("Download & Install", color = SkeuoAmberGlow)
+                    Text("Download & Install", color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { updateInfo = null }) { Text("Later", color = SkeuoTextSecondary) }
+                TextButton(onClick = { updateInfo = null }) { Text("Later", color = MaterialTheme.colorScheme.onSurfaceVariant) }
             },
-            containerColor = SkeuoDeckDark
+            containerColor = MaterialTheme.colorScheme.background
         )
     } else if (activeDownloadId != null) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("Downloading Update", color = SkeuoTextPrimary) },
+            title = { Text("Downloading Update", color = MaterialTheme.colorScheme.onBackground) },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     androidx.compose.material3.LinearProgressIndicator(
                         progress = { downloadProgress },
                         modifier = Modifier.fillMaxWidth().height(8.dp),
-                        color = SkeuoAmberGlow,
-                        trackColor = SkeuoRecessedTray
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.background
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "${(downloadProgress * 100).toInt()}%",
-                        color = SkeuoTextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
                     )
                 }
             },
             confirmButton = { },
-            containerColor = SkeuoDeckDark
+            containerColor = MaterialTheme.colorScheme.background
         )
     }
 
@@ -258,7 +242,7 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
                         .background(Color(0x33FF3D00), RoundedCornerShape(18.dp))
-                        .border(1.dp, SkeuoPeakRed.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
                         .padding(12.dp)
                 ) {
                     Row(
@@ -268,7 +252,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Warning,
                             contentDescription = "Stream Warning",
-                            tint = SkeuoPeakRed,
+                            tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(20.dp)
                         )
                         Column(modifier = Modifier.weight(1f)) {
@@ -279,7 +263,7 @@ fun HomeScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 11.sp
                                 ),
-                                color = SkeuoPeakRed
+                                color = MaterialTheme.colorScheme.error
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
@@ -288,7 +272,7 @@ fun HomeScreen(
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 10.sp
                                 ),
-                                color = SkeuoTextPrimary,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -472,11 +456,11 @@ fun HeroBanner(
                 modifier = Modifier.weight(1f)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SkeuoLedLamp(isLit = true, size = 6.dp, color = SkeuoAmberGlow)
+                    SkeuoLedLamp(isLit = true, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(6.dp))
                     LcdBadge(
                         text = "STUDIO MASTER • HI-FI 320K",
-                        textColor = SkeuoAmberGlow
+                        textColor = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -488,13 +472,13 @@ fun HeroBanner(
                         fontWeight = FontWeight.Black,
                         letterSpacing = (-0.5).sp
                     ),
-                    color = SkeuoTextPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = "Lossless acoustics & ultra-fast playback response",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                    color = SkeuoTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -504,7 +488,7 @@ fun HeroBanner(
             SkeuoTactileButton(
                 onClick = onPlayFeatured,
                 shape = CircleShape,
-                accentColor = SkeuoAmberGlow,
+                accentColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(52.dp)
                     .testTag("hero_play_button")
@@ -512,7 +496,7 @@ fun HeroBanner(
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Play Master Stream",
-                    tint = SkeuoAmberGlow,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(30.dp)
                 )
             }
@@ -541,8 +525,8 @@ fun TrendingSongCard(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -567,7 +551,7 @@ fun TrendingSongCard(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = null,
-                                tint = SkeuoAmberGlow,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -583,7 +567,7 @@ fun TrendingSongCard(
                     fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.SemiBold,
                     fontSize = 13.sp
                 ),
-                color = if (isCurrent) SkeuoAmberGlow else SkeuoTextPrimary,
+                color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -593,7 +577,7 @@ fun TrendingSongCard(
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace
                 ),
-                color = SkeuoTextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -619,8 +603,8 @@ fun AlbumCard(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -640,14 +624,14 @@ fun AlbumCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp
                 ),
-                color = SkeuoTextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "${album.artist} • ${album.year}",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                color = SkeuoTextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -673,8 +657,8 @@ fun PlaylistCard(
                 modifier = Modifier
                     .size(width = 136.dp, height = 98.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(SkeuoRecessedTray)
-                    .border(BorderStroke(1.dp, SkeuoChromeDark), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -694,7 +678,7 @@ fun PlaylistCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp
                 ),
-                color = SkeuoTextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -704,7 +688,7 @@ fun PlaylistCard(
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace
                 ),
-                color = SkeuoAmberGlow
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }

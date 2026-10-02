@@ -47,13 +47,6 @@ import com.example.ui.components.LoadingView
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
 import com.example.ui.viewmodel.PlaylistDetailViewModel
 
 @Composable
@@ -68,7 +61,7 @@ fun PlaylistDetailScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SkeuoDeckDark)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.isLoading) {
             LoadingView(message = "READING PLAYLIST CRATE...", modifier = Modifier.fillMaxSize())
@@ -96,12 +89,12 @@ fun PlaylistDetailScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = SkeuoChromeLight,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
-                        LcdBadge(text = "PLAYLIST CRATE", textColor = SkeuoAmberGlow)
+                        LcdBadge(text = "PLAYLIST CRATE", textColor = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -117,8 +110,8 @@ fun PlaylistDetailScreen(
                             modifier = Modifier
                                 .size(180.dp)
                                 .clip(RoundedCornerShape(20.dp))
-                                .background(SkeuoRecessedTray)
-                                .border(BorderStroke(2.dp, SkeuoChromeDark), RoundedCornerShape(20.dp))
+                                .background(MaterialTheme.colorScheme.background)
+                                .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(20.dp))
                         ) {
                             AsyncImage(
                                 model = playlist.artworkUrl,
@@ -135,7 +128,7 @@ fun PlaylistDetailScreen(
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = SkeuoTextPrimary,
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -145,7 +138,7 @@ fun PlaylistDetailScreen(
                             Text(
                                 text = playlist.description,
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -159,7 +152,7 @@ fun PlaylistDetailScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 11.sp
                             ),
-                            color = SkeuoAmberGlow
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         Spacer(modifier = Modifier.height(14.dp))
@@ -176,11 +169,11 @@ fun PlaylistDetailScreen(
                                 Icon(
                                     imageVector = Icons.Filled.PlayArrow,
                                     contentDescription = null,
-                                    tint = SkeuoAmberGlow,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("PLAY CRATE", fontWeight = FontWeight.Bold, color = SkeuoAmberGlow, letterSpacing = 1.sp)
+                                Text("PLAY CRATE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
                             }
                         }
 

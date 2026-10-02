@@ -77,23 +77,6 @@ import com.example.ui.components.SkeuoAppLogo
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoPeakRed
-import com.example.ui.theme.SkeuoPhosphorGreen
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.SettingsViewModel
 
 @Composable
@@ -139,7 +122,7 @@ fun SettingsScreen(
     ) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SkeuoLedLamp(isLit = true, size = 6.dp, color = SkeuoAmberGlow)
+                SkeuoLedLamp(isLit = true, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "DECK CONFIGURATION",
@@ -147,7 +130,7 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 1.sp
                     ),
-                    color = SkeuoTextPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             Spacer(modifier = Modifier.height(14.dp))
@@ -176,12 +159,12 @@ fun SettingsScreen(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Test Providers",
                             modifier = Modifier.size(13.dp),
-                            tint = if (uiState.isCheckingProviders) SkeuoAmberGlow else SkeuoTextSecondary
+                            tint = if (uiState.isCheckingProviders) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = if (uiState.isCheckingProviders) "TESTING..." else "TEST ALL",
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -196,7 +179,7 @@ fun SettingsScreen(
                     Text(
                         text = "Select active streaming engine. In Auto mode, Pulse routes between high-bitrate sources for instant, fail-safe playback.",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                        color = SkeuoTextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
 
@@ -218,7 +201,7 @@ fun SettingsScreen(
 
                         if (index < providers.size - 1) {
                             Divider(
-                                color = SkeuoChromeDark.copy(alpha = 0.4f),
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
                         }
@@ -244,7 +227,7 @@ fun SettingsScreen(
                         isSelected = uiState.userSettings.audioQuality == AudioQuality.HIGH,
                         onSelect = { viewModel.setQuality(AudioQuality.HIGH) }
                     )
-                    Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
                     QualityOptionRow(
                         title = "Standard (160 kbps)",
                         subtitle = "Fast streaming & data conservation",
@@ -271,22 +254,22 @@ fun SettingsScreen(
                         Text(
                             text = "Developer Mode",
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                            color = SkeuoTextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = "Show advanced streaming configurations and system info",
                             style = MaterialTheme.typography.bodySmall,
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     androidx.compose.material3.Switch(
                         checked = uiState.isDeveloperMode,
                         onCheckedChange = { viewModel.setDeveloperMode(it) },
                         colors = androidx.compose.material3.SwitchDefaults.colors(
-                            checkedThumbColor = SkeuoPhosphorGreen,
-                            checkedTrackColor = SkeuoRecessedTray,
-                            uncheckedThumbColor = SkeuoChromeDark,
-                            uncheckedTrackColor = SkeuoRecessedTray
+                            checkedThumbColor = Color(0xFF81C995),
+                            checkedTrackColor = MaterialTheme.colorScheme.background,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.background
                         )
                     )
                 }
@@ -297,12 +280,12 @@ fun SettingsScreen(
         if (uiState.isDeveloperMode) {
             item {
                 val logs by com.example.util.DebugLogger.logs.collectAsState()
-                Text("Debug Logs", style = MaterialTheme.typography.titleMedium, color = SkeuoLcdCyan, modifier = Modifier.padding(vertical = 8.dp))
+                Text("Debug Logs", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.tertiary, modifier = Modifier.padding(vertical = 8.dp))
                 SkeuoBevelCard(modifier = Modifier.fillMaxWidth().height(200.dp)) {
                     androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.padding(8.dp).fillMaxSize()) {
                         item {
                             androidx.compose.foundation.text.selection.SelectionContainer {
-                                Text(text = logs, color = SkeuoLcdCyan, style = MaterialTheme.typography.labelSmall)
+                                Text(text = logs, color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -326,17 +309,17 @@ fun SettingsScreen(
                             Text(
                                 text = "Crossfade Duration",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "Seamless analog overlap transition",
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         LcdBadge(
                             text = "${uiState.userSettings.crossfadeDurationSec} SEC",
-                            textColor = SkeuoAmberGlow
+                            textColor = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -348,14 +331,14 @@ fun SettingsScreen(
                         valueRange = 0f..8f,
                         steps = 7,
                         colors = SliderDefaults.colors(
-                            thumbColor = SkeuoAmberGlow,
-                            activeTrackColor = SkeuoAmberGlow,
-                            inactiveTrackColor = SkeuoRecessedTray
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.background
                         ),
                         modifier = Modifier.fillMaxWidth().testTag("crossfade_slider")
                     )
 
-                    Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 10.dp))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 10.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -366,27 +349,27 @@ fun SettingsScreen(
                             Text(
                                 text = "Continuous Autoplay Stream",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "Automatically cues similar tracks when queue finishes",
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Switch(
                             checked = uiState.userSettings.autoplayEnabled,
                             onCheckedChange = { viewModel.toggleAutoplay(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = SkeuoDeckDark,
-                                checkedTrackColor = SkeuoAmberGlow,
-                                uncheckedTrackColor = SkeuoRecessedTray
+                                checkedThumbColor = MaterialTheme.colorScheme.background,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.background
                             ),
                             modifier = Modifier.testTag("autoplay_switch")
                         )
                     }
 
-                    Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 10.dp))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 10.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -397,21 +380,21 @@ fun SettingsScreen(
                             Text(
                                 text = "Auto-Skip Dropped Tracks",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "Advances to next item if stream buffer stalls",
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Switch(
                             checked = uiState.userSettings.autoSkipFailedTracks,
                             onCheckedChange = { viewModel.toggleAutoSkip(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = SkeuoDeckDark,
-                                checkedTrackColor = SkeuoAmberGlow,
-                                uncheckedTrackColor = SkeuoRecessedTray
+                                checkedThumbColor = MaterialTheme.colorScheme.background,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.background
                             )
                         )
                     }
@@ -439,15 +422,15 @@ fun SettingsScreen(
                             Text(
                                 text = "Deck Buffer Storage",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "Cached audio for immediate local replay",
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        LcdBadge(text = cacheSizeFormatted, textColor = SkeuoLcdCyan)
+                        LcdBadge(text = cacheSizeFormatted, textColor = MaterialTheme.colorScheme.tertiary)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -460,7 +443,7 @@ fun SettingsScreen(
                         Text(
                             text = "Max Buffer Limit",
                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             listOf(500, 1000, 2000).forEach { limit ->
@@ -478,7 +461,7 @@ fun SettingsScreen(
                                             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                                             fontSize = 9.sp
                                         ),
-                                        color = if (selected) SkeuoAmberGlow else SkeuoTextSecondary,
+                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(horizontal = 8.dp)
                                     )
                                 }
@@ -497,9 +480,9 @@ fun SettingsScreen(
                             .testTag("clear_cache_button")
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.CleaningServices, contentDescription = null, tint = SkeuoPeakRed, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.CleaningServices, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("CLEAR BUFFER CACHE", color = SkeuoPeakRed, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                            Text("CLEAR BUFFER CACHE", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                         }
                     }
                 }
@@ -535,10 +518,10 @@ fun SettingsScreen(
                                 isLit = true,
                                 size = 8.dp,
                                 color = when {
-                                    hasError -> SkeuoPeakRed
-                                    isPlaying -> SkeuoPhosphorGreen
-                                    isBuffering -> SkeuoAmberGlow
-                                    else -> SkeuoTextTertiary
+                                    hasError -> MaterialTheme.colorScheme.error
+                                    isPlaying -> Color(0xFF81C995)
+                                    isBuffering -> MaterialTheme.colorScheme.primary
+                                    else -> MaterialTheme.colorScheme.outline
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -549,7 +532,7 @@ fun SettingsScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 11.sp
                                 ),
-                                color = SkeuoTextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
@@ -562,10 +545,10 @@ fun SettingsScreen(
                                 else -> "IDLE"
                             },
                             textColor = when {
-                                hasError -> SkeuoPeakRed
-                                isPlaying -> SkeuoPhosphorGreen
-                                isBuffering -> SkeuoAmberGlow
-                                else -> SkeuoTextTertiary
+                                hasError -> MaterialTheme.colorScheme.error
+                                isPlaying -> Color(0xFF81C995)
+                                isBuffering -> MaterialTheme.colorScheme.primary
+                                else -> MaterialTheme.colorScheme.outline
                             }
                         )
                     }
@@ -582,7 +565,7 @@ fun SettingsScreen(
                         Text(
                             text = "Active Track",
                             style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = currentTrack?.title ?: "None Selected",
@@ -590,7 +573,7 @@ fun SettingsScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = if (currentTrack != null) SkeuoTextPrimary else SkeuoTextTertiary,
+                            color = if (currentTrack != null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline,
                             maxLines = 1
                         )
                     }
@@ -604,7 +587,7 @@ fun SettingsScreen(
                         Text(
                             text = "Resolved Stream Source",
                             style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         val sourceLabel = when {
                             currentTrack == null -> "—"
@@ -622,7 +605,7 @@ fun SettingsScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = if (sourceLabel != "—" && sourceLabel != "Awaiting Resolution") SkeuoLcdCyan else SkeuoAmberGlow
+                            color = if (sourceLabel != "—" && sourceLabel != "Awaiting Resolution") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -635,7 +618,7 @@ fun SettingsScreen(
                         Text(
                             text = "Stream Target URL",
                             style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = if (currentTrack?.streamUrl.isNullOrBlank()) "Empty / None" else currentTrack!!.streamUrl.take(35) + "...",
@@ -643,7 +626,7 @@ fun SettingsScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp
                             ),
-                            color = if (!currentTrack?.streamUrl.isNullOrBlank()) SkeuoLcdCyan else SkeuoTextTertiary
+                            color = if (!currentTrack?.streamUrl.isNullOrBlank()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outline
                         )
                     }
 
@@ -654,12 +637,12 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color(0x33FF3D00), RoundedCornerShape(6.dp))
-                                .border(1.dp, SkeuoPeakRed.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
                                 .padding(10.dp)
                         ) {
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Warning, contentDescription = null, tint = SkeuoPeakRed, modifier = Modifier.size(14.dp))
+                                    Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "DIAGNOSTIC ERROR LOG",
@@ -668,7 +651,7 @@ fun SettingsScreen(
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 10.sp
                                         ),
-                                        color = SkeuoPeakRed
+                                        color = MaterialTheme.colorScheme.error
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
@@ -678,7 +661,7 @@ fun SettingsScreen(
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 11.sp
                                     ),
-                                    color = SkeuoTextPrimary
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         }
@@ -695,9 +678,9 @@ fun SettingsScreen(
                                 .height(36.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Refresh, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Default.Refresh, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("RETRY / RECONNECT STREAM", color = SkeuoAmberGlow, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                Text("RETRY / RECONNECT STREAM", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                             }
                         }
                     }
@@ -730,7 +713,7 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontWeight = FontWeight.Black
                                     ),
-                                    color = SkeuoTextPrimary
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Text(
                                     text = "v${com.example.BuildConfig.VERSION_NAME} • Skeuomorphic Hi-Fi Edition",
@@ -738,12 +721,12 @@ fun SettingsScreen(
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 11.sp
                                     ),
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
 
-                        SkeuoLedLamp(isLit = true, size = 8.dp, color = SkeuoPhosphorGreen)
+                        SkeuoLedLamp(isLit = true, size = 8.dp, color = Color(0xFF81C995))
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -751,11 +734,11 @@ fun SettingsScreen(
                     Text(
                         text = "Ultra-fast streaming architecture with physical tactile controls, low-latency audio pipelines, zero animation overhead, and 320kbps high-fidelity reproduction.",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 16.sp),
-                        color = SkeuoTextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    Divider(color = SkeuoChromeDark.copy(alpha = 0.4f))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Developer Card
@@ -763,7 +746,7 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
-                            tint = SkeuoAmberGlow,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -773,7 +756,7 @@ fun SettingsScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = SkeuoAmberGlow
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -784,7 +767,7 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Black
                         ),
-                        color = SkeuoTextPrimary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -792,7 +775,7 @@ fun SettingsScreen(
                     Text(
                         text = "Developer and security researcher with a strong focus on building real-world applications and consent-based telemetry tools. Work spans from front-end streaming platforms to ethical security frameworks.",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 15.sp),
-                        color = SkeuoTextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -815,7 +798,7 @@ fun SettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.Code, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Code, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "GITHUB",
@@ -824,10 +807,10 @@ fun SettingsScreen(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 10.sp
                                     ),
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
-                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = SkeuoAmberGlow.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
                             }
                         }
 
@@ -844,7 +827,7 @@ fun SettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.Language, contentDescription = null, tint = SkeuoLcdCyan, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Language, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "PORTFOLIO",
@@ -853,10 +836,10 @@ fun SettingsScreen(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 10.sp
                                     ),
-                                    color = SkeuoLcdCyan
+                                    color = MaterialTheme.colorScheme.tertiary
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
-                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = SkeuoLcdCyan.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
                             }
                         }
                     }
@@ -909,7 +892,7 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Default.Info, contentDescription = null, tint = SkeuoTextPrimary, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "ABOUT DECK & DEVELOPER",
@@ -918,7 +901,7 @@ fun SettingsScreen(
                                     fontWeight = FontWeight.Black,
                                     letterSpacing = 0.5.sp
                                 ),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -933,7 +916,7 @@ fun SettingsScreen(
     if (showAboutDialog) {
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
-            containerColor = SkeuoDeckElevated,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     SkeuoAppLogo(size = 32.dp)
@@ -945,7 +928,7 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.sp
                             ),
-                            color = SkeuoTextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = "v${com.example.BuildConfig.VERSION_NAME} • Skeuomorphic Edition",
@@ -953,7 +936,7 @@ fun SettingsScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp
                             ),
-                            color = SkeuoAmberGlow
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -963,18 +946,18 @@ fun SettingsScreen(
                     Text(
                         text = "High-fidelity, hardware-modeled music client designed for instant tactile playback, zero UI rendering lag, and offline caching.",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 16.sp),
-                        color = SkeuoTextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    Divider(color = SkeuoChromeDark.copy(alpha = 0.4f))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Security,
                             contentDescription = null,
-                            tint = SkeuoPhosphorGreen,
+                            tint = Color(0xFF81C995),
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -985,7 +968,7 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 10.sp
                             ),
-                            color = SkeuoPhosphorGreen
+                            color = Color(0xFF81C995)
                         )
                     }
 
@@ -994,7 +977,7 @@ fun SettingsScreen(
                     Text(
                         text = "Chriz-3656",
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
-                        color = SkeuoTextPrimary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -1002,7 +985,7 @@ fun SettingsScreen(
                     Text(
                         text = "I'm Chriz-3656, a developer and security researcher with a strong focus on building real-world applications and consent-based telemetry tools. My work spans from front-end streaming platforms to ethical security frameworks.",
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 15.sp),
-                        color = SkeuoTextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -1022,15 +1005,15 @@ fun SettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.Code, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Code, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "GitHub",
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
-                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = SkeuoAmberGlow.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
                             }
                         }
 
@@ -1045,15 +1028,15 @@ fun SettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.Language, contentDescription = null, tint = SkeuoLcdCyan, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Language, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "Portfolio",
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = SkeuoLcdCyan
+                                    color = MaterialTheme.colorScheme.tertiary
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
-                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = SkeuoLcdCyan.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
                             }
                         }
                     }
@@ -1068,7 +1051,7 @@ fun SettingsScreen(
                     Text(
                         text = "DISMISS",
                         fontWeight = FontWeight.Bold,
-                        color = SkeuoAmberGlow,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 14.dp)
                     )
                 }
@@ -1080,7 +1063,7 @@ fun SettingsScreen(
     if (showClearConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showClearConfirmDialog = false },
-            containerColor = SkeuoDeckElevated,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
                     "PURGE AUDIO CACHE?",
@@ -1088,10 +1071,10 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 1.sp
                     ),
-                    color = SkeuoPeakRed
+                    color = MaterialTheme.colorScheme.error
                 )
             },
-            text = { Text("This will delete temporary streaming buffers. Downloaded tracks remain intact.", color = SkeuoTextSecondary) },
+            text = { Text("This will delete temporary streaming buffers. Downloaded tracks remain intact.", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 SkeuoTactileButton(
                     onClick = {
@@ -1101,12 +1084,12 @@ fun SettingsScreen(
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.height(34.dp)
                 ) {
-                    Text("PURGE", fontWeight = FontWeight.Bold, color = SkeuoPeakRed, modifier = Modifier.padding(horizontal = 12.dp))
+                    Text("PURGE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = 12.dp))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showClearConfirmDialog = false }) {
-                    Text("CANCEL", color = SkeuoTextSecondary, fontWeight = FontWeight.SemiBold)
+                    Text("CANCEL", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                 }
             }
         )
@@ -1119,7 +1102,7 @@ fun SettingsSectionHeader(icon: ImageVector, title: String) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = SkeuoAmberGlow,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.width(6.dp))
@@ -1129,7 +1112,7 @@ fun SettingsSectionHeader(icon: ImageVector, title: String) {
                 fontWeight = FontWeight.Black,
                 letterSpacing = 1.sp
             ),
-            color = SkeuoTextPrimary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -1152,19 +1135,19 @@ fun QualityOptionRow(
         RadioButton(
             selected = isSelected,
             onClick = onSelect,
-            colors = RadioButtonDefaults.colors(selectedColor = SkeuoAmberGlow, unselectedColor = SkeuoChromeDark)
+            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary, unselectedColor = MaterialTheme.colorScheme.outline)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Column {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = SkeuoTextPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                color = SkeuoTextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -1183,7 +1166,7 @@ fun ProviderOptionRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(6.dp))
-            .background(if (isSelected) SkeuoAmberGlow.copy(alpha = 0.08f) else Color.Transparent)
+            .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) else Color.Transparent)
             .clickable(onClick = onSelect)
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -1192,8 +1175,8 @@ fun ProviderOptionRow(
             selected = isSelected,
             onClick = onSelect,
             colors = RadioButtonDefaults.colors(
-                selectedColor = SkeuoAmberGlow,
-                unselectedColor = SkeuoChromeDark
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.outline
             )
         )
         Spacer(modifier = Modifier.width(6.dp))
@@ -1202,34 +1185,34 @@ fun ProviderOptionRow(
                 Text(
                     text = provider.displayName,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = if (isSelected) SkeuoAmberGlow else SkeuoTextPrimary
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 SkeuoLedLamp(
                     isLit = isOperational,
                     size = 6.dp,
-                    color = if (isOperational) SkeuoPhosphorGreen else SkeuoPeakRed
+                    color = if (isOperational) Color(0xFF81C995) else MaterialTheme.colorScheme.error
                 )
                 if (latencyMs > 0L) {
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "${latencyMs}ms",
                         style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontFamily = FontFamily.Monospace),
-                        color = if (latencyMs < 500) SkeuoPhosphorGreen else SkeuoAmberGlow
+                        color = if (latencyMs < 500) Color(0xFF81C995) else MaterialTheme.colorScheme.primary
                     )
                 }
             }
             Text(
                 text = details ?: provider.description,
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                color = SkeuoTextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         if (isSelected) {
             Spacer(modifier = Modifier.width(4.dp))
             LcdBadge(
                 text = "ACTIVE",
-                textColor = SkeuoAmberGlow
+                textColor = MaterialTheme.colorScheme.primary
             )
         }
     }

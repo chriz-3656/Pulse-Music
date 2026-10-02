@@ -76,17 +76,6 @@ import com.example.ui.screens.LibraryScreen
 import com.example.ui.screens.PlaylistDetailScreen
 import com.example.ui.screens.SearchScreen
 import com.example.ui.screens.SettingsScreen
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.AlbumDetailViewModel
 import com.example.ui.viewmodel.ArtistDetailViewModel
 import com.example.ui.viewmodel.HomeViewModel
@@ -157,14 +146,14 @@ fun PulseMusicApp() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(SkeuoDeckDark)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Scaffold(
             bottomBar = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SkeuoDeckDark)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     // Mini player floating right above the navigation bar
                     MiniPlayerBar(
@@ -180,8 +169,8 @@ fun PulseMusicApp() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(navBarShape)
-                            .background(SkeuoDeckElevated)
-                            .border(BorderStroke(1.dp, SkeuoBevelHighlight), navBarShape)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(BorderStroke(1.dp, Color.Transparent), navBarShape)
                             .navigationBarsPadding()
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                             .testTag("bottom_navigation_bar")
@@ -213,7 +202,7 @@ fun PulseMusicApp() {
                                         Icon(
                                             imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
                                             contentDescription = destination.title,
-                                            tint = if (selected) SkeuoAmberGlow else SkeuoTextSecondary,
+                                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.size(18.dp)
                                         )
                                         Spacer(modifier = Modifier.height(2.dp))
@@ -225,7 +214,7 @@ fun PulseMusicApp() {
                                                 fontSize = 9.sp,
                                                 letterSpacing = 0.5.sp
                                             ),
-                                            color = if (selected) SkeuoAmberGlow else SkeuoTextSecondary
+                                            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -234,7 +223,7 @@ fun PulseMusicApp() {
                     }
                 }
             },
-            containerColor = SkeuoDeckDark,
+            containerColor = MaterialTheme.colorScheme.background,
             modifier = Modifier.statusBarsPadding()
         ) { innerPadding ->
             Box(

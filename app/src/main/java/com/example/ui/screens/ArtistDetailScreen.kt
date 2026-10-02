@@ -54,15 +54,6 @@ import com.example.ui.components.SectionHeader
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.components.SongItemRow
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
 import com.example.ui.viewmodel.ArtistDetailViewModel
 
 @Composable
@@ -78,7 +69,7 @@ fun ArtistDetailScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SkeuoDeckDark)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.isLoading) {
             LoadingView(message = "LOADING ARTIST PROFILE...", modifier = Modifier.fillMaxSize())
@@ -108,8 +99,8 @@ fun ArtistDetailScreen(
                                     Brush.verticalGradient(
                                         colors = listOf(
                                             Color.Black.copy(alpha = 0.3f),
-                                            SkeuoDeckDark.copy(alpha = 0.7f),
-                                            SkeuoDeckDark
+                                            MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                                            MaterialTheme.colorScheme.background
                                         )
                                     )
                                 )
@@ -132,7 +123,7 @@ fun ArtistDetailScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back",
-                                    tint = SkeuoChromeLight,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -144,14 +135,14 @@ fun ArtistDetailScreen(
                                 .align(Alignment.BottomStart)
                                 .padding(16.dp)
                         ) {
-                            LcdBadge(text = "FEATURED ARTIST", textColor = SkeuoAmberGlow)
+                            LcdBadge(text = "FEATURED ARTIST", textColor = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = artist.name,
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontWeight = FontWeight.Black
                                 ),
-                                color = SkeuoTextPrimary
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -174,9 +165,9 @@ fun ArtistDetailScreen(
                                 .testTag("artist_play_button")
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.PlayArrow, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("PLAY TOP SONGS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = SkeuoAmberGlow)
+                                Text("PLAY TOP SONGS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                             }
                         }
 
@@ -188,9 +179,9 @@ fun ArtistDetailScreen(
                                 .height(38.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Shuffle, contentDescription = null, tint = SkeuoChromeLight, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Shuffle, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("SHUFFLE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = SkeuoChromeLight)
+                                Text("SHUFFLE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }

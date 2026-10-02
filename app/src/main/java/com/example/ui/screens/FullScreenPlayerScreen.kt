@@ -79,24 +79,7 @@ import com.example.ui.components.QualityBadge
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
-import com.example.ui.theme.SkeuoAmberGlow
-import com.example.ui.theme.SkeuoBevelHighlight
-import com.example.ui.theme.SkeuoBevelShadow
-import com.example.ui.theme.SkeuoCardSurface
-import com.example.ui.theme.SkeuoChromeDark
-import com.example.ui.theme.SkeuoChromeLight
-import com.example.ui.theme.SkeuoChromeMid
-import com.example.ui.theme.SkeuoDeckDark
-import com.example.ui.theme.SkeuoDeckElevated
-import com.example.ui.theme.SkeuoKnobGrip
-import com.example.ui.theme.SkeuoLcdBg
-import com.example.ui.theme.SkeuoLcdCyan
-import com.example.ui.theme.SkeuoPeakRed
-import com.example.ui.theme.SkeuoPhosphorGreen
-import com.example.ui.theme.SkeuoRecessedTray
-import com.example.ui.theme.SkeuoTextPrimary
-import com.example.ui.theme.SkeuoTextSecondary
-import com.example.ui.theme.SkeuoTextTertiary
+import com.example.ui.theme.MaterialTheme.colorScheme.surface
 import com.example.ui.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -123,7 +106,7 @@ fun FullScreenPlayerScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SkeuoDeckDark)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .testTag("full_screen_player_screen")
     ) {
@@ -153,7 +136,7 @@ fun FullScreenPlayerScreen(
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
                         contentDescription = "Collapse",
-                        tint = SkeuoChromeLight,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -161,7 +144,7 @@ fun FullScreenPlayerScreen(
                 // Center Hi-Fi Model Plate
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        SkeuoLedLamp(isLit = playerState.isPlaying, size = 6.dp, color = SkeuoAmberGlow)
+                        SkeuoLedLamp(isLit = playerState.isPlaying, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "PULSE AUDIO DECK • HI-FI",
@@ -169,14 +152,14 @@ fun FullScreenPlayerScreen(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.5.sp
                             ),
-                            color = SkeuoAmberGlow
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                     Text(
                         text = song.album.ifBlank { "Direct Stream" },
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 11.sp,
-                            color = SkeuoTextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -203,10 +186,10 @@ fun FullScreenPlayerScreen(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                SkeuoRecessedTray,
-                                SkeuoDeckDark,
-                                SkeuoKnobGrip,
-                                SkeuoDeckDark
+                                MaterialTheme.colorScheme.background,
+                                MaterialTheme.colorScheme.background,
+                                MaterialTheme.colorScheme.surface,
+                                MaterialTheme.colorScheme.background
                             )
                         )
                     )
@@ -215,11 +198,11 @@ fun FullScreenPlayerScreen(
                             4.dp,
                             Brush.sweepGradient(
                                 listOf(
-                                    SkeuoChromeDark,
-                                    SkeuoChromeMid,
-                                    SkeuoChromeDark,
-                                    SkeuoBevelHighlight,
-                                    SkeuoChromeDark
+                                    MaterialTheme.colorScheme.outline,
+                                    MaterialTheme.colorScheme.outlineVariant,
+                                    MaterialTheme.colorScheme.outline,
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.outline
                                 )
                             )
                         ),
@@ -241,7 +224,7 @@ fun FullScreenPlayerScreen(
                     modifier = Modifier
                         .size(170.dp)
                         .clip(CircleShape)
-                        .border(2.dp, SkeuoChromeMid, CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
                 ) {
                     AsyncImage(
                         model = song.artworkUrl,
@@ -258,10 +241,10 @@ fun FullScreenPlayerScreen(
                         .clip(CircleShape)
                         .background(
                             Brush.radialGradient(
-                                listOf(SkeuoChromeLight, SkeuoChromeDark)
+                                listOf(MaterialTheme.colorScheme.onSurface, MaterialTheme.colorScheme.outline)
                             )
                         )
-                        .border(1.dp, SkeuoBevelHighlight, CircleShape)
+                        .border(1.dp, Color.Transparent, CircleShape)
                 )
             }
 
@@ -287,7 +270,7 @@ fun FullScreenPlayerScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             ),
-                            color = SkeuoTextPrimary,
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -298,7 +281,7 @@ fun FullScreenPlayerScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp
                             ),
-                            color = SkeuoAmberGlow,
+                            color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.clickable {
@@ -319,7 +302,7 @@ fun FullScreenPlayerScreen(
                         }
                         LcdBadge(
                             text = streamSourceTag,
-                            textColor = SkeuoLcdCyan
+                            textColor = MaterialTheme.colorScheme.tertiary
                         )
                     }
 
@@ -340,13 +323,13 @@ fun FullScreenPlayerScreen(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(16.dp),
                                     strokeWidth = 2.dp,
-                                    color = SkeuoAmberGlow
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             } else {
                                 Icon(
                                     imageVector = if (uiState.isDownloaded) Icons.Default.CheckCircle else Icons.Default.Download,
                                     contentDescription = "Download",
-                                    tint = if (uiState.isDownloaded) SkeuoAmberGlow else SkeuoTextSecondary,
+                                    tint = if (uiState.isDownloaded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -359,7 +342,7 @@ fun FullScreenPlayerScreen(
                             Icon(
                                 imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Favorite",
-                                tint = if (uiState.isFavorite) SkeuoAmberGlow else SkeuoTextSecondary,
+                                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -374,7 +357,7 @@ fun FullScreenPlayerScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color(0x33FF3D00), RoundedCornerShape(18.dp))
-                        .border(1.dp, SkeuoPeakRed.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Row(
@@ -384,7 +367,7 @@ fun FullScreenPlayerScreen(
                         Icon(
                             imageVector = Icons.Default.Warning,
                             contentDescription = "Stream Error",
-                            tint = SkeuoPeakRed,
+                            tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
@@ -393,7 +376,7 @@ fun FullScreenPlayerScreen(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 11.sp
                             ),
-                            color = SkeuoPeakRed,
+                            color = MaterialTheme.colorScheme.error,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -414,9 +397,9 @@ fun FullScreenPlayerScreen(
                         viewModel.seekTo(seekPositionMs.toLong())
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = SkeuoAmberGlow,
-                        activeTrackColor = SkeuoAmberGlow,
-                        inactiveTrackColor = SkeuoRecessedTray
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.background
                     ),
                     modifier = Modifier.fillMaxWidth().testTag("player_seek_slider")
                 )
@@ -429,11 +412,11 @@ fun FullScreenPlayerScreen(
                 ) {
                     LcdBadge(
                         text = formatTimecode(currentPosition),
-                        textColor = SkeuoLcdCyan
+                        textColor = MaterialTheme.colorScheme.tertiary
                     )
                     LcdBadge(
                         text = if (totalDuration <= 0L) "--:--" else formatTimecode(totalDuration),
-                        textColor = SkeuoTextSecondary
+                        textColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -460,7 +443,7 @@ fun FullScreenPlayerScreen(
                         Icon(
                             imageVector = Icons.Default.Shuffle,
                             contentDescription = "Shuffle",
-                            tint = if (playerState.isShuffle) SkeuoAmberGlow else SkeuoTextSecondary,
+                            tint = if (playerState.isShuffle) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -474,7 +457,7 @@ fun FullScreenPlayerScreen(
                         Icon(
                             imageVector = Icons.Default.SkipPrevious,
                             contentDescription = "Previous",
-                            tint = SkeuoChromeLight,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -484,20 +467,20 @@ fun FullScreenPlayerScreen(
                         onClick = { viewModel.togglePlayPause() },
                         shape = CircleShape,
                         isPressedOrActive = playerState.isPlaying,
-                        accentColor = SkeuoAmberGlow,
+                        accentColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(62.dp).testTag("player_play_pause_button")
                     ) {
                         if (playerState.isBuffering) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(28.dp),
                                 strokeWidth = 3.dp,
-                                color = SkeuoAmberGlow
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else {
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                                 contentDescription = if (playerState.isPlaying) "Pause" else "Play",
-                                tint = if (playerState.isPlaying) SkeuoAmberGlow else SkeuoChromeLight,
+                                tint = if (playerState.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
@@ -512,7 +495,7 @@ fun FullScreenPlayerScreen(
                         Icon(
                             imageVector = Icons.Default.SkipNext,
                             contentDescription = "Next",
-                            tint = SkeuoChromeLight,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -530,7 +513,7 @@ fun FullScreenPlayerScreen(
                                 else -> Icons.Default.Repeat
                             },
                             contentDescription = "Repeat",
-                            tint = if (playerState.repeatMode != RepeatMode.OFF) SkeuoAmberGlow else SkeuoTextSecondary,
+                            tint = if (playerState.repeatMode != RepeatMode.OFF) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -555,9 +538,9 @@ fun FullScreenPlayerScreen(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.FormatQuote, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.FormatQuote, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("LYRICS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = SkeuoTextPrimary)
+                        Text("LYRICS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
 
@@ -571,9 +554,9 @@ fun FullScreenPlayerScreen(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.QueueMusic, contentDescription = null, tint = SkeuoAmberGlow, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.QueueMusic, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("QUEUE (${playerState.queue.size})", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = SkeuoTextPrimary)
+                        Text("QUEUE (${playerState.queue.size})", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             }
@@ -585,8 +568,8 @@ fun FullScreenPlayerScreen(
         ModalBottomSheet(
             onDismissRequest = { viewModel.toggleQueue() },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = SkeuoDeckDark,
-            contentColor = SkeuoTextPrimary
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
         ) {
             QueueSheetContent(
                 queue = playerState.queue,
@@ -604,8 +587,8 @@ fun FullScreenPlayerScreen(
         ModalBottomSheet(
             onDismissRequest = { viewModel.toggleLyrics() },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = SkeuoDeckDark,
-            contentColor = SkeuoTextPrimary
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
         ) {
             LyricsSheetContent(
                 lyrics = uiState.lyrics,
@@ -639,7 +622,7 @@ private fun QueueSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SkeuoLedLamp(isLit = true, color = SkeuoAmberGlow)
+                SkeuoLedLamp(isLit = true, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "PLAYBACK QUEUE (${queue.size})",
@@ -647,17 +630,17 @@ private fun QueueSheetContent(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     ),
-                    color = SkeuoTextPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             Row {
                 if (queue.isNotEmpty()) {
                     IconButton(onClick = onClear) {
-                        Icon(Icons.Default.Delete, contentDescription = "Clear Queue", tint = SkeuoTextSecondary)
+                        Icon(Icons.Default.Delete, contentDescription = "Clear Queue", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = SkeuoTextSecondary)
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -674,7 +657,7 @@ private fun QueueSheetContent(
                 Text(
                     text = "QUEUE IS EMPTY",
                     style = MaterialTheme.typography.labelLarge.copy(fontFamily = FontFamily.Monospace),
-                    color = SkeuoTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
@@ -690,7 +673,7 @@ private fun QueueSheetContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(14.dp))
-                            .background(if (isCurrent) SkeuoCardSurface else Color.Transparent)
+                            .background(if (isCurrent) MaterialTheme.colorScheme.surface else Color.Transparent)
                             .clickable { onSongSelect(index) }
                             .padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -698,7 +681,7 @@ private fun QueueSheetContent(
                         Text(
                             text = "${index + 1}",
                             style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                            color = if (isCurrent) SkeuoAmberGlow else SkeuoTextTertiary,
+                            color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                             modifier = Modifier.width(28.dp)
                         )
                         Column(modifier = Modifier.weight(1f)) {
@@ -707,14 +690,14 @@ private fun QueueSheetContent(
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
                                 ),
-                                color = if (isCurrent) SkeuoAmberGlow else SkeuoTextPrimary,
+                                color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = song.artist,
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                color = SkeuoTextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -723,7 +706,7 @@ private fun QueueSheetContent(
                             onClick = { onRemove(index) },
                             modifier = Modifier.size(32.dp)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = SkeuoTextTertiary, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
@@ -758,16 +741,16 @@ private fun LyricsSheetContent(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     ),
-                    color = SkeuoAmberGlow
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "$songTitle • $artist",
                     style = MaterialTheme.typography.bodySmall,
-                    color = SkeuoTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close", tint = SkeuoTextSecondary)
+                Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
@@ -786,12 +769,12 @@ private fun LyricsSheetContent(
                 contentAlignment = Alignment.Center
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = SkeuoAmberGlow)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 } else if (lyrics.isNullOrBlank()) {
                     Text(
                         text = "NO LYRICS AVAILABLE",
                         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-                        color = SkeuoTextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -801,7 +784,7 @@ private fun LyricsSheetContent(
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     lineHeight = 26.sp
                                 ),
-                                color = SkeuoTextPrimary,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
