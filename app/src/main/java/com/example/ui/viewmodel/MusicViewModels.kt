@@ -405,6 +405,10 @@ class PlayerViewModel(
     fun toggleLyrics() {
         _uiState.update { it.copy(showLyricsSheet = !it.showLyricsSheet) }
     }
+
+    fun setSleepTimer(minutes: Int) {
+        playerController.setSleepTimer(minutes)
+    }
 }
 
 // -------------------------------------------------------------
