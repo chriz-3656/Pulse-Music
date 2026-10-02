@@ -64,32 +64,12 @@ fun SyncedLyricsView(
     modifier: Modifier = Modifier
 ) {
     if (lyrics.isNullOrBlank()) {
-        Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                text = "NO LYRICS",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp,
-                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.3f)
-                )
-            )
-        }
         return
     }
 
     val parsedLyrics = remember(lyrics) { parseLrc(lyrics) }
     
     if (parsedLyrics.isEmpty()) {
-        Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                text = "LYRICS NOT SYNCED",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp,
-                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.3f)
-                )
-            )
-        }
         return
     }
 
