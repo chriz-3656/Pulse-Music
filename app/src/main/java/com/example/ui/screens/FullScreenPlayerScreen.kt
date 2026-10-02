@@ -79,7 +79,6 @@ import com.example.ui.components.QualityBadge
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
-import com.example.ui.theme.MaterialTheme.colorScheme.surface
 import com.example.ui.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
