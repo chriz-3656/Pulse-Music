@@ -40,6 +40,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -111,7 +115,14 @@ fun SkeuoTactileButton(
     content: @Composable () -> Unit
 ) {
     val neu = LocalNeuColors.current
-    val cornerSize = if (shape is RoundedCornerShape) 20.dp else 16.dp // Approximation
+    val cornerSize = if (shape is RoundedCornerShape) 20.dp else 16.dp
+    
+    var isTapped by remember { mutableStateOf(false) }
+    val isActuallyPressed = isPressedOrActive || isTapped
+    
+    val animatedOffsetX by animateDpAsState(targetValue = if (isActuallyPressed) (-2).dp else 6.dp, animationSpec = tween(150), label = "")
+    val animatedOffsetY by animateDpAsState(targetValue = if (isActuallyPressed) (-2).dp else 6.dp, animationSpec = tween(150), label = "")
+    val animatedBlur by animateDpAsState(targetValue = if (isActuallyPressed) 4.dp else 12.dp, animationSpec = tween(150), label = "")
     
     Box(
         modifier = modifier
@@ -119,11 +130,23 @@ fun SkeuoTactileButton(
                 lightShadow = neu.lightShadow,
                 darkShadow = neu.darkShadow,
                 cornerRadius = cornerSize,
-                isPressed = isPressedOrActive
+                offsetX = animatedOffsetX,
+                offsetY = animatedOffsetY,
+                blurRadius = animatedBlur,
+                isPressed = isActuallyPressed
             )
             .clip(shape)
             .background(neu.background)
-            .clickable(onClick = onClick),
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isTapped = true
+                        tryAwaitRelease()
+                        isTapped = false
+                        onClick()
+                    }
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         content()

@@ -112,7 +112,7 @@ fun FullScreenPlayerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
+                .padding(horizontal = 24.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -174,7 +174,7 @@ fun FullScreenPlayerScreen(
                 QualityBadge(quality = playerState.audioQuality)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Tactile Turntable / Vinyl Record Bay
             Box(
@@ -247,7 +247,7 @@ fun FullScreenPlayerScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Backlit LCD Display Bay (Metadata & Status)
             SkeuoBevelCard(
@@ -258,7 +258,7 @@ fun FullScreenPlayerScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -351,7 +351,7 @@ fun FullScreenPlayerScreen(
 
             // Playback Error Banner (if error occurred during playback)
             if (!playerState.playbackError.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -428,7 +428,7 @@ fun FullScreenPlayerScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -644,7 +644,7 @@ private fun QueueSheetContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (queue.isEmpty()) {
             Box(
@@ -725,7 +725,7 @@ private fun LyricsSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 24.dp)
             .testTag("lyrics_sheet")
     ) {
         Row(

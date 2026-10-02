@@ -292,7 +292,7 @@ fun HomeScreen(
             )
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier.padding(vertical = 6.dp)
             ) {
                 items(uiState.trendingSongs, key = { it.id }) { song ->
@@ -316,7 +316,7 @@ fun HomeScreen(
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
                     items(uiState.featuredAlbums, key = { it.id }) { album ->
@@ -339,7 +339,7 @@ fun HomeScreen(
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
                     items(uiState.featuredPlaylists, key = { it.id }) { playlist ->
@@ -368,7 +368,7 @@ fun HomeScreen(
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
                     items(uiState.quickPicks, key = { it.id }) { song ->
@@ -393,7 +393,7 @@ fun HomeScreen(
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
                     items(uiState.moodPlaylists, key = { it.id }) { playlist ->
@@ -424,7 +424,7 @@ fun HomeScreen(
                 onPlayNext = { viewModel.playNext(song) },
                 onAddToQueue = { viewModel.addToQueue(song) },
                 onStartRadio = { viewModel.playRadio(song) },
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 12.dp)
             )
         }
     }
@@ -514,7 +514,7 @@ fun TrendingSongCard(
 ) {
     SkeuoBevelCard(
         modifier = modifier
-            .width(136.dp)
+            .width(148.dp)
             .clickable(onClick = onClick)
             .testTag("trending_card_${song.id}"),
         shape = RoundedCornerShape(22.dp)
@@ -523,7 +523,7 @@ fun TrendingSongCard(
             // Vinyl Framed Image Box
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(132.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.background)
                     .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
@@ -593,7 +593,7 @@ fun AlbumCard(
 ) {
     SkeuoBevelCard(
         modifier = modifier
-            .width(136.dp)
+            .width(148.dp)
             .clickable(onClick = onClick)
             .testTag("album_card_${album.id}"),
         shape = RoundedCornerShape(22.dp)
@@ -601,7 +601,7 @@ fun AlbumCard(
         Column(modifier = Modifier.padding(8.dp)) {
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(132.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.background)
                     .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(16.dp))
