@@ -40,8 +40,8 @@ class MusicPlayerController(
                 kotlinx.coroutines.delay(1000L)
                 timeLeftMs -= 1000L
             }
-            _playerState.update { it.copy(sleepTimerTimeLeftMs = 0L) }
-            pause()
+            _playerState.update { it.copy(sleepTimerTimeLeftMs = 0L, isPlaying = false) }
+            onServiceCommand?.invoke(ServiceAction.Pause)
             
             val intent = Intent(context, MusicPlaybackService::class.java).apply {
                 action = MusicPlaybackService.ACTION_STOP
