@@ -876,14 +876,10 @@ class MusicRepositoryImpl(
             if (conn.responseCode == 200) {
                 val text = conn.inputStream.bufferedReader().readText()
                 val json = JSONObject(text)
+                val synced = json.optString("syncedLyrics", "")
+                if (synced.isNotBlank()) return synced // Return raw LRC with timestamps!
                 val plain = json.optString("plainLyrics", "")
                 if (plain.isNotBlank()) return plain
-                val synced = json.optString("syncedLyrics", "")
-                if (synced.isNotBlank()) {
-                    return synced.lines().map { line ->
-                        line.replace(Regex("^\\[\\d+:\\d+(\\.\\d+)?\\]\\s*"), "")
-                    }.filter { it.isNotBlank() }.joinToString("\n")
-                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

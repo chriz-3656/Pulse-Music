@@ -76,6 +76,7 @@ import com.example.domain.model.Song
 import com.example.ui.components.AnalogVUMeter
 import com.example.ui.components.LcdBadge
 import com.example.ui.components.QualityBadge
+import com.example.ui.components.SyncedLyricsView
 import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
@@ -247,7 +248,22 @@ fun FullScreenPlayerScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Synced Lyrics View (Animated)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                SyncedLyricsView(
+                    lyrics = playerState.currentSong?.lyrics,
+                    currentPositionMs = playerState.currentPositionMs,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Backlit LCD Display Bay (Metadata & Status)
             SkeuoBevelCard(
