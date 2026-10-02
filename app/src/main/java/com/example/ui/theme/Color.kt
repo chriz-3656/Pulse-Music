@@ -8,7 +8,7 @@ val NeuLightShadowLight = Color(0xFFFFFFFF)
 val NeuLightShadowDark = Color(0xFFA3B1C6)
 val NeuLightTextPrimary = Color(0xFF4A4E69)
 val NeuLightTextSecondary = Color(0xFF9FA8DA)
-val NeuLightAccent = Color(0xFF6C63FF)
+val NeuLightAccent = Color(0xFFFFC107)
 
 // Dark Mode Neumorphism Colors
 val NeuDarkBackground = Color(0xFF202124) // Base gray
@@ -16,7 +16,7 @@ val NeuDarkShadowLight = Color(0xFF2A2B2F) // Top left
 val NeuDarkShadowDark = Color(0xFF161719) // Bottom right
 val NeuDarkTextPrimary = Color(0xFFE8EAED)
 val NeuDarkTextSecondary = Color(0xFF9AA0A6)
-val NeuDarkAccent = Color(0xFF8AB4F8)
+val NeuDarkAccent = Color(0xFFFFCA28)
 
 // Aliases mapping old names to new standard names, so app compiles!
 val SkeuoDeckDark = NeuDarkBackground
@@ -31,11 +31,11 @@ val SkeuoChromeMid = NeuDarkTextSecondary
 val SkeuoChromeDark = NeuDarkBackground
 val SkeuoKnobGrip = NeuDarkBackground
 
-val SkeuoAmberGlow = NeuDarkAccent
-val SkeuoAmberDim = Color(0x668AB4F8)
+val SkeuoAmberGlow = Color(0xFFFFC107)
+val SkeuoAmberDim = Color(0x66FFC107)
 val SkeuoPhosphorGreen = Color(0xFF81C995)
 val SkeuoPeakRed = Color(0xFFF28B82)
-val SkeuoLcdCyan = NeuDarkAccent
+val SkeuoLcdCyan = Color(0xFF00E5FF)
 val SkeuoLcdBg = NeuDarkBackground
 
 val SkeuoTextPrimary = NeuDarkTextPrimary
