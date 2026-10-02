@@ -254,10 +254,10 @@ fun FullScreenPlayerScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(56.dp)
             ) {
                 SyncedLyricsView(
-                    lyrics = playerState.currentSong?.lyrics,
+                    lyrics = uiState.lyrics ?: playerState.currentSong?.lyrics,
                     currentPositionMs = playerState.currentPositionMs,
                     modifier = Modifier.fillMaxSize()
                 )

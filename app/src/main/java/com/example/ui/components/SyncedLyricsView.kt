@@ -1,31 +1,28 @@
 package com.example.ui.components
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.LocalNeuColors
-import kotlinx.coroutines.delay
 
 data class LyricLine(val timestampMs: Long, val text: String)
 
@@ -69,11 +66,11 @@ fun SyncedLyricsView(
     if (lyrics.isNullOrBlank()) {
         Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
-                text = "NO LYRICS AVAILABLE",
+                text = "NO LYRICS",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
-                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.5f)
+                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.3f)
                 )
             )
         }
@@ -83,14 +80,13 @@ fun SyncedLyricsView(
     val parsedLyrics = remember(lyrics) { parseLrc(lyrics) }
     
     if (parsedLyrics.isEmpty()) {
-        // Plain text fallback
         Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
                 text = "LYRICS NOT SYNCED",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
-                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.5f)
+                    color = LocalNeuColors.current.textSecondary.copy(alpha = 0.3f)
                 )
             )
         }
@@ -108,47 +104,34 @@ fun SyncedLyricsView(
     }
     if (activeIndex == -1 && parsedLyrics.isNotEmpty()) activeIndex = 0
 
-    val listState = rememberLazyListState()
+    val currentLine = if (activeIndex in parsedLyrics.indices) parsedLyrics[activeIndex].text else ""
 
-    // Auto-scroll
-    LaunchedEffect(activeIndex) {
-        if (activeIndex >= 0 && activeIndex < parsedLyrics.size) {
-            // Try to center the active item (offset by roughly half the height)
-            val offset = if (activeIndex > 0) 1 else 0
-            listState.animateScrollToItem(maxOf(0, activeIndex - offset))
-        }
-    }
-
-    LazyColumn(
-        state = listState,
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        itemsIndexed(parsedLyrics) { index, line ->
-            val isActive = index == activeIndex
-            val alpha by animateFloatAsState(
-                targetValue = if (isActive) 1f else 0.3f,
-                animationSpec = tween(300), label = ""
-            )
-            val fontSize by animateFloatAsState(
-                targetValue = if (isActive) 18f else 14f,
-                animationSpec = tween(300), label = ""
-            )
-
-            Text(
-                text = line.text,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = fontSize.sp,
-                    color = if (isActive) LocalNeuColors.current.accent else LocalNeuColors.current.textPrimary
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = if (isActive) 8.dp else 4.dp)
-                    .alpha(alpha)
-            )
+        AnimatedContent(
+            targetState = currentLine,
+            transitionSpec = {
+                (slideInVertically(animationSpec = tween(400)) { height -> height } + fadeIn(animationSpec = tween(400))) togetherWith
+                        (slideOutVertically(animationSpec = tween(400)) { height -> -height } + fadeOut(animationSpec = tween(400)))
+            },
+            label = "lyrics_anim"
+        ) { text ->
+            if (text.isNotBlank()) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = LocalNeuColors.current.accent
+                    ),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
         }
     }
 }
