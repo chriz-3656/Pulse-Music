@@ -48,11 +48,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val authManager = (application as PulseMusicApplication).appContainer.spotifyAuthManager
-        authManager.handleAuthResponse(requestCode, resultCode, data)
-    }
 }
 
 @Composable

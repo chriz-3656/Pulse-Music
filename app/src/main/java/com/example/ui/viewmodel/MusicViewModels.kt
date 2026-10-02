@@ -420,17 +420,13 @@ data class LibraryUiState(
     val showCreateDialog: Boolean = false,
     val isLoading: Boolean = false,
     val importProgress: ImportProgress? = null,
-    val spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto> = emptyList(),
-    val isSpotifyLinked: Boolean = false
 )
 
 class LibraryViewModel(
     private val managePlaylistUseCase: ManagePlaylistUseCase,
     private val manageFavoritesUseCase: ManageFavoritesUseCase,
     private val manageDownloadsUseCase: ManageDownloadsUseCase,
-    private val playerController: MusicPlayerController,
-    private val spotifyAuthManager: com.example.util.SpotifyAuthManager,
-    private val spotifyApiService: com.example.data.remote.SpotifyApiService
+    private val playerController: MusicPlayerController
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LibraryUiState())
@@ -438,36 +434,6 @@ class LibraryViewModel(
 
     init {
         viewModelScope.launch {
-            launch {
-                spotifyAuthManager.accessToken.collectLatest { token ->
-                    _uiState.update { it.copy(isSpotifyLinked = token != null) }
-                    if (token != null) {
-                        try {
-                            val response = spotifyApiService.getMyPlaylists("Bearer $token")
-                            var playlists = response.items
-                            try {
-                                val likes = spotifyApiService.getMyLikedSongs("Bearer $token")
-                                val likesPlaylist = com.example.data.remote.SpotifyPlaylistDto(
-                                    id = "liked_songs",
-                                    name = "Liked Songs",
-                                    images = listOf(com.example.data.remote.SpotifyImageDto("https://misc.scdn.co/liked-songs/liked-songs-300.png")),
-                                    tracks = com.example.data.remote.SpotifyTracksInfo(total = likes.total)
-                                )
-                                playlists = listOf(likesPlaylist) + playlists
-                            } catch (e: Exception) {
-                                android.util.Log.e("LibraryViewModel", "Failed to load Liked Songs", e)
-                            }
-                            _uiState.update { it.copy(spotifyPlaylists = playlists) }
-                        } catch (e: Exception) {
-                            android.util.Log.e("LibraryViewModel", "Failed to load Spotify Playlists", e)
-                            val errorPlaylist = com.example.data.remote.SpotifyPlaylistDto(id="error", name="Error: ${e.message}", images=null, tracks=null)
-                            _uiState.update { it.copy(spotifyPlaylists = listOf(errorPlaylist)) }
-                        }
-                    } else {
-                        _uiState.update { it.copy(spotifyPlaylists = emptyList()) }
-                    }
-                }
-            }
             launch {
                 managePlaylistUseCase.getUserPlaylists().collectLatest { pls ->
                     _uiState.update { it.copy(playlists = pls) }
@@ -742,15 +708,12 @@ data class SettingsUiState(
     val playerState: PlayerState = PlayerState(),
     val providerStatuses: Map<MusicProvider, ProviderStatus> = emptyMap(),
     val isCheckingProviders: Boolean = false,
-    val isDeveloperMode: Boolean = false,
-    val spotifyUser: com.example.data.remote.SpotifyUserDto? = null
+    val isDeveloperMode: Boolean = false
 )
 
 class SettingsViewModel(
     private val manageSettingsUseCase: ManageSettingsUseCase,
-    private val playerController: MusicPlayerController,
-    private val spotifyAuthManager: com.example.util.SpotifyAuthManager,
-    private val spotifyApiService: com.example.data.remote.SpotifyApiService
+    private val playerController: MusicPlayerController
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -758,21 +721,6 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            launch {
-                spotifyAuthManager.accessToken.collectLatest { token ->
-                    if (token != null) {
-                        try {
-                            val user = spotifyApiService.getCurrentUserProfile("Bearer $token")
-                            _uiState.update { it.copy(spotifyUser = user) }
-                        } catch (e: Exception) {
-                            android.util.Log.e("SettingsVM", "Failed to fetch profile", e)
-                            _uiState.update { it.copy(spotifyUser = com.example.data.remote.SpotifyUserDto(id="error", display_name="Error: ${e.message}", email=null, images=emptyList())) }
-                        }
-                    } else {
-                        _uiState.update { it.copy(spotifyUser = null) }
-                    }
-                }
-            }
             manageSettingsUseCase.getSettings().collectLatest { settings ->
                 playerController.isAutoplayEnabled = settings.autoplayEnabled
                 _uiState.update {
@@ -948,17 +896,13 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
                     appContainer.managePlaylistUseCase,
                     appContainer.manageFavoritesUseCase,
                     appContainer.manageDownloadsUseCase,
-                    appContainer.playerController,
-                    appContainer.spotifyAuthManager,
-                    appContainer.spotifyApiService
+                    appContainer.playerController
                 ) as T
             }
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {
                 SettingsViewModel(
                     appContainer.manageSettingsUseCase, 
-                    appContainer.playerController,
-                    appContainer.spotifyAuthManager,
-                    appContainer.spotifyApiService
+                    appContainer.playerController
                 ) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

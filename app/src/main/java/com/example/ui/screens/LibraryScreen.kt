@@ -202,7 +202,6 @@ fun LibraryScreen(
                     PlaylistsTabContent(
                         onImportSpotifyClick = { showSpotifyDialog = true },
                         playlists = uiState.playlists,
-                        spotifyPlaylists = uiState.spotifyPlaylists,
                         onCreateClick = { viewModel.showCreatePlaylistDialog(true) },
                         onPlaylistClick = { playlist -> playlist.id?.let { onPlaylistClick(it) } },
                         onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
@@ -397,7 +396,6 @@ fun LibraryScreen(
 fun PlaylistsTabContent(
     onImportSpotifyClick: () -> Unit,
     playlists: List<Playlist>,
-    spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto>,
     onCreateClick: () -> Unit,
     onPlaylistClick: (Playlist) -> Unit,
     onDeletePlaylist: (String) -> Unit
@@ -500,86 +498,6 @@ fun PlaylistsTabContent(
             }
         }
 
-        if (spotifyPlaylists.isNotEmpty()) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "SPOTIFY SYNC",
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
-                    color = SkeuoLcdCyan
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            items(spotifyPlaylists.chunked(2)) { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    for (playlist in row) {
-                        SkeuoBevelCard(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                val imageUrl = playlist.images?.firstOrNull()?.url
-                                if (imageUrl != null) {
-                                    coil.compose.AsyncImage(
-                                        model = imageUrl,
-                                        contentDescription = playlist.name,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(SkeuoRecessedTray),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoLcdCyan)
-                                    }
-                                }
-                                
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .align(Alignment.BottomCenter)
-                                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
-                                        .padding(8.dp)
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = playlist.name ?: "Unknown",
-                                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                                            color = androidx.compose.ui.graphics.Color.White,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Text(
-                                            text = "${playlist.tracks?.total ?: 0} tracks",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = SkeuoLcdCyan
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (row.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                androidx.compose.material3.Divider(color = SkeuoChromeDark.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 6.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
 
         items(playlists) { playlist ->
             SkeuoBevelCard(
@@ -767,85 +685,3 @@ fun DownloadsTabContent(
     }
 }
 
-@Composable
-fun SpotifyTabContent(
-    isSpotifyLinked: Boolean,
-    spotifyPlaylists: List<com.example.data.remote.SpotifyPlaylistDto>,
-    onPlaylistClick: (String) -> Unit
-) {
-    if (!isSpotifyLinked) {
-        EmptyStateView(
-            title = "Not Linked",
-            message = "Connect your Spotify account in Settings to view your playlists here.",
-            icon = Icons.Default.Add
-        )
-    } else if (spotifyPlaylists.isEmpty()) {
-        EmptyStateView(
-            title = "No Playlists Found",
-            message = "We couldn't find any public playlists in your Spotify account.",
-            icon = Icons.Default.MusicNote
-        )
-    } else {
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
-            contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 8.dp, bottom = 96.dp),
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(spotifyPlaylists) { playlist ->
-                SkeuoBevelCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .clickable { playlist.id?.let { onPlaylistClick(it) } },
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        val imageUrl = playlist.images?.firstOrNull()?.url
-                        if (imageUrl != null) {
-                            AsyncImage(
-                                model = imageUrl,
-                                contentDescription = playlist.name,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(SkeuoRecessedTray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.MusicNote, contentDescription = null, tint = SkeuoLcdCyan)
-                            }
-                        }
-                        
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
-                                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
-                                .padding(8.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = playlist.name ?: "Unknown",
-                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = androidx.compose.ui.graphics.Color.White,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = "${playlist.tracks?.total ?: 0} tracks",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = SkeuoLcdCyan
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
