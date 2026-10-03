@@ -7,7 +7,7 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import okhttp3.OkHttpClient
@@ -23,7 +23,7 @@ class MediaCacheManager(
     
     // Default max cache size 1GB
     private var maxCacheSizeBytes = 1000L * 1024 * 1024
-    private var evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes)
+    private var evictor = DynamicCacheEvictor(maxCacheSizeBytes)
 
     val simpleCache: SimpleCache by lazy {
         if (!cacheFolder.exists()) {
@@ -34,6 +34,7 @@ class MediaCacheManager(
 
     fun setCacheLimitMb(limitMb: Int) {
         maxCacheSizeBytes = limitMb.toLong() * 1024 * 1024
+        evictor.setMaxBytes(maxCacheSizeBytes)
     }
 
     fun getUsedCacheSizeBytes(): Long {
