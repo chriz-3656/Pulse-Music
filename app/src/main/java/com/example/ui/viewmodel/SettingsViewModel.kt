@@ -22,6 +22,7 @@ import com.example.domain.usecase.ManageDownloadsUseCase
 import com.example.domain.usecase.ManageFavoritesUseCase
 import com.example.domain.usecase.ManagePlaylistUseCase
 import com.example.domain.usecase.ManageSettingsUseCase
+import com.example.ui.viewmodel.JamViewModel
 import com.example.domain.usecase.SearchMusicUseCase
 import com.example.player.MusicPlayerController
 import kotlinx.coroutines.FlowPreview
@@ -252,6 +253,9 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
                     appContainer.manageSettingsUseCase, 
                     appContainer.playerController
                 ) as T
+            }
+            modelClass.isAssignableFrom(JamViewModel::class.java) -> {
+                JamViewModel(appContainer.jamSessionManager) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
