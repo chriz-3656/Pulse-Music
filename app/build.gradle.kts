@@ -65,7 +65,8 @@ android {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
-  implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+  implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+  implementation("com.google.firebase:firebase-analytics")
   implementation("com.google.firebase:firebase-database")
   implementation("com.google.firebase:firebase-auth")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")

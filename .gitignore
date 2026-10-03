@@ -19,3 +19,4 @@ debug.keystore
 .build-outputs/
 *.apk
 release.keystore
+app/google-services.json
