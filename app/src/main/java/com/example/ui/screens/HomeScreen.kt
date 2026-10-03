@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -88,6 +89,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val jamUiState by jamViewModel.uiState.collectAsState()
+    var showJamDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     var updateInfo by remember { mutableStateOf<AppUpdater.UpdateInfo?>(null) }
