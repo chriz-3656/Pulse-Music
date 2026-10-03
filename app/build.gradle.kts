@@ -17,19 +17,17 @@ android {
     versionName = "2.1.4"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    
-    buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${System.getenv("SPOTIFY_CLIENT_ID") ?: "default_client_id"}\"")
-    buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${System.getenv("SPOTIFY_CLIENT_SECRET") ?: "default_client_secret"}\"")
-    manifestPlaceholders["redirectSchemeName"] = "pulsemusic"
-    manifestPlaceholders["redirectHostName"] = "callback"
   }
 
   signingConfigs {
     create("release") {
-      storeFile = file("${rootDir}/release.keystore")
-      storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "android"
-      keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
-      keyPassword = System.getenv("KEY_PASSWORD") ?: "android"
+      val keystoreFile = file("${rootDir}/release.keystore")
+      if (keystoreFile.exists()) {
+          storeFile = keystoreFile
+          storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "android"
+          keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
+          keyPassword = System.getenv("KEY_PASSWORD") ?: "android"
+      }
     }
   }
 
@@ -38,7 +36,10 @@ android {
       isCrunchPngs = false
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
+      val keystoreFile = file("${rootDir}/release.keystore")
+      if (keystoreFile.exists()) {
+          signingConfig = signingConfigs.getByName("release")
+      }
     }
     debug { signingConfig = signingConfigs.getByName("debug") }
   }
@@ -61,7 +62,6 @@ android {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
-  implementation("com.spotify.android:auth:2.1.1")
   implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
   implementation("org.mozilla:rhino:1.7.14")
   implementation("org.jsoup:jsoup:1.17.2")
