@@ -53,6 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.components.JamLobbyDialog
+import com.example.ui.viewmodel.JamViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -76,6 +80,7 @@ import com.example.ui.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    jamViewModel: JamViewModel,
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
     onAlbumClick: (String) -> Unit = {},

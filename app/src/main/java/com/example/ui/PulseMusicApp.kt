@@ -85,6 +85,7 @@ import com.example.ui.viewmodel.PlaylistDetailViewModel
 import com.example.ui.viewmodel.SearchViewModel
 import com.example.ui.viewmodel.SettingsViewModel
 import com.example.ui.viewmodel.ViewModelFactory
+import com.example.ui.viewmodel.JamViewModel
 
 enum class NavigationDestination(
     val title: String,
@@ -114,6 +115,7 @@ fun PulseMusicApp() {
     val playerViewModel: PlayerViewModel = viewModel(factory = factory)
     val libraryViewModel: LibraryViewModel = viewModel(factory = factory)
     val settingsViewModel: SettingsViewModel = viewModel(factory = factory)
+    val jamViewModel: JamViewModel = viewModel(factory = factory)
 
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
 
@@ -276,6 +278,7 @@ fun PulseMusicApp() {
                     when (currentDestination) {
                         NavigationDestination.HOME -> {
                             HomeScreen(
+                    jamViewModel = jamViewModel,
                                 viewModel = homeViewModel,
                                 playerState = playerState,
                                 onSongClick = { song -> homeViewModel.playSong(song) },
