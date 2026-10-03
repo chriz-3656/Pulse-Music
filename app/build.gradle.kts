@@ -1,5 +1,6 @@
 
 plugins {
+  id("com.google.gms.google-services")
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.google.devtools.ksp)
@@ -64,6 +65,10 @@ android {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+  implementation("com.google.firebase:firebase-database")
+  implementation("com.google.firebase:firebase-auth")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
   implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
   implementation("org.mozilla:rhino:1.7.14")
   implementation("org.jsoup:jsoup:1.17.2")
