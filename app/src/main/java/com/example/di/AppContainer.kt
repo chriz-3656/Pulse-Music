@@ -16,6 +16,7 @@ import com.example.domain.usecase.ManageFavoritesUseCase
 import com.example.domain.usecase.ManagePlaylistUseCase
 import com.example.domain.usecase.ManageSettingsUseCase
 import com.example.domain.usecase.SearchMusicUseCase
+import com.example.data.repository.JamSessionManager
 import com.example.player.MusicPlayerController
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
@@ -81,4 +82,8 @@ class AppContainer(private val context: Context) {
     val manageFavoritesUseCase by lazy { ManageFavoritesUseCase(musicRepository) }
     val manageDownloadsUseCase by lazy { ManageDownloadsUseCase(musicRepository) }
     val manageSettingsUseCase by lazy { ManageSettingsUseCase(musicRepository) }
+
+    val jamSessionManager: JamSessionManager by lazy {
+        JamSessionManager()
+    }
 }
