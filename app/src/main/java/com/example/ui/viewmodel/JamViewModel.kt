@@ -3,6 +3,7 @@ package com.example.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.player.MusicPlayerController
 import com.example.data.repository.JamSessionManager
 import com.example.di.AppContainer
 import com.example.domain.model.JamRoom
@@ -24,8 +25,6 @@ data class JamUiState(
     val activeRoom: JamRoom? = null
 )
 
-
-import com.example.player.MusicPlayerController
 
 class JamViewModel(
     val jamSessionManager: JamSessionManager,
