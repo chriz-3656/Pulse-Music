@@ -1,23 +1,30 @@
 package com.example.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.ui.components.SkeuoBevelCard
+import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.viewmodel.JamViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,13 +36,17 @@ fun JamRoomScreen(
 ) {
     val uiState by jamViewModel.uiState.collectAsState()
     val activeRoom = uiState.activeRoom
+    val searchResults by jamViewModel.searchResults.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchOpen by remember { mutableStateOf(false) }
 
     if (activeRoom == null) {
-        // Room ended or disconnected
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text("No active Jam Room", color = MaterialTheme.colorScheme.onSurface)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onBackClick) { Text("Go Back") }
+            Spacer(modifier = Modifier.height(24.dp))
+            SkeuoTactileButton(onClick = onBackClick, modifier = Modifier.height(50.dp).width(150.dp)) {
+                Text("Go Back", fontWeight = FontWeight.Bold)
+            }
         }
         return
     }
@@ -43,21 +54,24 @@ fun JamRoomScreen(
     val isHost = activeRoom.hostId == jamViewModel.jamSessionManager.currentUserId
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = { Text("LIVE JAM ROOM", fontWeight = FontWeight.Black) },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                titleContentColor = MaterialTheme.colorScheme.primary
-            )
-        )
+        // Neumorphic Custom Header
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp).systemBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SkeuoTactileButton(
+                onClick = onBackClick,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onSurface)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text("LIVE JAM ROOM", fontWeight = FontWeight.Black, fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
+        }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
@@ -74,26 +88,29 @@ fun JamRoomScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(24.dp))
-                        Button(
+                        SkeuoTactileButton(
                             onClick = onGoToPlayer,
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                            accentColor = MaterialTheme.colorScheme.primary
                         ) {
-                            Text("OPEN AUDIO PLAYER", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text("OPEN AUDIO PLAYER", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 }
             }
 
             item {
-                Text("PARTICIPANTS (${activeRoom.participants.size})", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("PARTICIPANTS (${activeRoom.participants.size})", fontWeight = FontWeight.Black, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
 
-            items(activeRoom.participants.values.toList()) { participant ->
+            items(activeRoom.participants.entries.toList()) { (participantId, participant) ->
                 SkeuoBevelCard(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), isRecessed = true) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -107,9 +124,99 @@ fun JamRoomScreen(
                             fontWeight = if (participant.isHost) FontWeight.Bold else FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                        Spacer(modifier = Modifier.weight(1f))
                         if (participant.isHost) {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text("HOST", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
+                            Text("HOST", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                        } else if (isHost) {
+                            SkeuoTactileButton(
+                                onClick = { jamViewModel.kickParticipant(participantId) },
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(Icons.Default.Close, contentDescription = "Kick", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text("UPCOMING QUEUE", fontWeight = FontWeight.Black, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.weight(1f))
+                    SkeuoTactileButton(
+                        onClick = { isSearchOpen = !isSearchOpen },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.height(36.dp).padding(horizontal = 8.dp)
+                    ) {
+                        Text(if (isSearchOpen) "CLOSE SEARCH" else "+ ADD SONG", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp))
+                    }
+                }
+            }
+
+            if (isSearchOpen) {
+                item {
+                    SkeuoBevelCard(modifier = Modifier.fillMaxWidth(), isRecessed = true) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it; jamViewModel.searchSongs(it) },
+                            placeholder = { Text("Search to add to queue...") },
+                            leadingIcon = { Icon(Icons.Outlined.Search, null) },
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+                }
+                items(searchResults) { song ->
+                    SkeuoTactileButton(
+                        onClick = { 
+                            jamViewModel.addToQueue(song)
+                            searchQuery = ""
+                            jamViewModel.searchSongs("")
+                            isSearchOpen = false
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            AsyncImage(
+                                model = song.artworkUrl,
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp))
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(song.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(song.artist, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Icon(Icons.Default.MusicNote, null, tint = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
+            }
+
+            if (activeRoom.queue.isEmpty() && !isSearchOpen) {
+                item {
+                    Text("No upcoming songs.", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp))
+                }
+            }
+
+            if (!isSearchOpen) {
+                items(activeRoom.queue) { song ->
+                    SkeuoBevelCard(modifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)) {
+                        Row(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            AsyncImage(
+                                model = song.artworkUrl,
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp))
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(song.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(song.artist, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
                         }
                     }
                 }
@@ -118,24 +225,25 @@ fun JamRoomScreen(
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 if (isHost) {
-                    Button(
+                    SkeuoTactileButton(
                         onClick = { jamViewModel.endRoom(); onBackClick() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        accentColor = MaterialTheme.colorScheme.error
                     ) {
-                        Text("END JAM SESSION", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onError)
+                        Text("END JAM SESSION", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
                     }
                 } else {
-                    Button(
+                    SkeuoTactileButton(
                         onClick = { jamViewModel.leaveRoom(); onBackClick() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        accentColor = MaterialTheme.colorScheme.error
                     ) {
-                        Text("LEAVE JAM SESSION", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onError)
+                        Text("LEAVE JAM SESSION", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.error)
                     }
                 }
+                Spacer(modifier = Modifier.height(48.dp)) // padding at bottom
             }
         }
     }
