@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class JamSessionManager {
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://pulse-musicapp-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
     private val auth = FirebaseAuth.getInstance()
 
     var currentUserId: String = ""
