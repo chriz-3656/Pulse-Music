@@ -1,9 +1,9 @@
 package com.example.domain.model
 
 data class Song(
-    val id: String,
-    val title: String,
-    val artist: String,
+    val id: String = "",
+    val title: String = "",
+    val artist: String = "",
     val album: String = "",
     val duration: Long = 0L,
     val artworkUrl: String = "",
@@ -73,9 +73,9 @@ data class Song(
 }
 
 data class Album(
-    val id: String,
-    val title: String,
-    val artist: String,
+    val id: String = "",
+    val title: String = "",
+    val artist: String = "",
     val artistId: String = "",
     val artworkUrl: String = "",
     val year: String = "",
@@ -84,8 +84,8 @@ data class Album(
 )
 
 data class Playlist(
-    val id: String,
-    val title: String,
+    val id: String = "",
+    val title: String = "",
     val description: String = "",
     val artworkUrl: String = "",
     val trackCount: Int = 0,
@@ -95,8 +95,8 @@ data class Playlist(
 )
 
 data class Artist(
-    val id: String,
-    val name: String,
+    val id: String = "",
+    val name: String = "",
     val imageUrl: String = "",
     val bio: String = "",
     val followerCount: String = "",
@@ -114,7 +114,7 @@ enum class AudioQuality(val label: String, val bitrate: String) {
 }
 
 enum class MusicProvider(
-    val id: String,
+    val id: String = "",
     val displayName: String,
     val description: String,
     val badge: String,
