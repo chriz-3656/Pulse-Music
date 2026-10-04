@@ -198,6 +198,14 @@ class MusicPlayerController(
         onServiceCommand?.invoke(ServiceAction.PlayTrack(song, queue, validIndex))
     }
 
+    fun setPlayWhenReady(playWhenReady: Boolean) {
+        val currentState = _playerState.value
+        if (currentState.isPlaying != playWhenReady) {
+            _playerState.update { it.copy(isPlaying = playWhenReady) }
+            onServiceCommand?.invoke(if (playWhenReady) ServiceAction.Resume else ServiceAction.Pause)
+        }
+    }
+
     fun togglePlayPause() {
         val currentState = _playerState.value
         if (currentState.currentSong == null) {

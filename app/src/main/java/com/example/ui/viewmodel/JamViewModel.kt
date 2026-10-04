@@ -165,31 +165,93 @@ class JamViewModel(
     private fun observeRoom(roomCode: String) {
         viewModelScope.launch {
             jamSessionManager.observeRoom(roomCode).collectLatest { room ->
+                val wasInRoom = _uiState.value.activeRoom != null
                 _uiState.update { it.copy(activeRoom = room, isConnecting = false) }
-                if (room != null && room.queue.isNotEmpty()) {
-                    playerController.syncQueue(room.queue)
+                
+                if (room != null) {
+                    // Kick detection
+                    if (wasInRoom && room.hostId != jamSessionManager.currentUserId && !room.participants.containsKey(jamSessionManager.currentUserId)) {
+                        _uiState.update { it.copy(activeRoom = null, errorMessage = "You have been kicked from the session by the host.") }
+                        playerController.setPlayWhenReady(false)
+                        return@collectLatest
+                    }
+                
+                    if (room.queue.isNotEmpty()) {
+                        playerController.syncQueue(room.queue)
+                        
+                        // Check skip votes
+                        val participantCount = room.participants.size.coerceAtLeast(1)
+                        val skipThreshold = (participantCount / 2.0).let { java.lang.Math.ceil(it).toInt() }.coerceAtLeast(1)
+                        if (room.skipVotes.size >= skipThreshold && room.hostId == jamSessionManager.currentUserId) {
+                            forceSkip()
+                        }
+                    }
                     
-                    // Check skip votes
-                    val participantCount = room.participants.size.coerceAtLeast(1)
-                    val skipThreshold = (participantCount / 2.0).let { java.lang.Math.ceil(it).toInt() }.coerceAtLeast(1)
-                    if (room.skipVotes.size >= skipThreshold && room.hostId == jamSessionManager.currentUserId) {
-                        forceSkip()
+                    // Participant Live Sync Receiver
+                    if (room.hostId != jamSessionManager.currentUserId) {
+                        val state = playerController.playerState.value
+                        val playback = room.playback
+                        if (playback.currentSong != null) {
+                            if (state.currentSong?.id != playback.currentSong.id) {
+                                playerController.playSong(playback.currentSong, room.queue)
+                            }
+                            
+                            playerController.setPlayWhenReady(playback.isPlaying)
+                            
+                            if (playback.isPlaying) {
+                                val expectedPos = playback.positionMs + (System.currentTimeMillis() - playback.updatedAt)
+                                // Add small delay buffer
+                                val syncPos = expectedPos - 200
+                                if (java.lang.Math.abs(state.currentPositionMs - syncPos) > 3000) {
+                                    playerController.seekTo(syncPos.coerceAtLeast(0))
+                                }
+                            } else {
+                                if (java.lang.Math.abs(state.currentPositionMs - playback.positionMs) > 3000) {
+                                    playerController.seekTo(playback.positionMs)
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         
-        // Host queue sync: if playerController generates autoplay suggestions, push them to Firebase
+        // Host Broadcaster
         viewModelScope.launch {
+            var lastSyncedPosition = 0L
+            var lastSyncedTime = 0L
+            
             playerController.playerState.collectLatest { state ->
                 val room = _uiState.value.activeRoom ?: return@collectLatest
                 if (room.hostId == jamSessionManager.currentUserId) {
+                
+                    // 1. Autoplay suggestion bridge
                     if (state.queue.size > room.queue.size) {
-                        // Find newly added songs (autoplay suggestions)
                         val newSongs = state.queue.filter { s -> room.queue.none { it.id == s.id } }
                         for (song in newSongs) {
                             jamSessionManager.addToQueue(room.roomId, song)
                         }
+                    }
+                    
+                    // 2. Playback State Sync
+                    val lastPlayback = room.playback
+                    val timeSinceUpdate = System.currentTimeMillis() - lastPlayback.updatedAt
+                    val isStateChanged = lastPlayback.currentSong?.id != state.currentSong?.id || lastPlayback.isPlaying != state.isPlaying
+                    
+                    val expectedPos = if(lastPlayback.isPlaying) lastPlayback.positionMs + timeSinceUpdate else lastPlayback.positionMs
+                    val isSeeked = java.lang.Math.abs(state.currentPositionMs - expectedPos) > 4000
+                    
+                    // Broadcast if state changed, user seeked, or every 5 seconds for heartbeat
+                    if (isStateChanged || isSeeked || (System.currentTimeMillis() - lastSyncedTime > 5000)) {
+                        val newPlayback = com.example.domain.model.JamPlaybackState(
+                            currentSong = state.currentSong,
+                            isPlaying = state.isPlaying,
+                            positionMs = state.currentPositionMs,
+                            updatedAt = System.currentTimeMillis()
+                        )
+                        jamSessionManager.updatePlaybackState(room.roomId, newPlayback)
+                        lastSyncedPosition = state.currentPositionMs
+                        lastSyncedTime = System.currentTimeMillis()
                     }
                 }
             }

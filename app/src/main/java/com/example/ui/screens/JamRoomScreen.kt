@@ -51,8 +51,8 @@ fun JamRoomScreen(
     val context = LocalContext.current
 
     if (activeRoom == null) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("No active Jam Room", color = MaterialTheme.colorScheme.onSurface)
+        Column(modifier = Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(uiState.errorMessage ?: "No active Jam Room", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
             Spacer(modifier = Modifier.height(24.dp))
             SkeuoTactileButton(onClick = onBackClick, modifier = Modifier.height(50.dp).width(150.dp)) {
                 Text("Go Back", fontWeight = FontWeight.Bold)
