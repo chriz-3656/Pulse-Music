@@ -143,6 +143,15 @@ fun HomeScreen(
         }
     }
 
+    if (showJamDialog) {
+        JamLobbyDialog(
+            uiState = jamUiState,
+            onDismiss = { showJamDialog = false },
+            onCreateRoom = { jamViewModel.createRoom(it) },
+            onJoinRoom = { code, name -> jamViewModel.joinRoom(code, name) }
+        )
+    }
+
     if (obsoleteApks.isNotEmpty()) {
         AlertDialog(
             onDismissRequest = { obsoleteApks = emptyList() },
