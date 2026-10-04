@@ -25,9 +25,12 @@ data class JamUiState(
 )
 
 
+import com.example.player.MusicPlayerController
+
 class JamViewModel(
     val jamSessionManager: JamSessionManager,
-    private val searchMusicUseCase: SearchMusicUseCase
+    private val searchMusicUseCase: SearchMusicUseCase,
+    private val playerController: MusicPlayerController
 ) : ViewModel() {
 
     private var searchJob: Job? = null
@@ -56,6 +59,11 @@ class JamViewModel(
         viewModelScope.launch {
             jamSessionManager.addToQueue(roomCode, song)
         }
+    }
+    
+    fun playSong(song: Song) {
+        val queue = _uiState.value.activeRoom?.queue ?: listOf(song)
+        playerController.playSong(song, queue)
     }
     
     fun kickParticipant(participantId: String) {
@@ -135,6 +143,25 @@ class JamViewModel(
         viewModelScope.launch {
             jamSessionManager.observeRoom(roomCode).collectLatest { room ->
                 _uiState.update { it.copy(activeRoom = room, isConnecting = false) }
+                if (room != null && room.queue.isNotEmpty()) {
+                    playerController.syncQueue(room.queue)
+                }
+            }
+        }
+        
+        // Host queue sync: if playerController generates autoplay suggestions, push them to Firebase
+        viewModelScope.launch {
+            playerController.playerState.collectLatest { state ->
+                val room = _uiState.value.activeRoom ?: return@collectLatest
+                if (room.hostId == jamSessionManager.currentUserId) {
+                    if (state.queue.size > room.queue.size) {
+                        // Find newly added songs (autoplay suggestions)
+                        val newSongs = state.queue.filter { s -> room.queue.none { it.id == s.id } }
+                        for (song in newSongs) {
+                            jamSessionManager.addToQueue(room.roomId, song)
+                        }
+                    }
+                }
             }
         }
     }
@@ -144,7 +171,7 @@ class JamViewModel(
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return JamViewModel(appContainer.jamSessionManager, appContainer.searchMusicUseCase) as T
+                    return JamViewModel(appContainer.jamSessionManager, appContainer.searchMusicUseCase, appContainer.playerController) as T
                 }
             }
     }

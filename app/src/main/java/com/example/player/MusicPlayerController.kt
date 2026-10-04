@@ -100,6 +100,13 @@ class MusicPlayerController(
         }
     }
 
+    fun syncQueue(newQueue: List<Song>) {
+        val current = _playerState.value
+        if (current.queue != newQueue) {
+            _playerState.update { it.copy(queue = newQueue) }
+        }
+    }
+
     fun playSong(song: Song, newQueue: List<Song>? = null) {
         val queue = newQueue ?: listOf(song)
         val index = queue.indexOfFirst { it.id == song.id }.let { if (it >= 0) it else 0 }

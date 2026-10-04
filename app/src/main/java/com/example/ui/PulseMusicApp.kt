@@ -280,7 +280,7 @@ fun PulseMusicApp() {
                                 jamViewModel = jamViewModel,
                                 onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) },
                                 onGoToPlayer = { isFullScreenPlayerOpen = true },
-                                onPlaySong = { song -> homeViewModel.playSong(song) }
+                                onPlaySong = { song -> jamViewModel.playSong(song) }
                             )
                         }
                     }
