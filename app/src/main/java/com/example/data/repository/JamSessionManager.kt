@@ -62,6 +62,24 @@ class JamSessionManager {
         database.child("rooms").child(roomCode).removeValue().await()
     }
 
+    suspend fun kickParticipant(roomCode: String, participantId: String) {
+        if (currentUserId.isEmpty()) return
+        database.child("rooms").child(roomCode).child("participants").child(participantId).removeValue().await()
+    }
+
+    suspend fun addToQueue(roomCode: String, song: com.example.domain.model.Song) {
+        val queueRef = database.child("rooms").child(roomCode).child("queue")
+        // Get current queue
+        val snapshot = queueRef.get().await()
+        val currentQueue = mutableListOf<com.example.domain.model.Song>()
+        for (child in snapshot.children) {
+            val s = child.getValue(com.example.domain.model.Song::class.java)
+            if (s != null) currentQueue.add(s)
+        }
+        currentQueue.add(song)
+        queueRef.setValue(currentQueue).await()
+    }
+
     fun observeRoom(roomCode: String): Flow<JamRoom?> = callbackFlow {
         val ref = database.child("rooms").child(roomCode)
         val listener = object : ValueEventListener {

@@ -44,7 +44,7 @@ class JamViewModel(
             delay(300) // debounce
             try {
                 val results = searchMusicUseCase(query)
-                _searchResults.value = results.songs
+                _searchResults.value = results
             } catch (e: Exception) {
                 // ignore
             }

@@ -255,7 +255,7 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
                 ) as T
             }
             modelClass.isAssignableFrom(JamViewModel::class.java) -> {
-                JamViewModel(appContainer.jamSessionManager) as T
+                JamViewModel(appContainer.jamSessionManager, appContainer.searchMusicUseCase) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
