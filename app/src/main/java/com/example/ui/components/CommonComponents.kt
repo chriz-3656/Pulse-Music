@@ -68,6 +68,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.domain.model.AudioQuality
@@ -117,8 +119,9 @@ fun SkeuoTactileButton(
     val neu = LocalNeuColors.current
     val cornerSize = if (shape is RoundedCornerShape) 20.dp else 16.dp
     
-    var isTapped by remember { mutableStateOf(false) }
-    val isActuallyPressed = isPressedOrActive || isTapped
+    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isActuallyPressed = isPressedOrActive || isPressed
     
     val animatedOffsetX by animateDpAsState(targetValue = if (isActuallyPressed) (-2).dp else 6.dp, animationSpec = tween(150), label = "")
     val animatedOffsetY by animateDpAsState(targetValue = if (isActuallyPressed) (-2).dp else 6.dp, animationSpec = tween(150), label = "")
@@ -137,16 +140,11 @@ fun SkeuoTactileButton(
             )
             .clip(shape)
             .background(neu.background)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isTapped = true
-                        tryAwaitRelease()
-                        isTapped = false
-                        onClick()
-                    }
-                )
-            },
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         content()

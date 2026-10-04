@@ -279,7 +279,8 @@ fun PulseMusicApp() {
                             JamRoomScreen(
                                 jamViewModel = jamViewModel,
                                 onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) },
-                                onGoToPlayer = { isFullScreenPlayerOpen = true }
+                                onGoToPlayer = { isFullScreenPlayerOpen = true },
+                                onPlaySong = { song -> homeViewModel.playSong(song) }
                             )
                         }
                     }

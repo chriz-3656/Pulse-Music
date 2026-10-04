@@ -1,5 +1,10 @@
 package com.example.ui.screens
 
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,16 +34,22 @@ import com.example.ui.viewmodel.JamViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun JamRoomScreen(
     jamViewModel: JamViewModel,
     onBackClick: () -> Unit,
-    onGoToPlayer: () -> Unit
+    onGoToPlayer: () -> Unit,
+    onPlaySong: (com.example.domain.model.Song) -> Unit
 ) {
     val uiState by jamViewModel.uiState.collectAsState()
     val activeRoom = uiState.activeRoom
     val searchResults by jamViewModel.searchResults.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var isSearchOpen by remember { mutableStateOf(false) }
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
 
     if (activeRoom == null) {
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -85,7 +96,11 @@ fun JamRoomScreen(
                         Text(
                             text = activeRoom.roomId,
                             style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black, letterSpacing = 12.sp),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.clickable {
+                                clipboardManager.setText(AnnotatedString(activeRoom.roomId))
+                                Toast.makeText(context, "Room Code Copied", Toast.LENGTH_SHORT).show()
+                            }
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         SkeuoTactileButton(
@@ -205,7 +220,11 @@ fun JamRoomScreen(
 
             if (!isSearchOpen) {
                 items(activeRoom.queue) { song ->
-                    SkeuoBevelCard(modifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)) {
+                    SkeuoTactileButton(
+                        onClick = { onPlaySong(song) },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)
+                    ) {
                         Row(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                             AsyncImage(
                                 model = song.artworkUrl,
