@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "469305948412",
+    "project_id": "pulse-musicapp",
+    "storage_bucket": "pulse-musicapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469305948412:android:fde26730c12f87029c7f79",
+        "android_client_info": {
+          "package_name": "com.aistudio.pulsemusic.kzvpmx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDf9bL_U0d1k1zKRziQOART-XdDQ8onzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

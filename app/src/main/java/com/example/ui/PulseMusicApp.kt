@@ -332,6 +332,7 @@ fun PulseMusicApp() {
         ) {
             FullScreenPlayerScreen(
                 viewModel = playerViewModel,
+                jamViewModel = jamViewModel,
                 onDismiss = { isFullScreenPlayerOpen = false },
                 onArtistClick = { artistId ->
                     subScreenBackStack.add(SubScreen.Artist(artistId))

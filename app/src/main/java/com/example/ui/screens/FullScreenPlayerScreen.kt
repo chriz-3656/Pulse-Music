@@ -81,17 +81,26 @@ import com.example.ui.components.SkeuoBevelCard
 import com.example.ui.components.SkeuoLedLamp
 import com.example.ui.components.SkeuoTactileButton
 import com.example.ui.viewmodel.PlayerViewModel
+import com.example.ui.viewmodel.JamViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Button
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullScreenPlayerScreen(
     viewModel: PlayerViewModel,
+    jamViewModel: JamViewModel,
     onDismiss: () -> Unit,
     onArtistClick: (String) -> Unit = {},
     onAlbumClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val jamUiState by jamViewModel.uiState.collectAsState()
     var showTimerDialog by remember { mutableStateOf(false) }
     val playerState = uiState.playerState
     val song = playerState.currentSong ?: return
@@ -148,7 +157,7 @@ fun FullScreenPlayerScreen(
                         SkeuoLedLamp(isLit = playerState.isPlaying, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "PULSE AUDIO DECK • HI-FI",
+                            text = if (jamUiState.currentRoom != null) "JAM ROOM: ${jamUiState.currentRoom!!.roomId}" else "PULSE AUDIO DECK • HI-FI",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.5.sp
@@ -434,6 +443,37 @@ fun FullScreenPlayerScreen(
                         text = if (totalDuration <= 0L) "--:--" else formatTimecode(totalDuration),
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            }
+
+            // Hardware Transport Controls Panel
+            if (jamUiState.currentRoom != null && jamUiState.currentRoom!!.settings.playbackControl == "VOTE") {
+                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    val skipVotes = jamUiState.currentRoom!!.skipVotes.size
+                    val totalParticipants = jamUiState.currentRoom!!.participants.size
+                    val voteProgress = if (totalParticipants > 0) skipVotes.toFloat() / totalParticipants.toFloat() else 0f
+                    
+                    Text(
+                        text = "👍 VOTE SKIP ($skipVotes / $totalParticipants)",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = voteProgress,
+                        modifier = Modifier.fillMaxWidth(0.6f).height(8.dp).clip(RoundedCornerShape(4.dp)),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SkeuoTactileButton(
+                        onClick = { jamViewModel.voteToSkip() },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.height(36.dp).width(120.dp)
+                    ) {
+                        Text("VOTE", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
 
