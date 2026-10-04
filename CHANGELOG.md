@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.0] - 2026-10-04
+### Added
+- **Pulse JAM (Live Sync Rooms):** Create and join live music rooms! Features a fully synchronized Firebase Realtime Queue where everyone in the room listens to the exact same music in perfect sync.
+- **In-Room Search & Queueing:** Tap '+ ADD SONG' inside any Jam Room to dynamically search for tracks and instantly broadcast them to the global Room Queue.
+- **Autoplay Suggestion Bridging:** When the Room Host reaches the end of the queue, the Music Engine automatically generates smart suggestions and seamlessly pushes them directly into the Firebase Room Queue for everyone to enjoy.
+- **Host Room Controls:** Hosts can kick participants and effortlessly control the playback state for all listeners.
+- **One-Tap Room Invites:** Simply tap the massive 6-digit Room Code at the top of the Jam Room to copy it to your clipboard.
+
+### Changed
+- **Scroll Handling Refactor:** Completely re-engineered the `SkeuoTactileButton` touch processing to perfectly decouple drag gestures, resulting in flawless scrolling inside large queues and participant lists.
+- **Player Controller Routing:** The core `MusicPlayerController` now elegantly intercepts and replaces its internal ExoPlayer queue with the active Firebase Room Queue the moment a Room song is played.
+
+
 ## [2.1.4] - 2026-10-02
 ### Added
 - **Auto-Scrolling Time-Synced Lyrics:** Beautiful Neumorphic animated lyrics injected right into the main player UI, automatically syncing and scrolling with the track.
