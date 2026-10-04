@@ -21,7 +21,7 @@ assignees: ''
 ## 📱 Device & Environment
 - **Device**: [e.g. Google Pixel 8, Samsung Galaxy S23]
 - **Android Version**: [e.g. Android 14, Android 15]
-- **Pulse Music Version**: [e.g. 1.0.0]
+- **Pulse Music Version**: [e.g. 2.5.0]
 - **Audio Output**: [e.g. Phone speaker, Bluetooth headphones, Wired 3.5mm]
 
 ## 📋 Additional Context & Logs

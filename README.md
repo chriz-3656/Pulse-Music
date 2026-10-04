@@ -6,7 +6,7 @@ Pulse Music is a highly immersive, aesthetically driven Android music player fea
 Welcome to the experimental **Pulse JAM Beta**! This is a test version of the app featuring our brand-new Live Sync Rooms architecture. 
 
 **How to Install:**
-1. Navigate to the [Actions tab](../../actions) of this repository.
+1. Navigate to the [Actions tab](actions) of this repository.
 2. Click on the latest successful workflow run for the `feature/pulse-jam` branch.
 3. Scroll down to the **Artifacts** section at the bottom of the page.
 4. Download the `pulse-music-apks.zip` file, extract it, and install the `app-debug.apk` directly on your Android device!

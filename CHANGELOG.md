@@ -7,6 +7,10 @@
 - **Autoplay Suggestion Bridging:** When the Room Host reaches the end of the queue, the Music Engine automatically generates smart suggestions and seamlessly pushes them directly into the Firebase Room Queue for everyone to enjoy.
 - **Host Room Controls:** Hosts can kick participants and effortlessly control the playback state for all listeners.
 - **One-Tap Room Invites:** Simply tap the massive 6-digit Room Code at the top of the Jam Room to copy it to your clipboard.
+- **Democratic Vote Skipping:** Guests can trigger `VOTE SKIP`, automatically advancing tracks once a 50% room consensus is reached.
+- **Host Queue Controls & Force Skip:** Hosts can delete individual songs from the upcoming queue and immediately force-skip tracks.
+- **Timestamp Drift Correction:** Listeners automatically adjust playback positions when drift exceeds 3 seconds relative to the host's timestamp broadcast.
+- **Host Kick Detection:** Listeners are notified and playback halts gracefully if removed from a room.
 
 ### Changed
 - **Scroll Handling Refactor:** Completely re-engineered the `SkeuoTactileButton` touch processing to perfectly decouple drag gestures, resulting in flawless scrolling inside large queues and participant lists.
