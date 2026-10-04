@@ -67,6 +67,20 @@ class JamSessionManager {
         database.child("rooms").child(roomCode).child("participants").child(participantId).removeValue().await()
     }
 
+    suspend fun removeFromQueue(roomCode: String, index: Int) {
+        val queueRef = database.child("rooms").child(roomCode).child("queue")
+        val snapshot = queueRef.get().await()
+        val currentQueue = mutableListOf<com.example.domain.model.Song>()
+        for (child in snapshot.children) {
+            val s = child.getValue(com.example.domain.model.Song::class.java)
+            if (s != null) currentQueue.add(s)
+        }
+        if (index in 0 until currentQueue.size) {
+            currentQueue.removeAt(index)
+            queueRef.setValue(currentQueue).await()
+        }
+    }
+
     suspend fun addToQueue(roomCode: String, song: com.example.domain.model.Song) {
         val queueRef = database.child("rooms").child(roomCode).child("queue")
         // Get current queue

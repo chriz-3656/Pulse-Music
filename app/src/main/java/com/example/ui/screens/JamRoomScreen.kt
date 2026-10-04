@@ -10,10 +10,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -153,14 +155,27 @@ fun JamRoomScreen(
             }
 
             item {
+                val isHost = activeRoom.hostId == jamViewModel.jamSessionManager.currentUserId
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Text("UPCOMING QUEUE", fontWeight = FontWeight.Black, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.weight(1f))
+                    
+                    if (!isSearchOpen && activeRoom.queue.isNotEmpty()) {
+                        SkeuoTactileButton(
+                            onClick = { if (isHost) jamViewModel.forceSkip() else jamViewModel.voteSkip() },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.height(36.dp).padding(end = 8.dp),
+                            accentColor = MaterialTheme.colorScheme.secondary
+                        ) {
+                            Text(if (isHost) "SKIP" else "VOTE SKIP", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp))
+                        }
+                    }
+
                     SkeuoTactileButton(
                         onClick = { isSearchOpen = !isSearchOpen },
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.height(36.dp).padding(horizontal = 8.dp)
+                        modifier = Modifier.height(36.dp)
                     ) {
                         Text(if (isSearchOpen) "CLOSE SEARCH" else "+ ADD SONG", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp))
                     }
@@ -216,7 +231,9 @@ fun JamRoomScreen(
             }
 
             if (!isSearchOpen) {
-                items(activeRoom.queue) { song ->
+                val isHost = activeRoom.hostId == jamViewModel.jamSessionManager.currentUserId
+
+                itemsIndexed(activeRoom.queue) { index, song ->
                     SkeuoTactileButton(
                         onClick = { onPlaySong(song) },
                         shape = RoundedCornerShape(12.dp),
@@ -232,6 +249,11 @@ fun JamRoomScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(song.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(song.artist, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            if (isHost) {
+                                IconButton(onClick = { jamViewModel.removeFromQueue(index) }) {
+                                    Icon(androidx.compose.material.icons.Icons.Default.Delete, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error)
+                                }
                             }
                         }
                     }

@@ -53,6 +53,30 @@ class JamViewModel(
         }
     }
 
+    fun removeFromQueue(index: Int) {
+        val room = _uiState.value.activeRoom ?: return
+        if (room.hostId != jamSessionManager.currentUserId) return
+        viewModelScope.launch {
+            jamSessionManager.removeFromQueue(room.roomId, index)
+        }
+    }
+
+    fun voteSkip() {
+        val roomCode = _uiState.value.activeRoom?.roomId ?: return
+        viewModelScope.launch {
+            jamSessionManager.voteSkip(roomCode)
+        }
+    }
+
+    fun forceSkip() {
+        val room = _uiState.value.activeRoom ?: return
+        if (room.hostId != jamSessionManager.currentUserId) return
+        viewModelScope.launch {
+            playerController.skipToNext()
+            jamSessionManager.resetSkipVotes(room.roomId)
+        }
+    }
+
     fun addToQueue(song: Song) {
         val roomCode = _uiState.value.activeRoom?.roomId ?: return
         viewModelScope.launch {
@@ -144,6 +168,13 @@ class JamViewModel(
                 _uiState.update { it.copy(activeRoom = room, isConnecting = false) }
                 if (room != null && room.queue.isNotEmpty()) {
                     playerController.syncQueue(room.queue)
+                    
+                    // Check skip votes
+                    val participantCount = room.participants.size.coerceAtLeast(1)
+                    val skipThreshold = (participantCount / 2.0).let { java.lang.Math.ceil(it).toInt() }.coerceAtLeast(1)
+                    if (room.skipVotes.size >= skipThreshold && room.hostId == jamSessionManager.currentUserId) {
+                        forceSkip()
+                    }
                 }
             }
         }
