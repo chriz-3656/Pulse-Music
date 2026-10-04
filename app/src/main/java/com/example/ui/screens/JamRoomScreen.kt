@@ -34,9 +34,6 @@ import com.example.ui.viewmodel.JamViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun JamRoomScreen(
     jamViewModel: JamViewModel,
     onBackClick: () -> Unit,
