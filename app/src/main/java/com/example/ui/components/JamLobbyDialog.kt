@@ -54,6 +54,25 @@ fun JamLobbyDialog(
             } else if (uiState.errorMessage != null) {
                 Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(16.dp))
+            } else if (uiState.activeRoom != null) {
+                val room = uiState.activeRoom
+                SkeuoBevelCard(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
+                    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("ROOM CODE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(room.roomId, style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black, letterSpacing = 8.sp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("${room.participants.size} Participant(s)", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("GO TO PLAYER", fontWeight = FontWeight.Bold)
+                }
+                return@Column
             }
 
             // Create Room Section
