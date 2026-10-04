@@ -57,6 +57,11 @@ class JamSessionManager {
         database.child("rooms").child(roomCode).child("participants").child(currentUserId).removeValue().await()
     }
 
+    suspend fun endRoom(roomCode: String) {
+        if (currentUserId.isEmpty()) return
+        database.child("rooms").child(roomCode).removeValue().await()
+    }
+
     fun observeRoom(roomCode: String): Flow<JamRoom?> = callbackFlow {
         val ref = database.child("rooms").child(roomCode)
         val listener = object : ValueEventListener {

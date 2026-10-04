@@ -16,6 +16,7 @@ import com.example.ui.viewmodel.JamUiState
 fun JamLobbyDialog(
     uiState: JamUiState,
     onDismiss: () -> Unit,
+    onGoToRoom: () -> Unit,
     onCreateRoom: (String) -> Unit,
     onJoinRoom: (String, String) -> Unit
 ) {
@@ -66,11 +67,11 @@ fun JamLobbyDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = onDismiss,
+                    onClick = { onDismiss(); onGoToRoom() },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("GO TO PLAYER", fontWeight = FontWeight.Bold)
+                    Text("GO TO ROOM MANAGER", fontWeight = FontWeight.Bold)
                 }
                 return@Column
             }

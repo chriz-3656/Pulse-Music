@@ -75,6 +75,7 @@ import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.LibraryScreen
 import com.example.ui.screens.PlaylistDetailScreen
 import com.example.ui.screens.SearchScreen
+import com.example.ui.screens.JamRoomScreen
 import com.example.ui.screens.SettingsScreen
 import com.example.ui.viewmodel.AlbumDetailViewModel
 import com.example.ui.viewmodel.ArtistDetailViewModel
@@ -102,6 +103,7 @@ sealed class SubScreen {
     data class Artist(val artistId: String) : SubScreen()
     data class Album(val albumId: String) : SubScreen()
     data class Playlist(val playlistId: String) : SubScreen()
+    data object JamRoom : SubScreen()
 }
 
 @Composable
@@ -273,6 +275,13 @@ fun PulseMusicApp() {
                                 onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) }
                             )
                         }
+                        is SubScreen.JamRoom -> {
+                            JamRoomScreen(
+                                jamViewModel = jamViewModel,
+                                onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) },
+                                onGoToPlayer = { isFullScreenPlayerOpen = true }
+                            )
+                        }
                     }
                 } else {
                     when (currentDestination) {
@@ -287,6 +296,9 @@ fun PulseMusicApp() {
                                 },
                                 onPlaylistClick = { playlistId ->
                                     subScreenBackStack.add(SubScreen.Playlist(playlistId))
+                                },
+                                onOpenJamRoom = {
+                                    subScreenBackStack.add(SubScreen.JamRoom)
                                 }
                             )
                         }

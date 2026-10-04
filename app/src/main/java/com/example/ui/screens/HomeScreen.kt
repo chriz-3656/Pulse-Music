@@ -147,6 +147,7 @@ fun HomeScreen(
         JamLobbyDialog(
             uiState = jamUiState,
             onDismiss = { showJamDialog = false },
+            onGoToRoom = onOpenJamRoom,
             onCreateRoom = { jamViewModel.createRoom(it) },
             onJoinRoom = { code, name -> jamViewModel.joinRoom(code, name) }
         )

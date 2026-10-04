@@ -20,7 +20,7 @@ data class JamUiState(
 )
 
 class JamViewModel(
-    private val jamSessionManager: JamSessionManager
+    val jamSessionManager: JamSessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(JamUiState())
@@ -57,6 +57,20 @@ class JamViewModel(
                 jamSessionManager.voteSkip(room.roomId)
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun endRoom() {
+        val currentCode = _uiState.value.activeRoom?.roomId
+        if (currentCode != null) {
+            viewModelScope.launch {
+                try {
+                    jamSessionManager.endRoom(currentCode)
+                } catch (e: Exception) {
+                    // Ignore
+                }
+                _uiState.update { it.copy(activeRoom = null) }
             }
         }
     }
