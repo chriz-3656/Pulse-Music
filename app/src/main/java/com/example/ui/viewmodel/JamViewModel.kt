@@ -50,6 +50,17 @@ class JamViewModel(
         }
     }
 
+    fun voteToSkip() {
+        val room = _uiState.value.activeRoom ?: return
+        viewModelScope.launch {
+            try {
+                jamSessionManager.voteSkip(room.roomId)
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
+    }
+
     fun leaveRoom() {
         val currentCode = _uiState.value.activeRoom?.roomId
         if (currentCode != null) {
