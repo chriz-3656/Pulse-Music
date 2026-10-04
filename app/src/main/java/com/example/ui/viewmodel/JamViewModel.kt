@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.domain.usecase.SearchMusicUseCase
+import com.example.domain.model.Song
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+
 
 data class JamUiState(
     val isConnecting: Boolean = false,
@@ -19,9 +24,46 @@ data class JamUiState(
     val activeRoom: JamRoom? = null
 )
 
+
 class JamViewModel(
-    val jamSessionManager: JamSessionManager
+    val jamSessionManager: JamSessionManager,
+    private val searchMusicUseCase: SearchMusicUseCase
 ) : ViewModel() {
+
+    private var searchJob: Job? = null
+    private val _searchResults = MutableStateFlow<List<Song>>(emptyList())
+    val searchResults: StateFlow<List<Song>> = _searchResults.asStateFlow()
+
+    fun searchSongs(query: String) {
+        searchJob?.cancel()
+        if (query.isBlank()) {
+            _searchResults.value = emptyList()
+            return
+        }
+        searchJob = viewModelScope.launch {
+            delay(300) // debounce
+            try {
+                val results = searchMusicUseCase(query)
+                _searchResults.value = results.songs
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+    }
+
+    fun addToQueue(song: Song) {
+        val roomCode = _uiState.value.activeRoom?.roomId ?: return
+        viewModelScope.launch {
+            jamSessionManager.addToQueue(roomCode, song)
+        }
+    }
+    
+    fun kickParticipant(participantId: String) {
+        val roomCode = _uiState.value.activeRoom?.roomId ?: return
+        viewModelScope.launch {
+            jamSessionManager.kickParticipant(roomCode, participantId)
+        }
+    }
 
     private val _uiState = MutableStateFlow(JamUiState())
     val uiState: StateFlow<JamUiState> = _uiState.asStateFlow()
@@ -102,7 +144,7 @@ class JamViewModel(
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return JamViewModel(appContainer.jamSessionManager) as T
+                    return JamViewModel(appContainer.jamSessionManager, appContainer.searchMusicUseCase) as T
                 }
             }
     }
