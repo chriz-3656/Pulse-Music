@@ -157,7 +157,7 @@ fun FullScreenPlayerScreen(
                         SkeuoLedLamp(isLit = playerState.isPlaying, size = 6.dp, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (jamUiState.currentRoom != null) "JAM ROOM: ${jamUiState.currentRoom!!.roomId}" else "PULSE AUDIO DECK • HI-FI",
+                            text = if (jamUiState.activeRoom != null) "JAM ROOM: ${jamUiState.activeRoom!!.roomId}" else "PULSE AUDIO DECK • HI-FI",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.5.sp
@@ -447,10 +447,10 @@ fun FullScreenPlayerScreen(
             }
 
             // Hardware Transport Controls Panel
-            if (jamUiState.currentRoom != null && jamUiState.currentRoom!!.settings.playbackControl == "VOTE") {
+            if (jamUiState.activeRoom != null && jamUiState.activeRoom!!.settings.playbackControl == "VOTE") {
                 Column(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    val skipVotes = jamUiState.currentRoom!!.skipVotes.size
-                    val totalParticipants = jamUiState.currentRoom!!.participants.size
+                    val skipVotes = jamUiState.activeRoom!!.skipVotes.size
+                    val totalParticipants = jamUiState.activeRoom!!.participants.size
                     val voteProgress = if (totalParticipants > 0) skipVotes.toFloat() / totalParticipants.toFloat() else 0f
                     
                     Text(
