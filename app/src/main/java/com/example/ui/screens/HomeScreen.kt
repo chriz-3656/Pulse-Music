@@ -86,6 +86,7 @@ fun HomeScreen(
     onSongClick: (Song) -> Unit,
     onAlbumClick: (String) -> Unit = {},
     onPlaylistClick: (String) -> Unit = {},
+    onOpenJamRoom: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
