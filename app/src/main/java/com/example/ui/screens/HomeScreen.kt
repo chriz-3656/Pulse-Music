@@ -238,7 +238,8 @@ fun HomeScreen(
                     if (uiState.trendingSongs.isNotEmpty()) {
                         viewModel.playSong(uiState.trendingSongs.first())
                     }
-                }
+                },
+                onJamClick = { showJamDialog = true }
             )
         }
 
@@ -441,6 +442,7 @@ fun HomeScreen(
 @Composable
 fun HeroBanner(
     onPlayFeatured: () -> Unit,
+    onJamClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     SkeuoBevelCard(
@@ -487,6 +489,21 @@ fun HeroBanner(
                     text = "Lossless acoustics & ultra-fast playback response",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            SkeuoTactileButton(
+                onClick = onJamClick,
+                shape = CircleShape,
+                modifier = Modifier.size(52.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Pulse Jam",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(26.dp)
                 )
             }
 
