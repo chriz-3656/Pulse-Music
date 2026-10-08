@@ -41,7 +41,7 @@ All contributors and community members are expected to follow our [Code of Condu
 1. Fork the repository on GitHub.
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/pulse-music.git
+   git clone https://github.com/chriz-3656/Pulse-Music.git
    cd pulse-music
    ```
 3. Open the project in **Android Studio (Ladybug 2024.2+)**.
