@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.1] - 2026-10-08
+### Fixed
+- **Offline Crash:** Resolved a critical bug where launching the app without an internet connection caused an immediate crash due to unhandled exceptions in the trending music flow.
+
 ## [2.5.0] - 2026-10-04
 ### Added
 - **Pulse JAM (Live Sync Rooms):** Create and join live music rooms! Features a fully synchronized Firebase Realtime Queue where everyone in the room listens to the exact same music in perfect sync.

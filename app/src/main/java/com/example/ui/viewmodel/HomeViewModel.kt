@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -67,27 +68,27 @@ class HomeViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 launch {
-                    getRecommendationsUseCase.getTrending().collectLatest { songs ->
+                    getRecommendationsUseCase.getTrending().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { songs ->
                         _uiState.update { it.copy(trendingSongs = songs, isLoading = false) }
                     }
                 }
                 launch {
-                    getRecommendationsUseCase.getTrending().collectLatest { songs ->
+                    getRecommendationsUseCase.getTrending().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { songs ->
                         _uiState.update { it.copy(quickPicks = songs) }
                     }
                 }
                 launch {
-                    getRecommendationsUseCase.getAlbums().collectLatest { albums ->
+                    getRecommendationsUseCase.getAlbums().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { albums ->
                         _uiState.update { it.copy(featuredAlbums = albums) }
                     }
                 }
                 launch {
-                    getRecommendationsUseCase.getPlaylists().collectLatest { playlists ->
+                    getRecommendationsUseCase.getPlaylists().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { playlists ->
                         _uiState.update { it.copy(featuredPlaylists = playlists) }
                     }
                 }
                 launch {
-                    getRecommendationsUseCase.getPlaylists().collectLatest { playlists ->
+                    getRecommendationsUseCase.getPlaylists().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { playlists ->
                         _uiState.update { it.copy(moodPlaylists = playlists) }
                     }
                 }

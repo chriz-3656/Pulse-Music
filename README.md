@@ -1,8 +1,8 @@
-# Pulse Music v2.5.0
+# Pulse Music v2.5.1
 
 Pulse Music is a highly immersive, aesthetically driven Android music player featuring a custom **Yellow Neumorphism** and **Skeuomorphic** hardware design language. 
 
-## 📥 Download Beta Release (v2.5.0)
+## 📥 Download Beta Release (v2.5.1)
 Welcome to the experimental **Pulse JAM Beta**! This is a test version of the app featuring our brand-new Live Sync Rooms architecture. 
 
 **How to Install:**
@@ -25,5 +25,5 @@ Welcome to the experimental **Pulse JAM Beta**! This is a test version of the ap
 This app relies on GitHub Actions for compilation and CI/CD. The local Gradle environment may time out on dependency resolution due to limited resources. Please push to the repository to trigger the `build.yml` GitHub Actions workflow.
 
 ## Versioning
-- **Current Version:** v2.5.0
+- **Current Version:** v2.5.1
 - **Latest Changes:** Introduced Pulse JAM (Live Sync Rooms), In-Room Search & Queueing, Autoplay Suggestion Bridging, and massive scrolling optimizations. See `CHANGELOG.md` for full details.
