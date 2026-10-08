@@ -16,7 +16,7 @@
 <!-- Detail the tests you conducted to verify your changes. -->
 - [ ] Tested on Android device / emulator (specify Android version: e.g. Android 14 / 15)
 - [ ] Verified background playback and notification drawer controls
-- [ ] Ran local unit tests (`gradle :app:testDebugUnitTest`)
+- [ ] Ran local unit tests (`./gradlew :app:testDebugUnitTest`)
 
 ## ✅ Checklist
 - [ ] My code adheres to the project's code style and Kotlin conventions.

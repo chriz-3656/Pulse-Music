@@ -59,7 +59,7 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders at `maintainers@example.com` or by contacting
+reported to the community leaders at `chrizmonsaji@proton.me` or by contacting
 any project maintainer directly. All complaints will be reviewed and investigated
 promptly and fairly.
 

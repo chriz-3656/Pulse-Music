@@ -15,7 +15,7 @@ All contributors and community members are expected to follow our [Code of Condu
 ## 🛠️ How Can I Contribute?
 
 ### 1. Reporting Bugs
-- Check existing [GitHub Issues](https://github.com/your-username/pulse-music/issues) to ensure your problem hasn't already been reported.
+- Check existing [GitHub Issues](https://github.com/chriz-3656/Pulse-Music/issues) to ensure your problem hasn't already been reported.
 - Use our **Bug Report Template** when submitting an issue.
 - Include:
   - Android version, device manufacturer, and model.
@@ -59,10 +59,10 @@ Before submitting a PR, ensure the build succeeds and tests pass:
 
 ```bash
 # Run JVM unit tests
-gradle :app:testDebugUnitTest
+./gradlew :app:testDebugUnitTest
 
 # Verify app compilation
-gradle :app:assembleDebug
+./gradlew :app:assembleDebug
 ```
 
 ---
@@ -90,7 +90,7 @@ gradle :app:assembleDebug
 
 Before opening your pull request, verify:
 - [ ] My code follows the code style of this project.
-- [ ] I have verified that all existing tests pass (`gradle :app:testDebugUnitTest`).
+- [ ] I have verified that all existing tests pass (`./gradlew :app:testDebugUnitTest`).
 - [ ] I have added tests that prove my fix is effective or that my feature works.
 - [ ] I have updated relevant documentation (README, KDoc comments).
 - [ ] My branch is rebased onto the latest `main` branch.

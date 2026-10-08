@@ -17,7 +17,7 @@ The Pulse Music development team takes software security and user privacy seriou
 
 ### Disclosure Process
 1. **Do not publicly disclose** the issue on public forums, GitHub Issues, or social media.
-2. Email your discovery and details to `security@example.com` or create a confidential security advisory on GitHub.
+2. Email your discovery and details to `chrizmonsaji@proton.me` or create a confidential security advisory on GitHub.
 3. Include the following details in your report:
    - Type of vulnerability (e.g., buffer overflow, insecure storage, URI injection).
    - Component or file affected (e.g., `TrackDownloadManager`, `MusicPlaybackService`).
