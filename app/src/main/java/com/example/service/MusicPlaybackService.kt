@@ -351,8 +351,18 @@ class MusicPlaybackService : Service() {
                         .build()
 
                     exoPlayer.setMediaItem(mediaItem)
+
+                    val currentState = playerController.playerState.value
+                    if (currentState.currentPositionMs > 0L) {
+                        exoPlayer.seekTo(currentState.currentPositionMs)
+                    }
+
                     exoPlayer.prepare()
-                    exoPlayer.play()
+                    if (currentState.isPlaying) {
+                        exoPlayer.play()
+                    } else {
+                        exoPlayer.pause()
+                    }
 
                     loadArtwork(activeSong.artworkUrl)
                     updateMediaMetadata(activeSong)

@@ -162,6 +162,10 @@ class JamViewModel(
         }
     }
 
+    private var pendingSyncSongId: String? = null
+    private var isInitialSyncPending: Boolean = false
+    private var lastSyncActionTimeMs: Long = 0L
+
     private fun observeRoom(roomCode: String) {
         viewModelScope.launch {
             jamSessionManager.observeRoom(roomCode).collectLatest { room ->
@@ -192,23 +196,53 @@ class JamViewModel(
                         val state = playerController.playerState.value
                         val playback = room.playback
                         if (playback.currentSong != null) {
-                            if (state.currentSong?.id != playback.currentSong.id) {
+                            val hostSongId = playback.currentSong.id
+                            val localSongId = state.currentSong?.id
+                            
+                            // 1. Separate track changes from position corrections
+                            if (localSongId != hostSongId && pendingSyncSongId != hostSongId) {
+                                pendingSyncSongId = hostSongId
+                                isInitialSyncPending = true
                                 playerController.playSong(playback.currentSong, room.queue)
+                                playerController.setPlayWhenReady(playback.isPlaying)
+                                return@collectLatest
                             }
                             
-                            playerController.setPlayWhenReady(playback.isPlaying)
+                            if (localSongId != hostSongId) {
+                                // Still waiting for controller to reflect the new song
+                                return@collectLatest
+                            }
                             
-                            if (playback.isPlaying) {
-                                val expectedPos = playback.positionMs + (System.currentTimeMillis() - playback.updatedAt)
-                                // Add small delay buffer
-                                val syncPos = expectedPos - 200
-                                if (java.lang.Math.abs(state.currentPositionMs - syncPos) > 3000) {
-                                    playerController.seekTo(syncPos.coerceAtLeast(0))
-                                }
+                            // 2. Readiness-aware sync (defer while buffering)
+                            if (state.isBuffering || state.totalDurationMs == 0L) {
+                                return@collectLatest
+                            }
+                            
+                            pendingSyncSongId = null
+                            
+                            // 3. Implement controlled drift correction
+                            val now = System.currentTimeMillis()
+                            val expectedPos = if (playback.isPlaying) {
+                                playback.positionMs + (now - playback.updatedAt)
                             } else {
-                                if (java.lang.Math.abs(state.currentPositionMs - playback.positionMs) > 3000) {
-                                    playerController.seekTo(playback.positionMs)
-                                }
+                                playback.positionMs
+                            }
+                            
+                            val duration = state.totalDurationMs.takeIf { it > 0 } ?: playback.currentSong.duration
+                            val clampedPos = expectedPos.coerceIn(0L, duration)
+                            
+                            val drift = java.lang.Math.abs(state.currentPositionMs - clampedPos)
+                            val driftThreshold = if (isInitialSyncPending) 500L else 2500L
+                            val correctionInterval = 2000L
+                            
+                            if (isInitialSyncPending || (drift > driftThreshold && (now - lastSyncActionTimeMs > correctionInterval))) {
+                                playerController.seekTo(clampedPos)
+                                lastSyncActionTimeMs = now
+                                isInitialSyncPending = false
+                            }
+                            
+                            if (state.isPlaying != playback.isPlaying) {
+                                playerController.setPlayWhenReady(playback.isPlaying)
                             }
                         }
                     }
