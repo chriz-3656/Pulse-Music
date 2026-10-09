@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.2] - 2026-10-09
+### Fixed
+- **JAM Playback Synchronization:** Completely eliminated race conditions and seek loops when participants sync to the host.
+- **Readiness-Aware Sync:** Resolved bugs where position corrections were applied before the stream had finished buffering, causing tracks to restart.
+- **Pause Override Fix:** Fixed a bug where joining a paused room would cause the participant's device to aggressively unpause when the stream resolved.
+- **Drift Correction Smoothing:** Throttled timestamp correction to run conservatively instead of spamming position requests during normal playback.
+
 ## [2.5.1] - 2026-10-08
 ### Fixed
 - **Offline Crash:** Resolved a critical bug where launching the app without an internet connection caused an immediate crash due to unhandled exceptions in the trending music flow.
