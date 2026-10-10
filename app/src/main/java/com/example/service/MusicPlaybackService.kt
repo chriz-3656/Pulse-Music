@@ -81,9 +81,14 @@ class MusicPlaybackService : Service() {
 
     private var currentArtworkBitmap: Bitmap? = null
     private var isForegroundActive = false
+    private var fetchWakeLock: android.os.PowerManager.WakeLock? = null
 
     override fun onCreate() {
         super.onCreate()
+        
+        val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        fetchWakeLock = powerManager.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "PulseMusic:FetchWakeLock")
+        
         createNotificationChannel()
         initMediaSession()
         initExoPlayer()
@@ -151,6 +156,7 @@ class MusicPlaybackService : Service() {
             .setMediaSourceFactory(mediaSourceFactory)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
             .build()
 
         exoPlayer.addListener(object : Player.Listener {
@@ -260,124 +266,131 @@ class MusicPlaybackService : Service() {
         playerController.updatePlaybackState(isPlaying = true, isBuffering = true, error = null)
 
         serviceScope.launch(Dispatchers.IO) {
-            var activeSong = song
-            val quality = playerController.playerState.value.audioQuality
+            fetchWakeLock?.acquire(30000L)
+            try {
+                var activeSong = song
+                val quality = playerController.playerState.value.audioQuality
 
-            // PRIORITY 1: Check if track is available locally for instant offline playback
-            var localFile: java.io.File? = null
-            if (!activeSong.localFilePath.isNullOrBlank()) {
-                val f = java.io.File(activeSong.localFilePath!!)
-                if (f.exists() && f.length() > 0L) {
-                    localFile = f
-                }
-            }
-            if (localFile == null) {
-                val downloadedPath = musicRepository.getLocalDownloadPath(activeSong.id)
-                if (!downloadedPath.isNullOrBlank()) {
-                    val f = java.io.File(downloadedPath)
+                // PRIORITY 1: Check if track is available locally for instant offline playback
+                var localFile: java.io.File? = null
+                if (!activeSong.localFilePath.isNullOrBlank()) {
+                    val f = java.io.File(activeSong.localFilePath!!)
                     if (f.exists() && f.length() > 0L) {
                         localFile = f
                     }
                 }
-            }
-
-            var streamUrl = ""
-            if (localFile != null) {
-                streamUrl = Uri.fromFile(localFile).toString()
-                activeSong = activeSong.copy(
-                    isDownloaded = true,
-                    localFilePath = localFile.absolutePath,
-                    stream160Url = streamUrl,
-                    stream320Url = streamUrl
-                )
-                withContext(Dispatchers.Main) {
-                    playerController.updateCurrentSong(activeSong)
-                }
-            } else {
-                streamUrl = activeSong.getStreamUrl(preferHighQuality = quality == AudioQuality.HIGH)
-            }
-
-            // 1. If streamUrl is empty, first try resolving stream URL directly (JioSaavn / SoundCloud / YTM fallback)
-            if (streamUrl.isBlank()) {
-                try {
-                    val resolved = musicRepository.resolveStreamUrl(activeSong)
-                    if (resolved.isNotBlank()) {
-                        streamUrl = resolved
-                        activeSong = activeSong.copy(
-                            stream160Url = resolved,
-                            stream320Url = resolved
-                        )
-                        withContext(Dispatchers.Main) {
-                            playerController.updateCurrentSong(activeSong)
+                if (localFile == null) {
+                    val downloadedPath = musicRepository.getLocalDownloadPath(activeSong.id)
+                    if (!downloadedPath.isNullOrBlank()) {
+                        val f = java.io.File(downloadedPath)
+                        if (f.exists() && f.length() > 0L) {
+                            localFile = f
                         }
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
 
-            // 2. If still empty, try fetching full song details from repository
-            if (streamUrl.isBlank()) {
-                try {
-                    val result = musicRepository.getSongDetails(song.id)
-                    if (result.isSuccess) {
-                        val fetchedSong = result.getOrNull()
-                        if (fetchedSong != null) {
-                            activeSong = fetchedSong
-                            streamUrl = activeSong.getStreamUrl(preferHighQuality = quality == AudioQuality.HIGH)
+                var streamUrl = ""
+                if (localFile != null) {
+                    streamUrl = Uri.fromFile(localFile).toString()
+                    activeSong = activeSong.copy(
+                        isDownloaded = true,
+                        localFilePath = localFile.absolutePath,
+                        stream160Url = streamUrl,
+                        stream320Url = streamUrl
+                    )
+                    withContext(Dispatchers.Main) {
+                        playerController.updateCurrentSong(activeSong)
+                    }
+                } else {
+                    streamUrl = activeSong.getStreamUrl(preferHighQuality = quality == AudioQuality.HIGH)
+                }
+
+                // 1. If streamUrl is empty, first try resolving stream URL directly (JioSaavn / SoundCloud / YTM fallback)
+                if (streamUrl.isBlank()) {
+                    try {
+                        val resolved = musicRepository.resolveStreamUrl(activeSong)
+                        if (resolved.isNotBlank()) {
+                            streamUrl = resolved
+                            activeSong = activeSong.copy(
+                                stream160Url = resolved,
+                                stream320Url = resolved
+                            )
                             withContext(Dispatchers.Main) {
                                 playerController.updateCurrentSong(activeSong)
                             }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
 
-            // If still blank, we can't play it
-            if (streamUrl.isBlank()) {
+                // 2. If still empty, try fetching full song details from repository
+                if (streamUrl.isBlank()) {
+                    try {
+                        val result = musicRepository.getSongDetails(song.id)
+                        if (result.isSuccess) {
+                            val fetchedSong = result.getOrNull()
+                            if (fetchedSong != null) {
+                                activeSong = fetchedSong
+                                streamUrl = activeSong.getStreamUrl(preferHighQuality = quality == AudioQuality.HIGH)
+                                withContext(Dispatchers.Main) {
+                                    playerController.updateCurrentSong(activeSong)
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                // If still blank, we can't play it
+                if (streamUrl.isBlank()) {
+                    withContext(Dispatchers.Main) {
+                        playerController.updatePlaybackState(isPlaying = false, isBuffering = false, error = "No stream available for ${song.title}")
+                    }
+                    return@launch
+                }
+
                 withContext(Dispatchers.Main) {
-                    playerController.updatePlaybackState(isPlaying = false, isBuffering = false, error = "No stream available for ${song.title}")
+                    try {
+                        val mediaItem = MediaItem.Builder()
+                            .setUri(Uri.parse(streamUrl))
+                            .setMediaId(activeSong.id)
+                            .build()
+
+                        exoPlayer.setMediaItem(mediaItem)
+
+                        val currentState = playerController.playerState.value
+                        if (currentState.currentPositionMs > 0L) {
+                            exoPlayer.seekTo(currentState.currentPositionMs)
+                        }
+
+                        exoPlayer.prepare()
+                        if (currentState.isPlaying) {
+                            exoPlayer.play()
+                        } else {
+                            exoPlayer.pause()
+                        }
+
+                        loadArtwork(activeSong.artworkUrl)
+                        updateMediaMetadata(activeSong)
+                        updateMediaSessionState()
+                        
+                        val notification = buildNotification(activeSong, isPlaying = true)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                        } else {
+                            startForeground(NOTIFICATION_ID, notification)
+                        }
+                        isForegroundActive = true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        playerController.updatePlaybackState(isPlaying = false, isBuffering = false, error = e.localizedMessage)
+                    }
                 }
-                return@launch
-            }
-
-            withContext(Dispatchers.Main) {
-                try {
-                    val mediaItem = MediaItem.Builder()
-                        .setUri(Uri.parse(streamUrl))
-                        .setMediaId(activeSong.id)
-                        .build()
-
-                    exoPlayer.setMediaItem(mediaItem)
-
-                    val currentState = playerController.playerState.value
-                    if (currentState.currentPositionMs > 0L) {
-                        exoPlayer.seekTo(currentState.currentPositionMs)
-                    }
-
-                    exoPlayer.prepare()
-                    if (currentState.isPlaying) {
-                        exoPlayer.play()
-                    } else {
-                        exoPlayer.pause()
-                    }
-
-                    loadArtwork(activeSong.artworkUrl)
-                    updateMediaMetadata(activeSong)
-                    updateMediaSessionState()
-                    
-                    val notification = buildNotification(activeSong, isPlaying = true)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
-                    } else {
-                        startForeground(NOTIFICATION_ID, notification)
-                    }
-                    isForegroundActive = true
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    playerController.updatePlaybackState(isPlaying = false, isBuffering = false, error = e.localizedMessage)
+            } finally {
+                if (fetchWakeLock?.isHeld == true) {
+                    fetchWakeLock?.release()
                 }
             }
         }
