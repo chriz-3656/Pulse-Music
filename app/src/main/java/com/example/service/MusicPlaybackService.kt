@@ -156,8 +156,8 @@ class MusicPlaybackService : Service() {
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 val isBuffering = playbackState == Player.STATE_BUFFERING
-                val isPlaying = exoPlayer.isPlaying
-                playerController.updatePlaybackState(isPlaying, isBuffering)
+                val playWhenReady = exoPlayer.playWhenReady
+                playerController.updatePlaybackState(playWhenReady, isBuffering)
 
                 if (playbackState == Player.STATE_READY) {
                     val duration = exoPlayer.duration
@@ -182,7 +182,7 @@ class MusicPlaybackService : Service() {
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                playerController.updatePlaybackState(isPlaying, exoPlayer.playbackState == Player.STATE_BUFFERING)
+                playerController.updatePlaybackState(exoPlayer.playWhenReady, exoPlayer.playbackState == Player.STATE_BUFFERING)
                 updateMediaSessionState()
                 updateNotification()
                 if (isPlaying) {
