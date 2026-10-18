@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.6.0] - 2026-10-18
+### Added
+- **Global Track Context Menu & "Add to Playlist" Dialog:** Seamlessly add any track from Search, Home, or Library directly into custom playlists via the new interactive dialog.
+- **In-Crate Playlist Track Management:** Delete or add tracks dynamically within custom playlists with real-time UI refresh.
+- **Language-Aware Radio Recommendation Engine:** Smart regional language affinity detection (Malayalam, Tamil, Hindi, English, Telugu, Punjabi) ensures radio recommendations closely match the seed song's language and vibe without jarring linguistic or genre shifts.
+- **Artist Diversity Guard:** Radio and suggestion queues now cap same-artist tracks to a balanced threshold (≤ 3 tracks), preventing monotone artist flooding.
+- **Screen-Off Continuous Playback (WakeLocks):** Added partial CPU wake locks and Wi-Fi locks to `MusicPlaybackService` to ensure smooth, uninterrupted continuous playback even when the screen is turned off or the device enters Doze mode.
+- **Manual Jam Room Resync:** Added an explicit quick re-sync control in `JamRoomScreen` allowing participants to instantly synchronize with the host on variable-latency connections.
+
+### Fixed
+- **Autoplay Stopping Bug:** Resolved an issue where playback would stop after a single song when playing Spotify-imported playlists or album queues. Playback now smoothly advances through the queue without interruptions.
+- **Favorite / Love Button Flashing:** Eliminated the bug where pressing the heart button caused the icon to flash amber and revert due to background player progress polling overwriting reactive Room DB state.
+- **JAM Playback Activation & Sync:** Resolved buffer readiness race conditions where participants joined a room but playback failed to trigger or seeked continuously.
+- **Shuffle & Repeat Mode Inconsistencies:** Refactored shuffle queue handling and repeat state transitions to prevent single-track infinite loops.
+- **Playlist 3-Dot Action Menus:** Fixed non-responsive 3-dot menus on song rows across all screens.
+
+### Refactored
+- **Codebase Clean Architecture & Deduplication:** Completely pruned over 285 lines of duplicate and unused imports across 28 Kotlin files, ViewModels, and unit tests.
+- **Manifest Cleanup:** Removed obsolete non-existent `SpotifyLoginActivity` declaration from `AndroidManifest.xml`.
+- **Build Configurations:** Streamlined `app/build.gradle.kts` and cleaned obsolete template comments.
+
 ## [2.5.2] - 2026-10-09
 ### Fixed
 - **JAM Playback Synchronization:** Completely eliminated race conditions and seek loops when participants sync to the host.
