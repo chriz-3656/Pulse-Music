@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import android.os.Handler
 import android.os.Looper
-import android.content.pm.PackageInfo
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri

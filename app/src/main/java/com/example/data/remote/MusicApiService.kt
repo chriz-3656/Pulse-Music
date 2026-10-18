@@ -1,7 +1,6 @@
 package com.example.data.remote
 
 import com.example.data.remote.dto.AlbumDto
-import com.example.data.remote.dto.ArtistDto
 import com.example.data.remote.dto.LyricsDto
 import com.example.data.remote.dto.PlaylistDto
 import com.example.data.remote.dto.RecommendationsDto

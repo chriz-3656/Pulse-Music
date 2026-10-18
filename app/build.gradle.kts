@@ -62,8 +62,6 @@ android {
 }
 
 
-// Some unused dependencies are commented out below instead of being removed.
-// This makes it easy to add them back in the future if needed.
 dependencies {
   implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
   implementation("com.google.firebase:firebase-analytics")
@@ -98,10 +96,6 @@ dependencies {
   implementation(libs.androidx.media3.common)
   implementation(libs.androidx.media)
   implementation(libs.converter.moshi)
-  // Uncomment to use Firestore:
-
-  // Uncomment ALL FOUR of the following dependencies together to use Firebase Auth and Google
-  // Sign-In via Credential Manager:
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.logging.interceptor)

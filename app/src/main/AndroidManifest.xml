@@ -22,10 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
-            android:name=".ui.screens.SpotifyLoginActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyApplication" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"

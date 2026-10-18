@@ -1,10 +1,7 @@
 package com.example
 
-import com.example.domain.model.AudioQuality
 import com.example.domain.model.Song
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
