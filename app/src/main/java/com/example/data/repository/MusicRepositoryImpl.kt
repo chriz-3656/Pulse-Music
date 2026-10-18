@@ -343,52 +343,138 @@ class MusicRepositoryImpl(
         val seedId = song.id
         val artist = song.artist.trim()
         val title = song.title.trim()
+        val album = song.album.trim()
         val provider = _userSettingsFlow.value.provider
 
+        // 1. SoundCloud seed
         if (provider == MusicProvider.SOUNDCLOUD || seedId.startsWith("sc_")) {
-            val scRadio = SoundCloudClient.getRelatedTracks(seedId, 10)
+            val scRadio = SoundCloudClient.getRelatedTracks(seedId, 15)
             if (scRadio.isNotEmpty()) list.addAll(scRadio)
-        } 
-        
-        if (list.isEmpty() && (provider == MusicProvider.YOUTUBE || (provider == MusicProvider.AUTO && !seedId.startsWith("sc_")))) {
-            try {
-                val radio = api.SongRadio.getSongRadio(seedId, null).getOrNull()
-                val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
-                if (ytmSongs.isNotEmpty()) list.addAll(ytmSongs)
-            } catch (e: Exception) {
-                e.printStackTrace()
+        }
+
+        // 2. JioSaavn / Regional Engine (Matches regional language e.g. Malayalam, Tamil, Hindi, Telugu, Punjabi)
+        var detectedLang: String? = null
+        if (list.isEmpty()) {
+            val saavnCleanId = seedId.removePrefix("sc_")
+            // If already a JioSaavn ID (non-numeric or non-11 YouTube ID)
+            if (saavnCleanId.isNotBlank() && (saavnCleanId.contains("_") || saavnCleanId.length != 11)) {
+                val directJio = fetchJioSaavnRadioTracks(saavnCleanId)
+                if (directJio.isNotEmpty()) {
+                    list.addAll(directJio)
+                }
             }
-            
-            if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
-                try {
-                    val searchRes = api.Search.search(if (artist.isNotBlank()) artist else title, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
-                    val artistSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
-                    list.addAll(artistSongs)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+
+            // Resolve on JioSaavn using title + artist to discover native curated radio & language
+            if (list.isEmpty() && title.isNotBlank()) {
+                val resolved = resolveJioSaavnSong(title, artist)
+                if (resolved != null) {
+                    val (jioId, lang) = resolved
+                    detectedLang = lang
+                    val reco = fetchJioSaavnRadioTracks(jioId, targetLanguage = lang)
+                    if (reco.isNotEmpty()) {
+                        list.addAll(reco)
+                    }
                 }
             }
         }
 
-        if (list.isEmpty() && (provider == MusicProvider.JIOSAAVN || provider == MusicProvider.AUTO)) {
-            val saavnCleanId = seedId.removePrefix("sc_")
-            val jioReco = fetchJioSaavnRadioTracks(saavnCleanId)
-            if (jioReco.isNotEmpty()) list.addAll(jioReco)
-            
-            if (list.isEmpty() && (artist.isNotBlank() || title.isNotBlank())) {
-                val query = if (artist.isNotBlank()) artist else title
+        // 3. YouTube Music Radio (for Western, Pop, YouTube tracks or if JioSaavn returned no matches)
+        if (list.isEmpty() && (provider == MusicProvider.YOUTUBE || provider == MusicProvider.AUTO)) {
+            try {
+                val ytId = if (seedId.length == 11 && !seedId.contains("_") && !seedId.startsWith("sc_")) {
+                    seedId
+                } else if (title.isNotBlank()) {
+                    val query = if (artist.isNotBlank()) "$title $artist" else title
+                    val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                    searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.firstOrNull()?.id
+                } else null
+
+                if (ytId != null) {
+                    val radio = api.SongRadio.getSongRadio(ytId, null).getOrNull()
+                    val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
+                    if (ytmSongs.isNotEmpty()) {
+                        list.addAll(ytmSongs)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // 4. Intelligent Contextual Fallback (Avoid artist-only monopolization)
+        if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
+            // Priority A: If album is known and not "Single" / "Unknown" (same soundtrack/album guarantees genre & language match)
+            if (album.isNotBlank() && !album.equals("single", ignoreCase = true) && !album.equals("unknown", ignoreCase = true)) {
+                try {
+                    val albumQuery = if (detectedLang != null) "$album $detectedLang" else album
+                    val albumTracks = searchJioSaavnSongs(albumQuery)
+                    if (albumTracks.isNotEmpty()) {
+                        list.addAll(albumTracks)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            // Priority B: Search related songs by title + artist (+ language if known)
+            if (list.isEmpty()) {
+                try {
+                    val query = if (detectedLang != null) {
+                        "$title $artist $detectedLang"
+                    } else if (artist.isNotBlank()) {
+                        "$title $artist radio"
+                    } else {
+                        title
+                    }
+                    val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                    val similarSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                    list.addAll(similarSongs)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            // Priority C: Search JioSaavn with title + artist
+            if (list.isEmpty()) {
+                val query = if (artist.isNotBlank()) "$title $artist" else title
                 list.addAll(searchJioSaavnSongs(query))
             }
         }
 
-        val seen = mutableSetOf<String>()
+        // 5. Deduplication, Filtering & Diversity Enforcement
+        val seenIds = mutableSetOf<String>()
+        val seenTitles = mutableSetOf<String>()
+        val artistCounts = mutableMapOf<String, Int>()
         val result = mutableListOf<Song>()
+        val seedLowerTitle = title.lowercase()
+
         for (item in list) {
-            if (item.id != seedId && item.title.isNotBlank() && seen.add(item.id)) {
-                result.add(item)
+            val itemTitleLower = item.title.trim().lowercase()
+            val itemArtistLower = item.artist.trim().lowercase()
+
+            // Exclude identical seed track
+            if (item.id == seedId || itemTitleLower == seedLowerTitle) {
+                continue
             }
+            // Exclude already added IDs or normalized titles
+            if (!seenIds.add(item.id) || !seenTitles.add(itemTitleLower)) {
+                continue
+            }
+
+            // Diversity Guard: Limit same artist to at most 3 tracks in radio queue
+            if (itemArtistLower.isNotBlank()) {
+                val count = artistCounts.getOrDefault(itemArtistLower, 0)
+                if (count >= 3) {
+                    continue
+                }
+                artistCounts[itemArtistLower] = count + 1
+            }
+
+            result.add(item)
         }
-        result.shuffle()
+
+        // PRESERVE RELEVANCE RANKING! Do NOT call result.shuffle(), so the closest matching
+        // companion songs play immediately next in true radio fashion.
         result
     }
 
@@ -818,7 +904,36 @@ class MusicRepositoryImpl(
 
 
 
-    private fun fetchJioSaavnRadioTracks(songId: String): List<Song> {
+    private fun resolveJioSaavnSong(title: String, artist: String): Pair<String, String>? {
+        if (title.isBlank()) return null
+        try {
+            val q = if (artist.isNotBlank()) "$title $artist" else title
+            val encoded = java.net.URLEncoder.encode(q, "UTF-8")
+            val url = URL("https://www.jiosaavn.com/api.php?__call=search.getResults&q=$encoded&p=1&n=5&_format=json&_marker=0&ctx=android")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+            conn.connectTimeout = 4000
+            conn.readTimeout = 4000
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().readText()
+                val json = JSONObject(text)
+                val results = json.optJSONArray("results")
+                if (results != null && results.length() > 0) {
+                    val first = results.getJSONObject(0)
+                    val id = first.optString("id")
+                    val lang = first.optString("language").trim().lowercase()
+                    if (id.isNotBlank()) {
+                        return Pair(id, lang)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun fetchJioSaavnRadioTracks(songId: String, targetLanguage: String? = null): List<Song> {
         try {
             val url = URL("https://www.jiosaavn.com/api.php?__call=reco.getreco&pid=$songId&_format=json&_marker=0&ctx=android")
             val conn = url.openConnection() as HttpURLConnection
@@ -828,23 +943,16 @@ class MusicRepositoryImpl(
             if (conn.responseCode == 200) {
                 val text = conn.inputStream.bufferedReader().readText()
                 val list = mutableListOf<Song>()
-                if (text.trim().startsWith("{")) {
+                val arr = if (text.trim().startsWith("{")) {
                     val json = JSONObject(text)
-                    val arr = json.optJSONArray(songId)
-                    if (arr != null) {
-                        for (i in 0 until arr.length()) {
-                            val s = arr.getJSONObject(i)
-                            val id = s.optString("id")
-                            val title = cleanSaavnText(s.optString("song"))
-                            val artist = cleanSaavnText(s.optString("primary_artists"))
-                            val album = cleanSaavnText(s.optString("album"))
-                            val dur = s.optInt("duration", 0) * 1000L
-                            val img = s.optString("image").replace("150x150", "500x500")
-                            list.add(Song(id = id, title = title, artist = artist, album = album, duration = dur, artworkUrl = img))
-                        }
-                    }
+                    json.optJSONArray(songId)
+                        ?: if (json.keys().hasNext()) json.optJSONArray(json.keys().next()) else null
                 } else if (text.trim().startsWith("[")) {
-                    val arr = org.json.JSONArray(text)
+                    org.json.JSONArray(text)
+                } else null
+
+                if (arr != null) {
+                    val cleanTargetLang = targetLanguage?.trim()?.lowercase()
                     for (i in 0 until arr.length()) {
                         val s = arr.getJSONObject(i)
                         val id = s.optString("id")
@@ -853,7 +961,35 @@ class MusicRepositoryImpl(
                         val album = cleanSaavnText(s.optString("album"))
                         val dur = s.optInt("duration", 0) * 1000L
                         val img = s.optString("image").replace("150x150", "500x500")
-                        list.add(Song(id = id, title = title, artist = artist, album = album, duration = dur, artworkUrl = img))
+                        val lang = s.optString("language").trim().lowercase()
+
+                        if (!cleanTargetLang.isNullOrBlank() && lang.isNotBlank() && lang != cleanTargetLang) {
+                            continue
+                        }
+
+                        val encMedia = s.optString("encrypted_media_url")
+                        var streamUrl = ""
+                        if (encMedia.isNotBlank()) {
+                            val dec = decryptJioSaavnUrl(encMedia)
+                            if (dec.startsWith("http")) {
+                                streamUrl = dec.replace("_96.mp4", "_320.mp4").replace("_96.m4a", "_320.mp4")
+                            }
+                        }
+
+                        if (id.isNotBlank() && title.isNotBlank()) {
+                            list.add(
+                                Song(
+                                    id = id,
+                                    title = title,
+                                    artist = if (artist.isNotBlank()) artist else "Artist",
+                                    album = album,
+                                    duration = dur,
+                                    artworkUrl = img,
+                                    stream160Url = streamUrl,
+                                    stream320Url = streamUrl
+                                )
+                            )
+                        }
                     }
                 }
                 return list

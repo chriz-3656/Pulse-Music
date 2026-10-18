@@ -150,6 +150,22 @@ class MusicPlayerController(
 
     fun playRadio(song: Song) {
         playSong(song, listOf(song))
+        scope.launch {
+            try {
+                val suggestions = fetchSuggestionsForSong(song)
+                if (suggestions.isNotEmpty()) {
+                    val current = _playerState.value
+                    if (current.currentSong?.id == song.id) {
+                        val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
+                        if (filtered.isNotEmpty()) {
+                            _playerState.update { it.copy(queue = current.queue + filtered) }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun addToQueue(song: Song) {
