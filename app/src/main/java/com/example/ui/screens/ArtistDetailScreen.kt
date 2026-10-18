@@ -62,6 +62,7 @@ fun ArtistDetailScreen(
     playerState: PlayerState,
     onBackClick: () -> Unit,
     onAlbumClick: (String) -> Unit,
+    onAddToPlaylist: ((Song) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -218,6 +219,11 @@ fun ArtistDetailScreen(
                             isPlaying = playerState.isPlaying && isCurrent,
                             isCurrentTrack = isCurrent,
                             onClick = { viewModel.playTrack(song) },
+                            onPlayNext = { viewModel.playNext(song) },
+                            onAddToQueue = { viewModel.addToQueue(song) },
+                            onFavoriteToggle = { viewModel.toggleFavorite(song) },
+                            onDownloadClick = { viewModel.downloadSong(song) },
+                            onAddToPlaylist = onAddToPlaylist?.let { cb -> { cb(song) } },
                             modifier = Modifier.padding(horizontal = 6.dp)
                         )
                     }

@@ -183,7 +183,10 @@ class SearchViewModel(
 
     fun toggleFavorite(song: Song) {
         viewModelScope.launch {
-            appContainer.manageFavoritesUseCase.toggleFavorite(song)
+            val newFav = appContainer.manageFavoritesUseCase.toggleFavorite(song)
+            if (appContainer.playerController.playerState.value.currentSong?.id == song.id) {
+                appContainer.playerController.updateCurrentSong(song.copy(isFavorite = newFav))
+            }
         }
     }
 }

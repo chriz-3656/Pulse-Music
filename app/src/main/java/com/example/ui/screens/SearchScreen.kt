@@ -89,6 +89,7 @@ fun SearchScreen(
     onArtistClick: (String) -> Unit = {},
     onAlbumClick: (String) -> Unit = {},
     onPlaylistClick: (String) -> Unit = {},
+    onAddToPlaylist: ((Song) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -334,7 +335,8 @@ fun SearchScreen(
                                 onAddToQueue = { viewModel.addToQueue(song) },
                                 onStartRadio = { viewModel.playSongAsRadio(song) },
                                 onDownloadClick = { viewModel.downloadSong(song) },
-                                onFavoriteToggle = { viewModel.toggleFavorite(song) }
+                                onFavoriteToggle = { viewModel.toggleFavorite(song) },
+                                onAddToPlaylist = onAddToPlaylist?.let { cb -> { cb(song) } }
                             )
                         }
                     }
@@ -391,7 +393,8 @@ fun SearchScreen(
                                 onAddToQueue = { viewModel.addToQueue(song) },
                                 onStartRadio = { viewModel.playSongAsRadio(song) },
                                 onDownloadClick = { viewModel.downloadSong(song) },
-                                onFavoriteToggle = { viewModel.toggleFavorite(song) }
+                                onFavoriteToggle = { viewModel.toggleFavorite(song) },
+                                onAddToPlaylist = onAddToPlaylist?.let { cb -> { cb(song) } }
                             )
                         }
                     }

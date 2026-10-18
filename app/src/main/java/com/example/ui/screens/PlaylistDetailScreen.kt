@@ -25,10 +25,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.example.domain.model.Song
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -54,9 +59,13 @@ fun PlaylistDetailScreen(
     viewModel: PlaylistDetailViewModel,
     playerState: PlayerState,
     onBackClick: () -> Unit,
+    onAddToPlaylist: ((Song) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isSearchOpen by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
 
     Box(
         modifier = modifier
@@ -157,23 +166,73 @@ fun PlaylistDetailScreen(
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        SkeuoTactileButton(
-                            onClick = { viewModel.playPlaylist() },
-                            shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(42.dp)
-                                .testTag("playlist_play_button")
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.PlayArrow,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            SkeuoTactileButton(
+                                onClick = { viewModel.playPlaylist() },
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(42.dp)
+                                    .testTag("playlist_play_button")
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.PlayArrow,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("PLAY CRATE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            SkeuoTactileButton(
+                                onClick = { isSearchOpen = !isSearchOpen },
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.height(42.dp)
+                            ) {
+                                Text(
+                                    text = if (isSearchOpen) "CLOSE" else "+ ADD SONGS",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 8.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("PLAY CRATE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
+                            }
+                        }
+
+                        if (isSearchOpen) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = {
+                                    searchQuery = it
+                                    viewModel.searchSongs(it)
+                                },
+                                placeholder = { Text("Search songs to add...") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            searchResults.forEach { searchHit ->
+                                SongItemRow(
+                                    song = searchHit,
+                                    isPlaying = false,
+                                    isCurrentTrack = false,
+                                    onClick = {
+                                        viewModel.addSongToPlaylist(searchHit)
+                                        searchQuery = ""
+                                        viewModel.searchSongs("")
+                                        isSearchOpen = false
+                                    },
+                                    onPlayNext = { viewModel.playNext(searchHit) },
+                                    onAddToQueue = { viewModel.addToQueue(searchHit) },
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
                             }
                         }
 
@@ -182,15 +241,44 @@ fun PlaylistDetailScreen(
                 }
 
                 // Tracklist Items
-                itemsIndexed(playlist.songs) { index, song ->
-                    val isPlayingThis = playerState.currentSong?.id == song.id
-                    SongItemRow(
-                        song = song,
-                        isPlaying = playerState.isPlaying && isPlayingThis,
-                        isCurrentTrack = isPlayingThis,
-                        onClick = { viewModel.playTrack(song) },
-                        modifier = Modifier.padding(horizontal = 6.dp)
-                    )
+                if (playlist.songs.isEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "No songs in this playlist crate.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Tap \"+ ADD SONGS\" above to add tracks!",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                } else {
+                    itemsIndexed(playlist.songs) { index, song ->
+                        val isPlayingThis = playerState.currentSong?.id == song.id
+                        SongItemRow(
+                            song = song,
+                            isPlaying = playerState.isPlaying && isPlayingThis,
+                            isCurrentTrack = isPlayingThis,
+                            onClick = { viewModel.playTrack(song) },
+                            onPlayNext = { viewModel.playNext(song) },
+                            onAddToQueue = { viewModel.addToQueue(song) },
+                            onFavoriteToggle = { viewModel.toggleFavorite(song) },
+                            onDownloadClick = { viewModel.downloadSong(song) },
+                            onRemoveFromPlaylist = { viewModel.removeSongFromPlaylist(song.id) },
+                            onAddToPlaylist = onAddToPlaylist?.let { cb -> { cb(song) } },
+                            modifier = Modifier.padding(horizontal = 6.dp)
+                        )
+                    }
                 }
             }
         } else {

@@ -71,16 +71,27 @@ class PlayerViewModel(
         viewModelScope.launch {
             playerController.playerState.collectLatest { state ->
                 val song = state.currentSong
+                val isSongChanged = _uiState.value.playerState.currentSong?.id != song?.id
                 _uiState.update {
                     it.copy(
                         playerState = state,
-                        isFavorite = song?.isFavorite ?: false,
+                        isFavorite = if (isSongChanged) (song?.isFavorite ?: false) else (it.isFavorite || (song?.isFavorite ?: false)),
                         isDownloaded = song?.isDownloaded ?: false,
-                        lyrics = if (it.playerState?.currentSong?.id != song?.id) null else it.lyrics
+                        lyrics = if (isSongChanged) null else it.lyrics
                     )
                 }
                 if (song != null && _uiState.value.lyrics == null) {
                     loadLyricsForSong(song)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            manageFavoritesUseCase.getFavorites().collectLatest { favorites ->
+                val currentSongId = playerController.playerState.value.currentSong?.id
+                if (currentSongId != null) {
+                    val isFav = favorites.any { it.id == currentSongId }
+                    _uiState.update { it.copy(isFavorite = isFav) }
                 }
             }
         }
@@ -119,8 +130,10 @@ class PlayerViewModel(
     fun toggleFavorite() {
         val song = playerController.playerState.value.currentSong ?: return
         viewModelScope.launch {
-            manageFavoritesUseCase.toggleFavorite(song)
-            _uiState.update { it.copy(isFavorite = !it.isFavorite) }
+            val newFav = manageFavoritesUseCase.toggleFavorite(song)
+            val updatedSong = song.copy(isFavorite = newFav)
+            playerController.updateCurrentSong(updatedSong)
+            _uiState.update { it.copy(isFavorite = newFav) }
         }
     }
 

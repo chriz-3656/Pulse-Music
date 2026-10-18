@@ -48,7 +48,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import android.widget.Toast
+import kotlinx.coroutines.launch
+import com.example.domain.model.Song
+import com.example.ui.components.AddToPlaylistDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -120,6 +125,10 @@ fun PulseMusicApp() {
     val jamViewModel: JamViewModel = viewModel(factory = factory)
 
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
+
+    val coroutineScope = rememberCoroutineScope()
+    var songForPlaylistDialog by remember { mutableStateOf<Song?>(null) }
+    val userPlaylists by appContainer.managePlaylistUseCase.getUserPlaylists().collectAsStateWithLifecycle(emptyList())
 
     var currentDestination by remember { mutableStateOf(NavigationDestination.HOME) }
     var isFullScreenPlayerOpen by remember { mutableStateOf(false) }
@@ -249,7 +258,8 @@ fun PulseMusicApp() {
                                 onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) },
                                 onAlbumClick = { albumId ->
                                     subScreenBackStack.add(SubScreen.Album(albumId))
-                                }
+                                },
+                                onAddToPlaylist = { song -> songForPlaylistDialog = song }
                             )
                         }
                         is SubScreen.Album -> {
@@ -272,7 +282,8 @@ fun PulseMusicApp() {
                             PlaylistDetailScreen(
                                 viewModel = playlistVm,
                                 playerState = playerState,
-                                onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) }
+                                onBackClick = { subScreenBackStack.removeAt(subScreenBackStack.size - 1) },
+                                onAddToPlaylist = { song -> songForPlaylistDialog = song }
                             )
                         }
                         is SubScreen.JamRoom -> {
@@ -288,7 +299,7 @@ fun PulseMusicApp() {
                     when (currentDestination) {
                         NavigationDestination.HOME -> {
                             HomeScreen(
-                    jamViewModel = jamViewModel,
+                                jamViewModel = jamViewModel,
                                 viewModel = homeViewModel,
                                 playerState = playerState,
                                 onSongClick = { song -> homeViewModel.playSong(song) },
@@ -300,7 +311,8 @@ fun PulseMusicApp() {
                                 },
                                 onOpenJamRoom = {
                                     subScreenBackStack.add(SubScreen.JamRoom)
-                                }
+                                },
+                                onAddToPlaylist = { song -> songForPlaylistDialog = song }
                             )
                         }
                         NavigationDestination.SEARCH -> {
@@ -316,7 +328,8 @@ fun PulseMusicApp() {
                                 },
                                 onPlaylistClick = { playlistId ->
                                     subScreenBackStack.add(SubScreen.Playlist(playlistId))
-                                }
+                                },
+                                onAddToPlaylist = { song -> songForPlaylistDialog = song }
                             )
                         }
                         NavigationDestination.LIBRARY -> {
@@ -326,7 +339,8 @@ fun PulseMusicApp() {
                                 onSongClick = { song -> libraryViewModel.playSong(song, listOf(song)) },
                                 onPlaylistClick = { playlistId ->
                                     subScreenBackStack.add(SubScreen.Playlist(playlistId))
-                                }
+                                },
+                                onAddToPlaylist = { song -> songForPlaylistDialog = song }
                             )
                         }
                         NavigationDestination.SETTINGS -> {
@@ -352,6 +366,33 @@ fun PulseMusicApp() {
                 },
                 onAlbumClick = { albumId ->
                     subScreenBackStack.add(SubScreen.Album(albumId))
+                }
+            )
+        }
+
+        if (songForPlaylistDialog != null) {
+            AddToPlaylistDialog(
+                song = songForPlaylistDialog!!,
+                playlists = userPlaylists,
+                onPlaylistSelected = { playlist ->
+                    val targetSong = songForPlaylistDialog!!
+                    songForPlaylistDialog = null
+                    coroutineScope.launch {
+                        appContainer.managePlaylistUseCase.addSong(playlist.id, targetSong)
+                        Toast.makeText(context, "Added to ${playlist.title}", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onCreatePlaylist = { title ->
+                    val targetSong = songForPlaylistDialog!!
+                    songForPlaylistDialog = null
+                    coroutineScope.launch {
+                        val newId = appContainer.managePlaylistUseCase.createPlaylist(title, "")
+                        appContainer.managePlaylistUseCase.addSong(newId, targetSong)
+                        Toast.makeText(context, "Created '$title' and added song", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onDismissRequest = {
+                    songForPlaylistDialog = null
                 }
             )
         }

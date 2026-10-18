@@ -87,6 +87,7 @@ fun HomeScreen(
     onAlbumClick: (String) -> Unit = {},
     onPlaylistClick: (String) -> Unit = {},
     onOpenJamRoom: () -> Unit = {},
+    onAddToPlaylist: ((Song) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -444,6 +445,9 @@ fun HomeScreen(
                 onPlayNext = { viewModel.playNext(song) },
                 onAddToQueue = { viewModel.addToQueue(song) },
                 onStartRadio = { viewModel.playRadio(song) },
+                onDownloadClick = { viewModel.downloadSong(song) },
+                onFavoriteToggle = { viewModel.toggleFavorite(song) },
+                onAddToPlaylist = onAddToPlaylist?.let { cb -> { cb(song) } },
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
         }

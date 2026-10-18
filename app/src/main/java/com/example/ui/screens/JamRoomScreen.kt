@@ -101,14 +101,32 @@ fun JamRoomScreen(
                                 Toast.makeText(context, "Room Code Copied", Toast.LENGTH_SHORT).show()
                             }
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
                         SkeuoTactileButton(
-                            onClick = onGoToPlayer,
+                            onClick = {
+                                if (!isHost) {
+                                    jamViewModel.syncWithHost()
+                                }
+                                onGoToPlayer()
+                            },
                             shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.fillMaxWidth().height(60.dp),
                             accentColor = MaterialTheme.colorScheme.primary
                         ) {
                             Text("OPEN AUDIO PLAYER", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary)
+                        }
+
+                        if (!isHost) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            SkeuoTactileButton(
+                                onClick = {
+                                    jamViewModel.syncWithHost()
+                                    Toast.makeText(context, "Resyncing with Host...", Toast.LENGTH_SHORT).show()
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                            ) {
+                                Text("ACTIVATE & RESYNC PLAYBACK", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

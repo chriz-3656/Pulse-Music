@@ -111,4 +111,20 @@ class ArtistDetailViewModel(
             playerController.playQueue(songs, 0)
         }
     }
+
+    fun playNext(song: Song) = playerController.playNext(song)
+    fun addToQueue(song: Song) = playerController.addToQueue(song)
+    fun toggleFavorite(song: Song) {
+        viewModelScope.launch {
+            val newFav = appContainer.manageFavoritesUseCase.toggleFavorite(song)
+            if (playerController.playerState.value.currentSong?.id == song.id) {
+                playerController.updateCurrentSong(song.copy(isFavorite = newFav))
+            }
+        }
+    }
+    fun downloadSong(song: Song) {
+        viewModelScope.launch {
+            appContainer.manageDownloadsUseCase.download(song)
+        }
+    }
 }

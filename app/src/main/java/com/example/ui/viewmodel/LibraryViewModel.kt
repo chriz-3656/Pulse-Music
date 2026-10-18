@@ -136,9 +136,20 @@ class LibraryViewModel(
         }
     }
 
+    fun playNext(song: Song) = playerController.playNext(song)
+    fun addToQueue(song: Song) = playerController.addToQueue(song)
+    fun downloadSong(song: Song) {
+        viewModelScope.launch {
+            manageDownloadsUseCase.download(song)
+        }
+    }
+
     fun toggleFavorite(song: Song) {
         viewModelScope.launch {
-            manageFavoritesUseCase.toggleFavorite(song)
+            val newFav = manageFavoritesUseCase.toggleFavorite(song)
+            if (playerController.playerState.value.currentSong?.id == song.id) {
+                playerController.updateCurrentSong(song.copy(isFavorite = newFav))
+            }
         }
     }
 }

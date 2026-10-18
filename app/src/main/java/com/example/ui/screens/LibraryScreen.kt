@@ -80,6 +80,7 @@ fun LibraryScreen(
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
     onPlaylistClick: (String) -> Unit = {},
+    onAddToPlaylist: ((Song) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -196,7 +197,12 @@ fun LibraryScreen(
                         favoriteSongs = uiState.favoriteSongs,
                         playerState = playerState,
                         onPlayAll = { viewModel.playAll(uiState.favoriteSongs) },
-                        onSongClick = { song -> viewModel.playSong(song, uiState.favoriteSongs) }
+                        onSongClick = { song -> viewModel.playSong(song, uiState.favoriteSongs) },
+                        onFavoriteToggle = { song -> viewModel.toggleFavorite(song) },
+                        onDownloadClick = { song -> viewModel.downloadSong(song) },
+                        onPlayNext = { song -> viewModel.playNext(song) },
+                        onAddToQueue = { song -> viewModel.addToQueue(song) },
+                        onAddToPlaylist = { song -> onAddToPlaylist?.invoke(song) }
                     )
                 }
                 LibraryTab.DOWNLOADS -> {
@@ -206,7 +212,10 @@ fun LibraryScreen(
                         onPlayAll = { viewModel.playAll(uiState.downloadedSongs) },
                         onSongClick = { song -> viewModel.playSong(song, uiState.downloadedSongs) },
                         onRemoveDownload = { songId -> viewModel.removeDownload(songId) },
-                        onFavoriteToggle = { song -> viewModel.toggleFavorite(song) }
+                        onFavoriteToggle = { song -> viewModel.toggleFavorite(song) },
+                        onPlayNext = { song -> viewModel.playNext(song) },
+                        onAddToQueue = { song -> viewModel.addToQueue(song) },
+                        onAddToPlaylist = { song -> onAddToPlaylist?.invoke(song) }
                     )
                 }
             }
@@ -550,7 +559,12 @@ fun FavoritesTabContent(
     favoriteSongs: List<Song>,
     playerState: PlayerState,
     onPlayAll: () -> Unit,
-    onSongClick: (Song) -> Unit
+    onSongClick: (Song) -> Unit,
+    onFavoriteToggle: (Song) -> Unit = {},
+    onDownloadClick: (Song) -> Unit = {},
+    onPlayNext: (Song) -> Unit = {},
+    onAddToQueue: (Song) -> Unit = {},
+    onAddToPlaylist: (Song) -> Unit = {}
 ) {
     if (favoriteSongs.isEmpty()) {
         EmptyStateView(
@@ -591,13 +605,18 @@ fun FavoritesTabContent(
                 }
             }
 
-            items(favoriteSongs) { song ->
+            items(favoriteSongs, key = { it.id }) { song ->
                 val isCurrent = playerState.currentSong?.id == song.id
                 SongItemRow(
                     song = song,
                     isPlaying = playerState.isPlaying && isCurrent,
                     isCurrentTrack = isCurrent,
                     onClick = { onSongClick(song) },
+                    onFavoriteToggle = { onFavoriteToggle(song) },
+                    onDownloadClick = { onDownloadClick(song) },
+                    onPlayNext = { onPlayNext(song) },
+                    onAddToQueue = { onAddToQueue(song) },
+                    onAddToPlaylist = { onAddToPlaylist(song) },
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
             }
@@ -612,7 +631,10 @@ fun DownloadsTabContent(
     onPlayAll: () -> Unit,
     onSongClick: (Song) -> Unit,
     onRemoveDownload: (String) -> Unit = {},
-    onFavoriteToggle: (Song) -> Unit = {}
+    onFavoriteToggle: (Song) -> Unit = {},
+    onPlayNext: (Song) -> Unit = {},
+    onAddToQueue: (Song) -> Unit = {},
+    onAddToPlaylist: (Song) -> Unit = {}
 ) {
     if (downloadedSongs.isEmpty()) {
         EmptyStateView(
@@ -662,6 +684,9 @@ fun DownloadsTabContent(
                     onClick = { onSongClick(song) },
                     onDownloadClick = { onRemoveDownload(song.id) },
                     onFavoriteToggle = { onFavoriteToggle(song) },
+                    onPlayNext = { onPlayNext(song) },
+                    onAddToQueue = { onAddToQueue(song) },
+                    onAddToPlaylist = { onAddToPlaylist(song) },
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
             }

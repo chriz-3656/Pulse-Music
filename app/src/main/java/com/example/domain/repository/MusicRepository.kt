@@ -66,7 +66,7 @@ interface MusicRepository {
 
     // Favorites & Downloads
     fun getFavoriteSongs(): Flow<List<Song>>
-    suspend fun toggleFavorite(song: Song)
+    suspend fun toggleFavorite(song: Song): Boolean
     fun getDownloadedSongs(): Flow<List<Song>>
     suspend fun downloadSong(song: Song): Result<String>
     suspend fun removeDownload(songId: String)

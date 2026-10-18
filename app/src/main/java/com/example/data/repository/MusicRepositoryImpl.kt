@@ -1090,13 +1090,15 @@ class MusicRepositoryImpl(
     override suspend fun removeSongFromPlaylist(playlistId: String, songId: String) = playlistDao.removeSongFromPlaylist(playlistId, songId)
     
     override fun getFavoriteSongs(): Flow<List<Song>> = songDao.getFavoriteSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
-    override suspend fun toggleFavorite(song: Song) {
+    override suspend fun toggleFavorite(song: Song): Boolean {
         val current = songDao.getSongById(song.id)
+        val newFav = if (current != null) !current.isFavorite else true
         if (current != null) {
-            songDao.updateFavorite(song.id, !current.isFavorite)
+            songDao.updateFavorite(song.id, newFav)
         } else {
             songDao.insertSong(com.example.data.local.entity.SongEntity(song.id, song.title, song.artist, song.album, song.duration, song.artworkUrl, song.stream160Url, song.stream320Url, song.lyrics, song.isDownloaded, true, song.localFilePath, song.year, song.artistId, song.albumId, System.currentTimeMillis()))
         }
+        return newFav
     }
     
     override fun getDownloadedSongs(): Flow<List<Song>> = songDao.getDownloadedSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }

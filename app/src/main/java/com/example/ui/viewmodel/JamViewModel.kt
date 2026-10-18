@@ -162,6 +162,17 @@ class JamViewModel(
         }
     }
 
+    fun syncWithHost() {
+        val room = _uiState.value.activeRoom ?: return
+        if (room.hostId == jamSessionManager.currentUserId) return
+        val playback = room.playback
+        val hostSong = playback.currentSong ?: return
+        pendingSyncSongId = hostSong.id
+        isInitialSyncPending = true
+        playerController.playSong(hostSong, room.queue)
+        playerController.setPlayWhenReady(playback.isPlaying)
+    }
+
     private var pendingSyncSongId: String? = null
     private var isInitialSyncPending: Boolean = false
     private var lastSyncActionTimeMs: Long = 0L
@@ -245,6 +256,42 @@ class JamViewModel(
                                 playerController.setPlayWhenReady(playback.isPlaying)
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        // Participant Player Readiness & Dynamic Drift Sync Observer
+        viewModelScope.launch {
+            playerController.playerState.collectLatest { state ->
+                val room = _uiState.value.activeRoom ?: return@collectLatest
+                if (room.hostId == jamSessionManager.currentUserId) return@collectLatest
+                val playback = room.playback
+                val hostSong = playback.currentSong ?: return@collectLatest
+
+                if (state.currentSong?.id == hostSong.id && !state.isBuffering && state.totalDurationMs > 0L) {
+                    val now = System.currentTimeMillis()
+                    val expectedPos = if (playback.isPlaying) {
+                        playback.positionMs + (now - playback.updatedAt)
+                    } else {
+                        playback.positionMs
+                    }
+                    val duration = state.totalDurationMs.takeIf { it > 0 } ?: hostSong.duration
+                    val clampedPos = expectedPos.coerceIn(0L, duration)
+                    val drift = java.lang.Math.abs(state.currentPositionMs - clampedPos)
+
+                    if (isInitialSyncPending) {
+                        playerController.seekTo(clampedPos)
+                        playerController.setPlayWhenReady(playback.isPlaying)
+                        lastSyncActionTimeMs = now
+                        isInitialSyncPending = false
+                    } else if (drift > 3000L && (now - lastSyncActionTimeMs > 2500L)) {
+                        playerController.seekTo(clampedPos)
+                        lastSyncActionTimeMs = now
+                    }
+
+                    if (state.isPlaying != playback.isPlaying && !isInitialSyncPending) {
+                        playerController.setPlayWhenReady(playback.isPlaying)
                     }
                 }
             }

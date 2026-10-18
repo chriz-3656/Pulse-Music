@@ -79,6 +79,10 @@ class MusicPlaybackService : Service() {
         (applicationContext as PulseMusicApplication).appContainer.musicRepository
     }
 
+    private val database by lazy {
+        (applicationContext as PulseMusicApplication).appContainer.database
+    }
+
     private var currentArtworkBitmap: Bitmap? = null
     private var isForegroundActive = false
     private var fetchWakeLock: android.os.PowerManager.WakeLock? = null
@@ -183,7 +187,7 @@ class MusicPlaybackService : Service() {
                     }
                     updateNotification()
                 } else if (playbackState == Player.STATE_ENDED) {
-                    playerController.skipToNext()
+                    playerController.skipToNext(isAutoAdvance = true)
                 }
             }
 
@@ -204,7 +208,7 @@ class MusicPlaybackService : Service() {
 
                 serviceScope.launch {
                     delay(1500)
-                    playerController.skipToNext()
+                    playerController.skipToNext(isAutoAdvance = true)
                 }
             }
         })
@@ -231,7 +235,7 @@ class MusicPlaybackService : Service() {
                 exoPlayer.repeatMode = when (action.mode) {
                     RepeatMode.OFF -> Player.REPEAT_MODE_OFF
                     RepeatMode.ONE -> Player.REPEAT_MODE_ONE
-                    RepeatMode.ALL -> Player.REPEAT_MODE_ALL
+                    RepeatMode.ALL -> Player.REPEAT_MODE_OFF
                 }
             }
             is ServiceAction.ReloadStreamWithQuality -> {
@@ -269,6 +273,14 @@ class MusicPlaybackService : Service() {
             fetchWakeLock?.acquire(30000L)
             try {
                 var activeSong = song
+                val cachedEntity = database.songDao().getSongById(activeSong.id)
+                if (cachedEntity != null) {
+                    activeSong = activeSong.copy(
+                        isFavorite = cachedEntity.isFavorite,
+                        isDownloaded = cachedEntity.isDownloaded || activeSong.isDownloaded,
+                        localFilePath = cachedEntity.localFilePath ?: activeSong.localFilePath
+                    )
+                }
                 val quality = playerController.playerState.value.audioQuality
 
                 // PRIORITY 1: Check if track is available locally for instant offline playback
@@ -365,6 +377,7 @@ class MusicPlaybackService : Service() {
                             exoPlayer.seekTo(currentState.currentPositionMs)
                         }
 
+                        exoPlayer.playWhenReady = currentState.isPlaying
                         exoPlayer.prepare()
                         if (currentState.isPlaying) {
                             exoPlayer.play()

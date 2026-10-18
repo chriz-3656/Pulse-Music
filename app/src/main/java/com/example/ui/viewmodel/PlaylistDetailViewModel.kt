@@ -85,4 +85,57 @@ class PlaylistDetailViewModel(
             playerController.playQueue(playlist.songs, 0)
         }
     }
+
+    fun playNext(song: Song) = playerController.playNext(song)
+    fun addToQueue(song: Song) = playerController.addToQueue(song)
+
+    fun toggleFavorite(song: Song) {
+        viewModelScope.launch {
+            val newFav = appContainer.manageFavoritesUseCase.toggleFavorite(song)
+            if (playerController.playerState.value.currentSong?.id == song.id) {
+                playerController.updateCurrentSong(song.copy(isFavorite = newFav))
+            }
+        }
+    }
+
+    fun downloadSong(song: Song) {
+        viewModelScope.launch {
+            appContainer.manageDownloadsUseCase.download(song)
+        }
+    }
+
+    fun removeSongFromPlaylist(songId: String) {
+        viewModelScope.launch {
+            appContainer.managePlaylistUseCase.removeSong(playlistId, songId)
+            loadPlaylist()
+        }
+    }
+
+    fun addSongToPlaylist(song: Song) {
+        viewModelScope.launch {
+            appContainer.managePlaylistUseCase.addSong(playlistId, song)
+            loadPlaylist()
+        }
+    }
+
+    private var searchJob: kotlinx.coroutines.Job? = null
+    private val _searchResults = MutableStateFlow<List<Song>>(emptyList())
+    val searchResults: StateFlow<List<Song>> = _searchResults.asStateFlow()
+
+    fun searchSongs(query: String) {
+        searchJob?.cancel()
+        if (query.isBlank()) {
+            _searchResults.value = emptyList()
+            return
+        }
+        searchJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(300)
+            try {
+                val results = appContainer.searchMusicUseCase(query)
+                _searchResults.value = results
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+    }
 }

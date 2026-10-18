@@ -225,11 +225,23 @@ class MusicPlayerController(
         onServiceCommand?.invoke(ServiceAction.SeekTo(positionMs))
     }
 
-    fun skipToNext() {
+    fun skipToNext(isAutoAdvance: Boolean = false) {
         val state = _playerState.value
         if (state.queue.isEmpty()) return
 
-        var nextIndex = state.currentIndex + 1
+        if (isAutoAdvance && state.repeatMode == RepeatMode.ONE && state.currentSong != null) {
+            seekTo(0L)
+            onServiceCommand?.invoke(ServiceAction.Resume)
+            return
+        }
+
+        var nextIndex = if (state.isShuffle && state.queue.size > 1) {
+            val remainingIndices = state.queue.indices.filter { it != state.currentIndex }
+            if (remainingIndices.isNotEmpty()) remainingIndices.random() else (state.currentIndex + 1)
+        } else {
+            state.currentIndex + 1
+        }
+
         if (nextIndex >= state.queue.size) {
             if (state.repeatMode == RepeatMode.ALL) {
                 nextIndex = 0
@@ -313,7 +325,13 @@ class MusicPlayerController(
             return
         }
 
-        var prevIndex = state.currentIndex - 1
+        var prevIndex = if (state.isShuffle && state.queue.size > 1) {
+            val remainingIndices = state.queue.indices.filter { it != state.currentIndex }
+            if (remainingIndices.isNotEmpty()) remainingIndices.random() else (state.currentIndex - 1)
+        } else {
+            state.currentIndex - 1
+        }
+
         if (prevIndex < 0) {
             if (state.repeatMode == RepeatMode.ALL) {
                 prevIndex = state.queue.size - 1
