@@ -227,7 +227,7 @@ class ViewModelFactory(private val appContainer: AppContainer) : ViewModelProvid
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
-                HomeViewModel(appContainer.getRecommendationsUseCase, appContainer.playerController) as T
+                HomeViewModel(appContainer.getRecommendationsUseCase, appContainer.playerController, appContainer) as T
             }
             modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
                 SearchViewModel(appContainer, appContainer.playerController) as T

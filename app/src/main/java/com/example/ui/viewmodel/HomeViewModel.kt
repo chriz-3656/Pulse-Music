@@ -53,7 +53,8 @@ data class HomeUiState(
 
 class HomeViewModel(
     private val getRecommendationsUseCase: GetRecommendationsUseCase,
-    private val playerController: MusicPlayerController
+    private val playerController: MusicPlayerController,
+    private val appContainer: AppContainer
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
