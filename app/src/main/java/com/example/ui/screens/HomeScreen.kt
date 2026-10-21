@@ -249,6 +249,42 @@ fun HomeScreen(
             )
         }
 
+        if (uiState.isPureOfflineMode) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
+                        .padding(14.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("✈️", fontSize = 20.sp)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "PURE OFFLINE MODE ACTIVE",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Deck streaming disabled • Only downloaded & local files",
+                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Live Audio Stream Diagnostic Alert (if stream error occurred)
         if (!playerState.playbackError.isNullOrBlank()) {
             item {

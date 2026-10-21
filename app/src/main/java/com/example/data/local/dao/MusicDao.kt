@@ -34,6 +34,9 @@ interface SongDao {
     @Query("SELECT * FROM cached_songs WHERE isDownloaded = 1 ORDER BY cachedAt DESC")
     suspend fun getDownloadedSongsSync(): List<SongEntity>
 
+    @Query("SELECT * FROM cached_songs WHERE (isDownloaded = 1 OR localFilePath IS NOT NULL) AND (title LIKE '%' || :query || '%' OR artist LIKE '%' || :query || '%') ORDER BY cachedAt DESC")
+    suspend fun searchDownloadedSongs(query: String): List<SongEntity>
+
     @Query("SELECT * FROM cached_songs ORDER BY cachedAt DESC LIMIT 100")
     fun getAllCachedSongs(): Flow<List<SongEntity>>
 

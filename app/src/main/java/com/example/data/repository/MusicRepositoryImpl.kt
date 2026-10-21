@@ -59,7 +59,8 @@ class MusicRepositoryImpl(
             autoSkipFailedTracks = prefs.getBoolean("auto_skip_failed", true),
             autoplayEnabled = prefs.getBoolean("autoplay_enabled", true),
             customApiBaseUrl = prefs.getString("custom_api_url", "") ?: "",
-            apiProvider = prefs.getString("api_provider", "auto") ?: "auto"
+            apiProvider = prefs.getString("api_provider", "auto") ?: "auto",
+            isPureOfflineMode = prefs.getBoolean("is_pure_offline", false)
         )
     }
 
@@ -114,6 +115,9 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun searchSongs(query: String): List<Song> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext searchOffline(query)
+        }
         val provider = _userSettingsFlow.value.provider
         when (provider) {
             MusicProvider.SOUNDCLOUD -> {
@@ -162,6 +166,10 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun searchAll(query: String): SearchResults = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            val offline = searchOffline(query)
+            return@withContext SearchResults(songs = offline)
+        }
         val provider = _userSettingsFlow.value.provider
 
         if (provider == MusicProvider.SOUNDCLOUD) {
@@ -204,6 +212,10 @@ class MusicRepositoryImpl(
         }
 
         searchJioSaavnAndSoundCloudAll(query)
+    }
+
+    override suspend fun searchOffline(query: String): List<Song> = withContext(Dispatchers.IO) {
+        songDao.searchDownloadedSongs(query).map { it.toDomain() }
     }
 
     override fun getRecentSearches(): Flow<List<String>> = recentSearchDao.getRecentSearches().map { list -> list.map { it.query } }
@@ -1382,6 +1394,7 @@ class MusicRepositoryImpl(
             .putBoolean("autoplay_enabled", settings.autoplayEnabled)
             .putString("custom_api_url", settings.customApiBaseUrl)
             .putString("api_provider", settings.apiProvider)
+            .putBoolean("is_pure_offline", settings.isPureOfflineMode)
             .apply()
         _userSettingsFlow.value = settings
     }

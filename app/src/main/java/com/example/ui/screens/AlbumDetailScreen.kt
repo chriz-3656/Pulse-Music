@@ -22,6 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -179,23 +182,74 @@ fun AlbumDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        SkeuoTactileButton(
-                            onClick = { viewModel.playAlbum() },
-                            shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(42.dp)
-                                .testTag("album_play_button")
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.PlayArrow,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("PLAY FULL ALBUM", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            SkeuoTactileButton(
+                                onClick = { viewModel.playAlbum() },
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(42.dp)
+                                    .testTag("album_play_button")
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.PlayArrow,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("PLAY ALBUM", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, letterSpacing = 1.sp)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            SkeuoTactileButton(
+                                onClick = {
+                                    if (uiState.isAllDownloaded) {
+                                        viewModel.removeAllDownloads()
+                                    } else if (!uiState.isDownloadingAll) {
+                                        viewModel.downloadAllSongs()
+                                    }
+                                },
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.height(42.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp)) {
+                                    if (uiState.isDownloadingAll) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(14.dp),
+                                            strokeWidth = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = uiState.downloadProgressText ?: "DOWNLOADING",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 10.sp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    } else if (uiState.isAllDownloaded) {
+                                        Icon(
+                                            imageVector = Icons.Filled.DownloadDone,
+                                            contentDescription = "Downloaded",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("OFFLINE", fontWeight = FontWeight.Bold, fontSize = 10.sp, color = MaterialTheme.colorScheme.primary)
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Filled.Download,
+                                            contentDescription = "Download All",
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("DOWNLOAD", fontWeight = FontWeight.Bold, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                }
                             }
                         }
 

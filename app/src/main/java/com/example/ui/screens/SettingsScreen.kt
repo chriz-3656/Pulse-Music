@@ -392,6 +392,37 @@ fun SettingsScreen(
                             )
                         )
                     }
+
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), modifier = Modifier.padding(vertical = 10.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Pure Offline Mode",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Text(
+                                text = "Filter app to downloaded & cached tracks only (flight mode & zero data)",
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = uiState.userSettings.isPureOfflineMode,
+                            onCheckedChange = { viewModel.setPureOfflineMode(it) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.background,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.background
+                            ),
+                            modifier = Modifier.testTag("pure_offline_switch")
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

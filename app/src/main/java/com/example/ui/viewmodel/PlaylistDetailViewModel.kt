@@ -8,6 +8,7 @@ import com.example.domain.model.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,7 +18,10 @@ import kotlinx.coroutines.launch
 data class PlaylistUiState(
     val playlist: Playlist? = null,
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isDownloadingAll: Boolean = false,
+    val downloadProgressText: String? = null,
+    val isAllDownloaded: Boolean = false
 )
 
 class PlaylistDetailViewModel(
@@ -41,10 +45,57 @@ class PlaylistDetailViewModel(
             val result = repository.getPlaylistDetails(playlistId)
             val playlist = result.getOrNull()
             if (playlist != null) {
-                _uiState.update { it.copy(playlist = playlist, isLoading = false) }
+                try {
+                    val downloadedSongs = appContainer.manageDownloadsUseCase.getDownloaded().first()
+                    val downloadedIds = downloadedSongs.map { it.id }.toSet()
+                    val allDown = playlist.songs.isNotEmpty() && playlist.songs.all { it.id in downloadedIds || it.isDownloaded }
+                    _uiState.update { it.copy(playlist = playlist, isLoading = false, isAllDownloaded = allDown) }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(playlist = playlist, isLoading = false) }
+                }
             } else {
                 _uiState.update { it.copy(isLoading = false, errorMessage = "Playlist not found") }
             }
+        }
+    }
+
+    fun downloadAllSongs() {
+        val playlist = _uiState.value.playlist ?: return
+        if (playlist.songs.isEmpty()) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDownloadingAll = true) }
+            val total = playlist.songs.size
+            var completed = 0
+            for ((index, song) in playlist.songs.withIndex()) {
+                _uiState.update { it.copy(downloadProgressText = "${index + 1}/$total") }
+                try {
+                    appContainer.manageDownloadsUseCase.download(song)
+                    completed++
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            _uiState.update {
+                it.copy(
+                    isDownloadingAll = false,
+                    downloadProgressText = null,
+                    isAllDownloaded = completed == total
+                )
+            }
+        }
+    }
+
+    fun removeAllDownloads() {
+        val playlist = _uiState.value.playlist ?: return
+        viewModelScope.launch {
+            for (song in playlist.songs) {
+                try {
+                    appContainer.manageDownloadsUseCase.remove(song.id)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            _uiState.update { it.copy(isAllDownloaded = false) }
         }
     }
 

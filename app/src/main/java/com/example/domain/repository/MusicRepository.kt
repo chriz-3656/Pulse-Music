@@ -26,6 +26,7 @@ interface MusicRepository {
     // Search
     suspend fun searchSongs(query: String): List<Song>
     suspend fun searchAll(query: String): SearchResults
+    suspend fun searchOffline(query: String): List<Song>
     suspend fun getSearchSuggestions(query: String): List<String>
     fun getRecentSearches(): Flow<List<String>>
     suspend fun saveSearchQuery(query: String)

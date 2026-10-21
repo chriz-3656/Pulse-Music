@@ -8,6 +8,7 @@ import com.example.domain.model.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,7 +18,10 @@ import kotlinx.coroutines.launch
 data class AlbumUiState(
     val album: Album? = null,
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isDownloadingAll: Boolean = false,
+    val downloadProgressText: String? = null,
+    val isAllDownloaded: Boolean = false
 )
 
 class AlbumDetailViewModel(
@@ -41,10 +45,57 @@ class AlbumDetailViewModel(
             val result = repository.getAlbumDetails(albumId)
             val album = result.getOrNull()
             if (album != null) {
-                _uiState.update { it.copy(album = album, isLoading = false) }
+                try {
+                    val downloadedSongs = appContainer.manageDownloadsUseCase.getDownloaded().first()
+                    val downloadedIds = downloadedSongs.map { it.id }.toSet()
+                    val allDown = album.songs.isNotEmpty() && album.songs.all { it.id in downloadedIds || it.isDownloaded }
+                    _uiState.update { it.copy(album = album, isLoading = false, isAllDownloaded = allDown) }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(album = album, isLoading = false) }
+                }
             } else {
                 _uiState.update { it.copy(isLoading = false, errorMessage = "Album not found") }
             }
+        }
+    }
+
+    fun downloadAllSongs() {
+        val album = _uiState.value.album ?: return
+        if (album.songs.isEmpty()) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDownloadingAll = true) }
+            val total = album.songs.size
+            var completed = 0
+            for ((index, song) in album.songs.withIndex()) {
+                _uiState.update { it.copy(downloadProgressText = "${index + 1}/$total") }
+                try {
+                    appContainer.manageDownloadsUseCase.download(song)
+                    completed++
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            _uiState.update {
+                it.copy(
+                    isDownloadingAll = false,
+                    downloadProgressText = null,
+                    isAllDownloaded = completed == total
+                )
+            }
+        }
+    }
+
+    fun removeAllDownloads() {
+        val album = _uiState.value.album ?: return
+        viewModelScope.launch {
+            for (song in album.songs) {
+                try {
+                    appContainer.manageDownloadsUseCase.remove(song.id)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            _uiState.update { it.copy(isAllDownloaded = false) }
         }
     }
 

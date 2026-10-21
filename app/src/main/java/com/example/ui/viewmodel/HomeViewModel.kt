@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,7 +27,8 @@ data class HomeUiState(
     val featuredPlaylists: List<Playlist> = emptyList(),
     val moodPlaylists: List<Playlist> = emptyList(),
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isPureOfflineMode: Boolean = false
 )
 
 class HomeViewModel(
@@ -39,6 +41,15 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            appContainer.musicRepository.getUserSettings().collectLatest { settings ->
+                val prevOffline = _uiState.value.isPureOfflineMode
+                _uiState.update { it.copy(isPureOfflineMode = settings.isPureOfflineMode) }
+                if (prevOffline != settings.isPureOfflineMode) {
+                    loadData()
+                }
+            }
+        }
         loadData()
     }
 
@@ -46,6 +57,21 @@ class HomeViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
+                val settings = appContainer.musicRepository.getUserSettings().first()
+                if (settings.isPureOfflineMode) {
+                    launch {
+                        appContainer.manageDownloadsUseCase.getDownloaded().collectLatest { downloaded ->
+                            _uiState.update {
+                                it.copy(
+                                    trendingSongs = downloaded,
+                                    quickPicks = downloaded.shuffled(),
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    }
+                    return@launch
+                }
                 launch {
                     getRecommendationsUseCase.getTrending().catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }.collectLatest { songs ->
                         _uiState.update { it.copy(trendingSongs = songs, isLoading = false) }

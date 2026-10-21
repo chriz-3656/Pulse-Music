@@ -114,6 +114,13 @@ class SettingsViewModel(
         }
     }
 
+    fun setPureOfflineMode(enabled: Boolean) {
+        val updated = _uiState.value.userSettings.copy(isPureOfflineMode = enabled)
+        viewModelScope.launch {
+            manageSettingsUseCase.updateSettings(updated)
+        }
+    }
+
     fun toggleAutoSkip(autoSkip: Boolean) {
         val updated = _uiState.value.userSettings.copy(autoSkipFailedTracks = autoSkip)
         viewModelScope.launch {

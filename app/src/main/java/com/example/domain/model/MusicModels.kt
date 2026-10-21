@@ -174,7 +174,8 @@ data class UserSettings(
     val autoSkipFailedTracks: Boolean = true,
     val autoplayEnabled: Boolean = true,
     val customApiBaseUrl: String = "",
-    val apiProvider: String = "youtube"
+    val apiProvider: String = "youtube",
+    val isPureOfflineMode: Boolean = false
 ) {
     val provider: MusicProvider get() = MusicProvider.fromId(apiProvider)
 }

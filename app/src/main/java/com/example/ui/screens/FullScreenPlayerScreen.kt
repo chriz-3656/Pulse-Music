@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -56,6 +57,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,6 +81,7 @@ import com.example.domain.model.RepeatMode
 import com.example.domain.model.Song
 import com.example.ui.components.AnalogVUMeter
 import com.example.ui.components.LcdBadge
+import com.example.ui.components.LyricStoryPreviewDialog
 import com.example.ui.components.QualityBadge
 import com.example.ui.components.SyncedLyricsView
 import com.example.ui.components.SkeuoBevelCard
@@ -700,8 +703,7 @@ fun FullScreenPlayerScreen(
                 lyrics = uiState.lyrics,
                 isLoading = uiState.lyricsLoading,
                 currentPositionMs = playerState.currentPositionMs,
-                songTitle = song.title,
-                artist = song.artist,
+                song = song,
                 onSeekTo = { pos -> viewModel.seekTo(pos) },
                 onClose = { viewModel.toggleLyrics() }
             )
@@ -828,11 +830,14 @@ private fun LyricsSheetContent(
     lyrics: String?,
     isLoading: Boolean,
     currentPositionMs: Long,
-    songTitle: String,
-    artist: String,
+    song: Song,
     onSeekTo: (Long) -> Unit,
     onClose: () -> Unit
 ) {
+    var isSelectionMode by remember { mutableStateOf(false) }
+    val selectedIndices = remember { mutableStateListOf<Int>() }
+    var showPreviewDialog by remember { mutableStateOf(false) }
+
     val parsedLines = remember(lyrics) {
         if (!lyrics.isNullOrBlank()) {
             com.example.ui.components.parseLrc(lyrics)
@@ -851,8 +856,8 @@ private fun LyricsSheetContent(
     }
     if (activeIndex == -1 && parsedLines.isNotEmpty()) activeIndex = 0
 
-    LaunchedEffect(activeIndex) {
-        if (activeIndex >= 0 && activeIndex < parsedLines.size) {
+    LaunchedEffect(activeIndex, isSelectionMode) {
+        if (!isSelectionMode && activeIndex >= 0 && activeIndex < parsedLines.size) {
             listState.animateScrollToItem(maxOf(0, activeIndex - 2))
         }
     }
@@ -868,9 +873,9 @@ private fun LyricsSheetContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "LYRICS TELEPROMPTER",
+                    text = if (isSelectionMode) "SELECT LYRICS FOR STORY" else "LYRICS TELEPROMPTER",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -878,13 +883,33 @@ private fun LyricsSheetContent(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "$songTitle • $artist",
+                    text = if (isSelectionMode) "${selectedIndices.size}/5 lines selected" else "${song.title} • ${song.artist}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!lyrics.isNullOrBlank() && !isLoading && parsedLines.isNotEmpty()) {
+                    SkeuoTactileButton(
+                        onClick = {
+                            isSelectionMode = !isSelectionMode
+                            if (!isSelectionMode) selectedIndices.clear()
+                        },
+                        modifier = Modifier.height(34.dp).padding(end = 8.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = if (isSelectionMode) "CANCEL" else "STORY CARD",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = if (isSelectionMode) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
 
@@ -918,9 +943,41 @@ private fun LyricsSheetContent(
                     ) {
                         itemsIndexed(parsedLines, key = { index, line -> "$index-${line.timestampMs}" }) { index, line ->
                             val isActive = index == activeIndex
+                            val isSelected = selectedIndices.contains(index)
+                            val itemModifier = if (isSelectionMode) {
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp, horizontal = 12.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(
+                                        if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                        else Color.Transparent
+                                    )
+                                    .border(
+                                        width = if (isSelected) 1.5.dp else 1.dp,
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .clickable {
+                                        if (isSelected) {
+                                            selectedIndices.remove(index)
+                                        } else {
+                                            if (selectedIndices.size < 5) {
+                                                selectedIndices.add(index)
+                                            }
+                                        }
+                                    }
+                                    .padding(vertical = 10.dp, horizontal = 14.dp)
+                            } else {
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 12.dp)
+                                    .clickable { onSeekTo(line.timestampMs) }
+                            }
+
                             Text(
                                 text = line.text,
-                                style = if (isActive) {
+                                style = if (isActive && !isSelectionMode) {
                                     MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 17.sp,
@@ -932,16 +989,15 @@ private fun LyricsSheetContent(
                                         lineHeight = 22.sp
                                     )
                                 },
-                                color = if (isActive) {
+                                color = if (isSelected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else if (isActive && !isSelectionMode) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
                                 },
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp, horizontal = 12.dp)
-                                    .clickable { onSeekTo(line.timestampMs) }
+                                modifier = itemModifier
                             )
                         }
                     }
@@ -963,6 +1019,59 @@ private fun LyricsSheetContent(
                         }
                     }
                 }
+            }
+        }
+
+        if (isSelectionMode) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${selectedIndices.size} of 5 selected",
+                    style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                SkeuoTactileButton(
+                    onClick = {
+                        if (selectedIndices.isNotEmpty()) {
+                            showPreviewDialog = true
+                        }
+                    },
+                    modifier = Modifier.height(38.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = null,
+                            tint = if (selectedIndices.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "PREVIEW CARD",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = if (selectedIndices.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+            }
+        }
+
+        if (showPreviewDialog) {
+            val selectedTexts = selectedIndices.sorted().mapNotNull { idx ->
+                parsedLines.getOrNull(idx)?.text?.takeIf { it.isNotBlank() }
+            }
+            if (selectedTexts.isNotEmpty()) {
+                LyricStoryPreviewDialog(
+                    song = song,
+                    selectedLyrics = selectedTexts,
+                    onDismiss = { showPreviewDialog = false }
+                )
             }
         }
     }
