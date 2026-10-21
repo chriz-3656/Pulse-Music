@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.6.1] - 2026-10-21
+### Fixed
+- **Mid-Playback Song Selection Position Carryover:** Fixed bug where selecting a new song while another song was playing in the middle caused the new song to start at the previous song's elapsed time instead of 0:00. Now halts previous playback and resets progress immediately upon selection.
+- **Song Selection Pause Glitch:** Fixed bug where selecting a song would resolve the stream and then enter a paused state, requiring a second tap on the play button. `playWhenReady` is now explicitly set to `true` upon track selection.
+- **Continuous Play Provider Switching:** Fixed bug where auto-advance and continuous play recommendations changed and switched between providers (YouTube, JioSaavn, SoundCloud). Recommendation engine and stream resolution now strictly respect the user's configured provider.
+- **Queue Pre-Filling & Upcoming Songs:** Fixed bug where the upcoming song queue failed to pre-populate. Proactively pre-fetches and fills upcoming suggestions whenever 3 or fewer tracks remain in the queue and eagerly populates when the Queue bottom sheet is opened.
+- **Dynamic Cache Evictor Infinite Loop:** Fixed potential deadlock and infinite loop in `DynamicCacheEvictor` when span removal failed due to locked cache files.
+- **Jam Ghost Participants & Vote-Skip Threshold:** Added Firebase `.onDisconnect().removeValue()` to participant references so disconnected listeners are automatically removed and do not block 50% vote-skip consensus.
+- **OkHttp Socket Descriptor Leak:** Wrapped download HTTP execution in `TrackDownloadManager` with `response.use { }` to prevent connection leaks during track downloads.
+- **HttpURLConnection Descriptor Leaks:** Enforced safe stream reading and `.disconnect()` calls across JioSaavn stream resolution.
+
+### Added
+- **Multi-Line Synchronized Lyrics Teleprompter:** Upgraded the Lyrics Bottom Sheet from a raw LRC dump into a full interactive, auto-scrolling teleprompter with active sung line highlighting in glowing amber and click-to-seek functionality.
+- **Workspace Agent Skills:** Integrated specialized skills for Media3 ExoPlayer streaming, Jetpack Compose UI, Clean Architecture, and GitHub Actions CI/CD.
+
 ## [2.6.0] - 2026-10-18
 ### Added
 - **Global Track Context Menu & "Add to Playlist" Dialog:** Seamlessly add any track from Search, Home, or Library directly into custom playlists via the new interactive dialog.

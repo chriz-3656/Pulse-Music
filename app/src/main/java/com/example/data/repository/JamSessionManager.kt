@@ -43,6 +43,7 @@ class JamSessionManager {
         )
         
         roomRef.setValue(newRoom).await()
+        roomRef.child("participants").child(currentUserId).onDisconnect().removeValue()
         return roomCode
     }
 
@@ -50,6 +51,7 @@ class JamSessionManager {
         if (currentUserId.isEmpty()) authenticateAnonymously()
         val participantRef = database.child("rooms").child(roomCode).child("participants").child(currentUserId)
         participantRef.setValue(com.example.domain.model.JamParticipant(name = guestName, isHost = false)).await()
+        participantRef.onDisconnect().removeValue()
     }
 
     suspend fun leaveRoom(roomCode: String) {

@@ -143,6 +143,9 @@ class PlayerViewModel(
 
     fun toggleQueueSheet(show: Boolean) {
         _uiState.update { it.copy(showQueueSheet = show) }
+        if (show) {
+            playerController.ensureUpcomingQueueFilled()
+        }
     }
 
     fun toggleLyricsSheet(show: Boolean) {
@@ -150,7 +153,11 @@ class PlayerViewModel(
     }
 
     fun toggleQueue() {
-        _uiState.update { it.copy(showQueueSheet = !it.showQueueSheet) }
+        val willShow = !_uiState.value.showQueueSheet
+        _uiState.update { it.copy(showQueueSheet = willShow) }
+        if (willShow) {
+            playerController.ensureUpcomingQueueFilled()
+        }
     }
 
     fun toggleLyrics() {

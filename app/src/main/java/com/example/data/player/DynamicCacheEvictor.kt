@@ -52,10 +52,13 @@ class DynamicCacheEvictor(private var maxBytes: Long) : CacheEvictor {
 
     private fun evictCache(cache: Cache, requiredSpace: Long) {
         while (currentSize + requiredSpace > maxBytes && !leastRecentlyUsed.isEmpty()) {
+            val toRemove = leastRecentlyUsed.first()
             try {
-                cache.removeSpan(leastRecentlyUsed.first())
+                cache.removeSpan(toRemove)
             } catch (e: Cache.CacheException) {
-                // Ignore.
+                // Remove from in-memory tracking if cache removal threw to prevent infinite loop
+                leastRecentlyUsed.remove(toRemove)
+                currentSize -= toRemove.length
             }
         }
     }

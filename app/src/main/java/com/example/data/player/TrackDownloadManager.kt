@@ -71,19 +71,21 @@ class TrackDownloadManager(
             }
 
             val response = okHttpClient.newCall(requestBuilder.build()).execute()
-            if (!response.isSuccessful) {
-                Log.e(TAG, "Download failed with HTTP ${response.code} for ${song.title}")
-                return@withContext Result.failure(IOException("HTTP ${response.code} downloading track"))
-            }
+            response.use { resp ->
+                if (!resp.isSuccessful) {
+                    Log.e(TAG, "Download failed with HTTP ${resp.code} for ${song.title}")
+                    return@withContext Result.failure(IOException("HTTP ${resp.code} downloading track"))
+                }
 
-            val body = response.body ?: return@withContext Result.failure(IOException("Empty response body"))
-            
-            // Clean up any stale temp file
-            if (tempFile.exists()) tempFile.delete()
+                val body = resp.body ?: return@withContext Result.failure(IOException("Empty response body"))
+                
+                // Clean up any stale temp file
+                if (tempFile.exists()) tempFile.delete()
 
-            body.byteStream().use { input ->
-                FileOutputStream(tempFile).use { output ->
-                    input.copyTo(output, bufferSize = 64 * 1024)
+                body.byteStream().use { input ->
+                    FileOutputStream(tempFile).use { output ->
+                        input.copyTo(output, bufferSize = 64 * 1024)
+                    }
                 }
             }
 

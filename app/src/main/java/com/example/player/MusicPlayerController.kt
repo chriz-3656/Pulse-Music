@@ -127,13 +127,13 @@ class MusicPlayerController(
 
         // If playing a single track (radio mode) or near queue end, proactively pre-fetch suggestions
         if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null)) {
-            if (queue.size == 1 || index >= queue.size - 1) {
+            if (queue.size <= 1 || (queue.size - index) <= 3) {
                 scope.launch {
                     try {
                         val suggestions = fetchSuggestionsForSong(song)
                         if (suggestions.isNotEmpty()) {
                             val current = _playerState.value
-                            if (current.currentSong?.id == song.id) {
+                            if (current.currentSong?.id == song.id || current.currentSong?.title.equals(song.title, ignoreCase = true)) {
                                 val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
                                 if (filtered.isNotEmpty()) {
                                     _playerState.update { it.copy(queue = current.queue + filtered) }
@@ -315,8 +315,8 @@ class MusicPlayerController(
         }
         onServiceCommand?.invoke(ServiceAction.PlayTrack(nextSong, state.queue, nextIndex))
 
-        // Pre-fetch suggestions when approaching the end of the queue
-        if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null) && nextIndex >= state.queue.size - 2) {
+        // Pre-fetch suggestions when approaching the end of the queue (3 or fewer songs left)
+        if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null) && (state.queue.size - nextIndex) <= 3) {
             scope.launch {
                 try {
                     val suggestions = fetchSuggestionsForSong(nextSong)
@@ -324,6 +324,27 @@ class MusicPlayerController(
                     val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
                     if (filtered.isNotEmpty()) {
                         _playerState.update { it.copy(queue = current.queue + filtered) }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    fun ensureUpcomingQueueFilled() {
+        val state = _playerState.value
+        val song = state.currentSong ?: return
+        if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null) && (state.queue.size - state.currentIndex) <= 3) {
+            scope.launch {
+                try {
+                    val suggestions = fetchSuggestionsForSong(song)
+                    if (suggestions.isNotEmpty()) {
+                        val current = _playerState.value
+                        val filtered = suggestions.filter { sug -> current.queue.none { it.id == sug.id } }
+                        if (filtered.isNotEmpty()) {
+                            _playerState.update { it.copy(queue = current.queue + filtered) }
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

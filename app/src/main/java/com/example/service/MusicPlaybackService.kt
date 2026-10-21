@@ -235,7 +235,7 @@ class MusicPlaybackService : Service() {
                 exoPlayer.repeatMode = when (action.mode) {
                     RepeatMode.OFF -> Player.REPEAT_MODE_OFF
                     RepeatMode.ONE -> Player.REPEAT_MODE_ONE
-                    RepeatMode.ALL -> Player.REPEAT_MODE_OFF
+                    RepeatMode.ALL -> Player.REPEAT_MODE_ALL
                 }
             }
             is ServiceAction.ReloadStreamWithQuality -> {
@@ -267,6 +267,15 @@ class MusicPlaybackService : Service() {
     }
 
     private fun playTrack(song: Song) {
+        // Immediately halt current playback and progress polling on Main thread
+        stopProgressPolling()
+        try {
+            exoPlayer.stop()
+            exoPlayer.clearMediaItems()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        playerController.updateProgress(0L, song.duration, 0L)
         playerController.updatePlaybackState(isPlaying = true, isBuffering = true, error = null)
 
         serviceScope.launch(Dispatchers.IO) {
@@ -371,19 +380,13 @@ class MusicPlaybackService : Service() {
                             .build()
 
                         exoPlayer.setMediaItem(mediaItem)
-
-                        val currentState = playerController.playerState.value
-                        if (currentState.currentPositionMs > 0L) {
-                            exoPlayer.seekTo(currentState.currentPositionMs)
-                        }
-
-                        exoPlayer.playWhenReady = currentState.isPlaying
+                        exoPlayer.seekTo(0L) // Newly selected songs always begin at 0:00
+                        exoPlayer.playWhenReady = true // Explicitly trigger playback on selection
                         exoPlayer.prepare()
-                        if (currentState.isPlaying) {
-                            exoPlayer.play()
-                        } else {
-                            exoPlayer.pause()
-                        }
+                        exoPlayer.play()
+
+                        playerController.updateProgress(0L, activeSong.duration, 0L)
+                        playerController.updatePlaybackState(isPlaying = true, isBuffering = true, error = null)
 
                         loadArtwork(activeSong.artworkUrl)
                         updateMediaMetadata(activeSong)
@@ -403,6 +406,11 @@ class MusicPlaybackService : Service() {
                 }
             } finally {
                 if (fetchWakeLock?.isHeld == true) {
+                    fetchWakeLock?.release()
+                }
+            }
+        }
+    }
                     fetchWakeLock?.release()
                 }
             }
@@ -499,7 +507,7 @@ class MusicPlaybackService : Service() {
                     
                     if (dur > 0) {
                         playerController.playerState.value.currentSong?.let { song ->
-                            if (song.duration <= 0L || song.duration == 210000L || song.duration != dur) {
+                            if ((song.duration <= 0L || song.duration == 210000L) && song.duration != dur) {
                                 playerController.updateCurrentSongDuration(dur)
                                 serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                     musicRepository.updateSongDuration(song.id, dur)

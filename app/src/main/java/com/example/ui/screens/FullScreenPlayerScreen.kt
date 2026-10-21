@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,6 +52,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -696,8 +699,10 @@ fun FullScreenPlayerScreen(
             LyricsSheetContent(
                 lyrics = uiState.lyrics,
                 isLoading = uiState.lyricsLoading,
+                currentPositionMs = playerState.currentPositionMs,
                 songTitle = song.title,
                 artist = song.artist,
+                onSeekTo = { pos -> viewModel.seekTo(pos) },
                 onClose = { viewModel.toggleLyrics() }
             )
         }
@@ -822,10 +827,36 @@ private fun QueueSheetContent(
 private fun LyricsSheetContent(
     lyrics: String?,
     isLoading: Boolean,
+    currentPositionMs: Long,
     songTitle: String,
     artist: String,
+    onSeekTo: (Long) -> Unit,
     onClose: () -> Unit
 ) {
+    val parsedLines = remember(lyrics) {
+        if (!lyrics.isNullOrBlank()) {
+            com.example.ui.components.parseLrc(lyrics)
+        } else emptyList()
+    }
+
+    val listState = rememberLazyListState()
+
+    var activeIndex = -1
+    for (i in parsedLines.indices) {
+        if (currentPositionMs >= parsedLines[i].timestampMs) {
+            activeIndex = i
+        } else {
+            break
+        }
+    }
+    if (activeIndex == -1 && parsedLines.isNotEmpty()) activeIndex = 0
+
+    LaunchedEffect(activeIndex) {
+        if (activeIndex >= 0 && activeIndex < parsedLines.size) {
+            listState.animateScrollToItem(maxOf(0, activeIndex - 2))
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -839,7 +870,7 @@ private fun LyricsSheetContent(
         ) {
             Column {
                 Text(
-                    text = "LYRICS DISPLAY",
+                    text = "LYRICS TELEPROMPTER",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -862,7 +893,7 @@ private fun LyricsSheetContent(
         SkeuoBevelCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(360.dp),
+                .height(380.dp),
             isRecessed = true
         ) {
             Box(
@@ -879,8 +910,46 @@ private fun LyricsSheetContent(
                         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                } else if (parsedLines.isNotEmpty()) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 40.dp)
+                    ) {
+                        itemsIndexed(parsedLines, key = { index, line -> "$index-${line.timestampMs}" }) { index, line ->
+                            val isActive = index == activeIndex
+                            Text(
+                                text = line.text,
+                                style = if (isActive) {
+                                    MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 17.sp,
+                                        lineHeight = 26.sp
+                                    )
+                                } else {
+                                    MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = 14.sp,
+                                        lineHeight = 22.sp
+                                    )
+                                },
+                                color = if (isActive) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
+                                },
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 12.dp)
+                                    .clickable { onSeekTo(line.timestampMs) }
+                            )
+                        }
+                    }
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                    ) {
                         item {
                             Text(
                                 text = lyrics,
@@ -889,7 +958,7 @@ private fun LyricsSheetContent(
                                 ),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().padding(16.dp)
                             )
                         }
                     }

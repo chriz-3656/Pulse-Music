@@ -344,98 +344,151 @@ class MusicRepositoryImpl(
         val album = song.album.trim()
         val provider = _userSettingsFlow.value.provider
 
-        // 1. SoundCloud seed
-        if (provider == MusicProvider.SOUNDCLOUD || seedId.startsWith("sc_")) {
-            val scRadio = SoundCloudClient.getRelatedTracks(seedId, 15)
-            if (scRadio.isNotEmpty()) list.addAll(scRadio)
-        }
-
-        // 2. JioSaavn / Regional Engine (Matches regional language e.g. Malayalam, Tamil, Hindi, Telugu, Punjabi)
-        var detectedLang: String? = null
-        if (list.isEmpty()) {
-            val saavnCleanId = seedId.removePrefix("sc_")
-            // If already a JioSaavn ID (non-numeric or non-11 YouTube ID)
-            if (saavnCleanId.isNotBlank() && (saavnCleanId.contains("_") || saavnCleanId.length != 11)) {
-                val directJio = fetchJioSaavnRadioTracks(saavnCleanId)
-                if (directJio.isNotEmpty()) {
-                    list.addAll(directJio)
+        // Strict provider-respecting recommendation routing to prevent unintended provider switching
+        when (provider) {
+            MusicProvider.SOUNDCLOUD -> {
+                val scRadio = SoundCloudClient.getRelatedTracks(seedId, 15)
+                if (scRadio.isNotEmpty()) list.addAll(scRadio)
+                if (list.isEmpty()) {
+                    val scSearch = searchSoundCloudSongs(if (artist.isNotBlank()) "$title $artist" else title)
+                    if (scSearch.isNotEmpty()) list.addAll(scSearch)
                 }
             }
+            MusicProvider.YOUTUBE -> {
+                try {
+                    val ytId = if (seedId.length == 11 && !seedId.contains("_") && !seedId.startsWith("sc_")) {
+                        seedId
+                    } else if (title.isNotBlank()) {
+                        val query = if (artist.isNotBlank()) "$title $artist" else title
+                        val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                        searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.firstOrNull()?.id
+                    } else null
 
-            // Resolve on JioSaavn using title + artist to discover native curated radio & language
-            if (list.isEmpty() && title.isNotBlank()) {
-                val resolved = resolveJioSaavnSong(title, artist)
-                if (resolved != null) {
-                    val (jioId, lang) = resolved
-                    detectedLang = lang
-                    val reco = fetchJioSaavnRadioTracks(jioId, targetLanguage = lang)
-                    if (reco.isNotEmpty()) {
-                        list.addAll(reco)
+                    if (ytId != null) {
+                        val radio = api.SongRadio.getSongRadio(ytId, null).getOrNull()
+                        val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
+                        if (ytmSongs.isNotEmpty()) {
+                            list.addAll(ytmSongs)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
+                    try {
+                        val query = if (artist.isNotBlank()) "$title $artist radio" else title
+                        val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                        val similarSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                        list.addAll(similarSongs)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }
-        }
-
-        // 3. YouTube Music Radio (for Western, Pop, YouTube tracks or if JioSaavn returned no matches)
-        if (list.isEmpty() && (provider == MusicProvider.YOUTUBE || provider == MusicProvider.AUTO)) {
-            try {
-                val ytId = if (seedId.length == 11 && !seedId.contains("_") && !seedId.startsWith("sc_")) {
-                    seedId
-                } else if (title.isNotBlank()) {
+            MusicProvider.JIOSAAVN -> {
+                val saavnCleanId = seedId.removePrefix("sc_")
+                if (saavnCleanId.isNotBlank() && (saavnCleanId.contains("_") || saavnCleanId.length != 11)) {
+                    val directJio = fetchJioSaavnRadioTracks(saavnCleanId)
+                    if (directJio.isNotEmpty()) list.addAll(directJio)
+                }
+                if (list.isEmpty() && title.isNotBlank()) {
+                    val resolved = resolveJioSaavnSong(title, artist)
+                    if (resolved != null) {
+                        val (jioId, lang) = resolved
+                        val reco = fetchJioSaavnRadioTracks(jioId, targetLanguage = lang)
+                        if (reco.isNotEmpty()) list.addAll(reco)
+                    }
+                }
+                if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
                     val query = if (artist.isNotBlank()) "$title $artist" else title
-                    val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
-                    searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.firstOrNull()?.id
-                } else null
+                    list.addAll(searchJioSaavnSongs(query))
+                }
+            }
+            MusicProvider.AUTO -> {
+                var detectedLang: String? = null
+                if (seedId.startsWith("sc_")) {
+                    val scRadio = SoundCloudClient.getRelatedTracks(seedId, 15)
+                    if (scRadio.isNotEmpty()) list.addAll(scRadio)
+                }
 
-                if (ytId != null) {
-                    val radio = api.SongRadio.getSongRadio(ytId, null).getOrNull()
-                    val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
-                    if (ytmSongs.isNotEmpty()) {
-                        list.addAll(ytmSongs)
+                // If seed has a regional / JioSaavn signature
+                if (list.isEmpty()) {
+                    val saavnCleanId = seedId.removePrefix("sc_")
+                    if (saavnCleanId.isNotBlank() && (saavnCleanId.contains("_") || saavnCleanId.length != 11)) {
+                        val directJio = fetchJioSaavnRadioTracks(saavnCleanId)
+                        if (directJio.isNotEmpty()) list.addAll(directJio)
                     }
+                    if (list.isEmpty() && title.isNotBlank()) {
+                        val resolved = resolveJioSaavnSong(title, artist)
+                        if (resolved != null) {
+                            val (jioId, lang) = resolved
+                            detectedLang = lang
+                            val reco = fetchJioSaavnRadioTracks(jioId, targetLanguage = lang)
+                            if (reco.isNotEmpty()) list.addAll(reco)
+                        }
+                    }
+                }
+
+                // YouTube Music fallback
+                if (list.isEmpty()) {
+                    try {
+                        val ytId = if (seedId.length == 11 && !seedId.contains("_") && !seedId.startsWith("sc_")) {
+                            seedId
+                        } else if (title.isNotBlank()) {
+                            val query = if (artist.isNotBlank()) "$title $artist" else title
+                            val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                            searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.firstOrNull()?.id
+                        } else null
+
+                        if (ytId != null) {
+                            val radio = api.SongRadio.getSongRadio(ytId, null).getOrNull()
+                            val ytmSongs = radio?.items?.map { it.toDomain() } ?: emptyList()
+                            if (ytmSongs.isNotEmpty()) list.addAll(ytmSongs)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                // Contextual fallback
+                if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
+                    if (album.isNotBlank() && !album.equals("single", ignoreCase = true) && !album.equals("unknown", ignoreCase = true)) {
+                        try {
+                            val albumQuery = if (detectedLang != null) "$album $detectedLang" else album
+                            val albumTracks = searchJioSaavnSongs(albumQuery)
+                            if (albumTracks.isNotEmpty()) list.addAll(albumTracks)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    if (list.isEmpty()) {
+                        try {
+                            val query = if (detectedLang != null) "$title $artist $detectedLang" else if (artist.isNotBlank()) "$title $artist radio" else title
+                            val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                            val similarSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                            list.addAll(similarSongs)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+        }
+
+        // Global fallback across any provider so the upcoming queue is NEVER empty
+        if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
+            try {
+                val query = if (artist.isNotBlank()) "$title $artist" else title
+                val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
+                val fallbackSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
+                if (fallbackSongs.isNotEmpty()) {
+                    list.addAll(fallbackSongs)
+                } else {
+                    list.addAll(searchJioSaavnSongs(query))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-            }
-        }
-
-        // 4. Intelligent Contextual Fallback (Avoid artist-only monopolization)
-        if (list.isEmpty() && (title.isNotBlank() || artist.isNotBlank())) {
-            // Priority A: If album is known and not "Single" / "Unknown" (same soundtrack/album guarantees genre & language match)
-            if (album.isNotBlank() && !album.equals("single", ignoreCase = true) && !album.equals("unknown", ignoreCase = true)) {
-                try {
-                    val albumQuery = if (detectedLang != null) "$album $detectedLang" else album
-                    val albumTracks = searchJioSaavnSongs(albumQuery)
-                    if (albumTracks.isNotEmpty()) {
-                        list.addAll(albumTracks)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            // Priority B: Search related songs by title + artist (+ language if known)
-            if (list.isEmpty()) {
-                try {
-                    val query = if (detectedLang != null) {
-                        "$title $artist $detectedLang"
-                    } else if (artist.isNotBlank()) {
-                        "$title $artist radio"
-                    } else {
-                        title
-                    }
-                    val searchRes = api.Search.search(query, dev.toastbits.ytmkt.endpoint.SearchType.SONG.getDefaultParams()).getOrNull()
-                    val similarSongs = searchRes?.categories?.firstOrNull()?.first?.items?.filterIsInstance<dev.toastbits.ytmkt.model.external.mediaitem.YtmSong>()?.map { it.toDomain() } ?: emptyList()
-                    list.addAll(similarSongs)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            // Priority C: Search JioSaavn with title + artist
-            if (list.isEmpty()) {
-                val query = if (artist.isNotBlank()) "$title $artist" else title
-                list.addAll(searchJioSaavnSongs(query))
             }
         }
 
@@ -1089,36 +1142,44 @@ class MusicRepositoryImpl(
                 searchConn.connectTimeout = 4000
                 searchConn.readTimeout = 4000
 
-                if (searchConn.responseCode == 200) {
-                    val searchRes = searchConn.inputStream.bufferedReader().readText()
-                    val jsonObj = org.json.JSONObject(searchRes)
-                    val results = jsonObj.optJSONArray("results")
-                    if (results != null && results.length() > 0) {
-                        for (i in 0 until results.length()) {
-                            val candidate = results.getJSONObject(i)
-                            val jioId = candidate.optString("id")
-                            if (jioId.isNotBlank()) {
-                                val detailsUrl = java.net.URL("https://www.jiosaavn.com/api.php?__call=song.getDetails&pids=$jioId&_format=json&_marker=0&ctx=android")
-                                val dConn = detailsUrl.openConnection() as java.net.HttpURLConnection
-                                dConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                                dConn.connectTimeout = 4000
-                                dConn.readTimeout = 4000
-                                if (dConn.responseCode == 200) {
-                                    val dRes = dConn.inputStream.bufferedReader().readText()
-                                    val dJson = org.json.JSONObject(dRes).optJSONObject(jioId)
-                                    if (dJson != null) {
-                                        val encMediaUrl = dJson.optString("encrypted_media_url")
-                                        if (encMediaUrl.isNotBlank()) {
-                                            val dec = decryptJioSaavnUrl(encMediaUrl)
-                                            if (dec.startsWith("http")) {
-                                                return dec.replace("_96.mp4", "_320.mp4").replace("_96.m4a", "_320.mp4")
+                try {
+                    if (searchConn.responseCode == 200) {
+                        val searchRes = searchConn.inputStream.bufferedReader().use { it.readText() }
+                        val jsonObj = org.json.JSONObject(searchRes)
+                        val results = jsonObj.optJSONArray("results")
+                        if (results != null && results.length() > 0) {
+                            for (i in 0 until results.length()) {
+                                val candidate = results.getJSONObject(i)
+                                val jioId = candidate.optString("id")
+                                if (jioId.isNotBlank()) {
+                                    val detailsUrl = java.net.URL("https://www.jiosaavn.com/api.php?__call=song.getDetails&pids=$jioId&_format=json&_marker=0&ctx=android")
+                                    val dConn = detailsUrl.openConnection() as java.net.HttpURLConnection
+                                    dConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                                    dConn.connectTimeout = 4000
+                                    dConn.readTimeout = 4000
+                                    try {
+                                        if (dConn.responseCode == 200) {
+                                            val dRes = dConn.inputStream.bufferedReader().use { it.readText() }
+                                            val dJson = org.json.JSONObject(dRes).optJSONObject(jioId)
+                                            if (dJson != null) {
+                                                val encMediaUrl = dJson.optString("encrypted_media_url")
+                                                if (encMediaUrl.isNotBlank()) {
+                                                    val dec = decryptJioSaavnUrl(encMediaUrl)
+                                                    if (dec.startsWith("http")) {
+                                                        return dec.replace("_96.mp4", "_320.mp4").replace("_96.m4a", "_320.mp4")
+                                                    }
+                                                }
                                             }
                                         }
+                                    } finally {
+                                        dConn.disconnect()
                                     }
                                 }
                             }
                         }
                     }
+                } finally {
+                    searchConn.disconnect()
                 }
             }
         } catch (e: Exception) {
@@ -1165,9 +1226,12 @@ class MusicRepositoryImpl(
         return withContext(Dispatchers.IO) {
             val provider = _userSettingsFlow.value.provider
             
-            // Fast-path: if the ID itself resolves natively (e.g. YouTube ID), use it.
-            val yt = fetchYouTubeStreamUrl(id)
-            if (yt.isNotBlank()) return@withContext yt
+            // Fast-path: if the ID is an 11-char YouTube ID and provider allows YouTube, try direct extraction
+            val isLikelyYoutubeId = id.length == 11 && !id.contains("_") && !id.startsWith("sc_") && !id.contains(" ")
+            if (isLikelyYoutubeId && (provider == MusicProvider.YOUTUBE || provider == MusicProvider.AUTO)) {
+                val yt = fetchYouTubeStreamUrl(id)
+                if (yt.isNotBlank()) return@withContext yt
+            }
             
             when (provider) {
                 MusicProvider.YOUTUBE -> {
@@ -1175,10 +1239,14 @@ class MusicRepositoryImpl(
                     if (ytSearch.isNotBlank()) return@withContext ytSearch
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
                 }
                 MusicProvider.JIOSAAVN -> {
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
+                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
+                    if (ytSearch.isNotBlank()) return@withContext ytSearch
                     val sc = fetchSoundCloudStreamUrl(title, artist)
                     if (sc.isNotBlank()) return@withContext sc
                 }
@@ -1187,14 +1255,20 @@ class MusicRepositoryImpl(
                     if (sc.isNotBlank()) return@withContext sc
                     val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
                     if (ytSearch.isNotBlank()) return@withContext ytSearch
-                }
-                MusicProvider.AUTO -> {
-                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
-                    if (ytSearch.isNotBlank()) return@withContext ytSearch
-                    val sc = fetchSoundCloudStreamUrl(title, artist)
-                    if (sc.isNotBlank()) return@withContext sc
                     val jio = fetchJioSaavnStreamUrl(title, artist)
                     if (jio.isNotBlank()) return@withContext jio
+                }
+                MusicProvider.AUTO -> {
+                    if (id.startsWith("sc_")) {
+                        val sc = fetchSoundCloudStreamUrl(title, artist)
+                        if (sc.isNotBlank()) return@withContext sc
+                    }
+                    val ytSearch = fetchYoutubeStreamUrlFromSearch(title, artist)
+                    if (ytSearch.isNotBlank()) return@withContext ytSearch
+                    val jio = fetchJioSaavnStreamUrl(title, artist)
+                    if (jio.isNotBlank()) return@withContext jio
+                    val sc = fetchSoundCloudStreamUrl(title, artist)
+                    if (sc.isNotBlank()) return@withContext sc
                 }
             }
             ""
