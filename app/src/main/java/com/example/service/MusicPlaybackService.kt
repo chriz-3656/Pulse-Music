@@ -173,7 +173,7 @@ class MusicPlaybackService : Service() {
                     val duration = exoPlayer.duration
                     if (duration > 0) {
                         playerController.playerState.value.currentSong?.let { song ->
-                            if (song.duration <= 0L || song.duration == 210000L || song.duration != duration) {
+                            if ((song.duration <= 0L || song.duration == 210000L) && song.duration != duration) {
                                 playerController.updateCurrentSongDuration(duration)
                                 serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                     musicRepository.updateSongDuration(song.id, duration)
