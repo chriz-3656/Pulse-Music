@@ -411,11 +411,6 @@ class MusicPlaybackService : Service() {
             }
         }
     }
-                    fetchWakeLock?.release()
-                }
-            }
-        }
-    }
 
     private fun resumePlayback() {
         exoPlayer.play()
