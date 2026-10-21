@@ -2,6 +2,7 @@ package com.example.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.model.DownloadTask
 import com.example.domain.model.ImportProgress
 import com.example.domain.model.Playlist
 import com.example.domain.model.Song
@@ -26,6 +27,7 @@ data class LibraryUiState(
     val playlists: List<Playlist> = emptyList(),
     val favoriteSongs: List<Song> = emptyList(),
     val downloadedSongs: List<Song> = emptyList(),
+    val downloadTasks: List<DownloadTask> = emptyList(),
     val showCreateDialog: Boolean = false,
     val isLoading: Boolean = false,
     val importProgress: ImportProgress? = null,
@@ -56,6 +58,11 @@ class LibraryViewModel(
             launch {
                 manageDownloadsUseCase.getDownloaded().collectLatest { downs ->
                     _uiState.update { it.copy(downloadedSongs = downs) }
+                }
+            }
+            launch {
+                manageDownloadsUseCase.getDownloadTasks().collectLatest { tasks ->
+                    _uiState.update { it.copy(downloadTasks = tasks) }
                 }
             }
         }
@@ -112,6 +119,12 @@ class LibraryViewModel(
     fun removeDownload(songId: String) {
         viewModelScope.launch {
             manageDownloadsUseCase.remove(songId)
+        }
+    }
+
+    fun cancelDownloadTask(songId: String) {
+        viewModelScope.launch {
+            manageDownloadsUseCase.cancelDownload(songId)
         }
     }
 

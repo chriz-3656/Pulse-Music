@@ -8,6 +8,7 @@ import com.example.domain.model.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,6 +38,33 @@ class PlaylistDetailViewModel(
 
     init {
         loadPlaylist()
+        viewModelScope.launch {
+            appContainer.manageDownloadsUseCase.getDownloadTasks().collectLatest { tasks ->
+                val playlist = _uiState.value.playlist ?: return@collectLatest
+                val songIds = playlist.songs.map { it.id }.toSet()
+                val related = tasks.filter { it.song.id in songIds }
+                if (related.isNotEmpty()) {
+                    val completed = playlist.songs.size - related.size
+                    _uiState.update {
+                        it.copy(
+                            isDownloadingAll = true,
+                            downloadProgressText = "$completed/${playlist.songs.size}"
+                        )
+                    }
+                } else if (_uiState.value.isDownloadingAll) {
+                    val downloadedSongs = appContainer.manageDownloadsUseCase.getDownloaded().first()
+                    val downloadedIds = downloadedSongs.map { it.id }.toSet()
+                    val allDown = playlist.songs.isNotEmpty() && playlist.songs.all { it.id in downloadedIds || it.isDownloaded }
+                    _uiState.update {
+                        it.copy(
+                            isDownloadingAll = false,
+                            downloadProgressText = null,
+                            isAllDownloaded = allDown
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun loadPlaylist() {
@@ -63,25 +91,11 @@ class PlaylistDetailViewModel(
         val playlist = _uiState.value.playlist ?: return
         if (playlist.songs.isEmpty()) return
         viewModelScope.launch {
-            _uiState.update { it.copy(isDownloadingAll = true) }
-            val total = playlist.songs.size
-            var completed = 0
-            for ((index, song) in playlist.songs.withIndex()) {
-                _uiState.update { it.copy(downloadProgressText = "${index + 1}/$total") }
-                try {
-                    appContainer.manageDownloadsUseCase.download(song)
-                    completed++
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            _uiState.update {
-                it.copy(
-                    isDownloadingAll = false,
-                    downloadProgressText = null,
-                    isAllDownloaded = completed == total
-                )
-            }
+            _uiState.update { it.copy(isDownloadingAll = true, downloadProgressText = "0/${playlist.songs.size}") }
+            appContainer.manageDownloadsUseCase.enqueueDownloads(
+                playlist.songs,
+                sourceCollection = "Playlist: ${playlist.title}"
+            )
         }
     }
 

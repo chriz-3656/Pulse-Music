@@ -50,7 +50,10 @@ class ManageFavoritesUseCase(private val repository: MusicRepository) {
 
 class ManageDownloadsUseCase(private val repository: MusicRepository) {
     fun getDownloaded(): Flow<List<Song>> = repository.getDownloadedSongs()
+    fun getDownloadTasks(): Flow<List<com.example.domain.model.DownloadTask>> = repository.getDownloadTasks()
     suspend fun download(song: Song): Result<String> = repository.downloadSong(song)
+    suspend fun enqueueDownloads(songs: List<Song>, sourceCollection: String? = null) = repository.enqueueDownloads(songs, sourceCollection)
+    suspend fun cancelDownload(songId: String) = repository.cancelDownload(songId)
     suspend fun remove(songId: String) = repository.removeDownload(songId)
 }
 

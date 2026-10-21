@@ -187,3 +187,20 @@ data class ImportProgress(
     val playlistId: String? = null,
     val error: String? = null
 )
+
+enum class DownloadStatus {
+    QUEUED,
+    DOWNLOADING,
+    COMPLETED,
+    FAILED
+}
+
+data class DownloadTask(
+    val song: Song,
+    val progress: Float = 0f,
+    val bytesDownloaded: Long = 0L,
+    val totalBytes: Long = 0L,
+    val status: DownloadStatus = DownloadStatus.QUEUED,
+    val sourceCollection: String? = null,
+    val error: String? = null
+)

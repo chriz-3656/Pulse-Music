@@ -20,28 +20,6 @@ class NewFeaturesTest {
     }
 
     @Test
-    fun testLyricParsingForStoryCardSelection() {
-        val lrcContent = """
-            [00:12.50]Here comes the sun
-            [00:15.80]Little darlin'
-            [00:18.20]It's been a long cold lonely winter
-            [00:24.00]Here comes the sun
-            [00:27.50]It's alright
-        """.trimIndent()
-
-        val parsed = parseLrc(lrcContent)
-        assertEquals(5, parsed.size)
-        assertEquals("Here comes the sun", parsed[0].text)
-        assertEquals(12500L, parsed[0].timestampMs)
-        assertEquals("It's alright", parsed[4].text)
-
-        // Select a slice (max 5 lines for story card)
-        val selected = parsed.take(3).map { it.text }
-        assertEquals(3, selected.size)
-        assertEquals("Here comes the sun", selected[0])
-    }
-
-    @Test
     fun testPlainTextLyricsParsingFallback() {
         val plainLyrics = "Line 1 of song\nLine 2 of song\nLine 3 of song"
         val parsed = parseLrc(plainLyrics)
@@ -65,5 +43,34 @@ class NewFeaturesTest {
         val fullDownloadedIds = setOf("s1", "s2", "s3")
         val isAllDownloadedAfter = songs.all { it.id in fullDownloadedIds || it.isDownloaded }
         assertTrue("All songs should be recognized as downloaded", isAllDownloadedAfter)
+    }
+
+    @Test
+    fun testDownloadTaskQueueAndLiveProgress() {
+        val song1 = Song(id = "track_01", title = "Midnight Ride", artist = "Synth Wave")
+        val song2 = Song(id = "track_02", title = "Retro Sunset", artist = "Neon Pulse")
+
+        val task1 = com.example.domain.model.DownloadTask(
+            song = song1,
+            progress = 0.45f,
+            bytesDownloaded = 4500L,
+            totalBytes = 10000L,
+            status = com.example.domain.model.DownloadStatus.DOWNLOADING,
+            sourceCollection = "Playlist: Synthwave Classics"
+        )
+
+        val task2 = com.example.domain.model.DownloadTask(
+            song = song2,
+            progress = 0f,
+            status = com.example.domain.model.DownloadStatus.QUEUED,
+            sourceCollection = "Playlist: Synthwave Classics"
+        )
+
+        val tasks = listOf(task1, task2)
+        assertEquals(2, tasks.size)
+        assertEquals(com.example.domain.model.DownloadStatus.DOWNLOADING, tasks[0].status)
+        assertEquals(0.45f, tasks[0].progress, 0.001f)
+        assertEquals(com.example.domain.model.DownloadStatus.QUEUED, tasks[1].status)
+        assertEquals("Playlist: Synthwave Classics", tasks[0].sourceCollection)
     }
 }

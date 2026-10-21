@@ -67,6 +67,19 @@ class MusicRepositoryImpl(
     private val api: YtmApi = YoutubeiApi(data_language = "en-GB")
     private val songCache = java.util.concurrent.ConcurrentHashMap<String, Song>()
 
+    init {
+        downloadManager.streamResolver = { song ->
+            var targetSong = song
+            if (targetSong.getStreamUrl(preferHighQuality = true).isBlank()) {
+                val resolved = resolveStreamUrl(targetSong)
+                if (resolved.isNotBlank()) {
+                    targetSong = targetSong.copy(stream160Url = resolved, stream320Url = resolved)
+                }
+            }
+            targetSong
+        }
+    }
+
     private fun YtmSong.toDomain(streamUrl: String = ""): Song {
         val artwork = this.thumbnail_provider?.getThumbnailUrl(ThumbnailProvider.Quality.HIGH) ?: ""
         val artistName = this.artists?.firstOrNull()?.name ?: "Unknown Artist"
@@ -1341,6 +1354,16 @@ class MusicRepositoryImpl(
     
     override fun getDownloadedSongs(): Flow<List<Song>> = songDao.getDownloadedSongs().map { it.map { entity -> Song(entity.id, entity.title, entity.artist, entity.album, entity.duration, entity.artworkUrl, entity.stream160Url, entity.stream320Url, entity.lyrics, entity.isDownloaded, entity.isFavorite, entity.localFilePath, entity.year, entity.artistId, entity.albumId) } }
     
+    override fun getDownloadTasks(): Flow<List<com.example.domain.model.DownloadTask>> = downloadManager.downloadTasks
+
+    override suspend fun enqueueDownloads(songs: List<Song>, sourceCollection: String?): Unit = withContext(Dispatchers.IO) {
+        downloadManager.enqueueDownloads(songs, sourceCollection)
+    }
+
+    override suspend fun cancelDownload(songId: String): Unit = withContext(Dispatchers.IO) {
+        downloadManager.cancelDownload(songId)
+    }
+
     override suspend fun downloadSong(song: Song): Result<String> = withContext(Dispatchers.IO) {
         var targetSong = song
         if (targetSong.getStreamUrl(preferHighQuality = true).isBlank()) {

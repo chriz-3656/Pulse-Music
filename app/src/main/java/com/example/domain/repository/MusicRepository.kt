@@ -69,7 +69,10 @@ interface MusicRepository {
     fun getFavoriteSongs(): Flow<List<Song>>
     suspend fun toggleFavorite(song: Song): Boolean
     fun getDownloadedSongs(): Flow<List<Song>>
+    fun getDownloadTasks(): Flow<List<com.example.domain.model.DownloadTask>>
     suspend fun downloadSong(song: Song): Result<String>
+    suspend fun enqueueDownloads(songs: List<Song>, sourceCollection: String? = null)
+    suspend fun cancelDownload(songId: String)
     suspend fun removeDownload(songId: String)
     suspend fun getLocalDownloadPath(songId: String): String?
 

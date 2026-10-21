@@ -22,12 +22,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.rounded.AddLink
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -54,6 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.domain.model.DownloadStatus
+import com.example.domain.model.DownloadTask
 import com.example.domain.model.PlayerState
 import com.example.domain.model.Playlist
 import com.example.domain.model.Song
@@ -200,10 +205,12 @@ fun LibraryScreen(
                 LibraryTab.DOWNLOADS -> {
                     DownloadsTabContent(
                         downloadedSongs = uiState.downloadedSongs,
+                        downloadTasks = uiState.downloadTasks,
                         playerState = playerState,
                         onPlayAll = { viewModel.playAll(uiState.downloadedSongs) },
                         onSongClick = { song -> viewModel.playSong(song, uiState.downloadedSongs) },
                         onRemoveDownload = { songId -> viewModel.removeDownload(songId) },
+                        onCancelDownloadTask = { songId -> viewModel.cancelDownloadTask(songId) },
                         onFavoriteToggle = { song -> viewModel.toggleFavorite(song) },
                         onPlayNext = { song -> viewModel.playNext(song) },
                         onAddToQueue = { song -> viewModel.addToQueue(song) },
@@ -619,16 +626,18 @@ fun FavoritesTabContent(
 @Composable
 fun DownloadsTabContent(
     downloadedSongs: List<Song>,
+    downloadTasks: List<DownloadTask> = emptyList(),
     playerState: PlayerState,
     onPlayAll: () -> Unit,
     onSongClick: (Song) -> Unit,
     onRemoveDownload: (String) -> Unit = {},
+    onCancelDownloadTask: (String) -> Unit = {},
     onFavoriteToggle: (Song) -> Unit = {},
     onPlayNext: (Song) -> Unit = {},
     onAddToQueue: (Song) -> Unit = {},
     onAddToPlaylist: (Song) -> Unit = {}
 ) {
-    if (downloadedSongs.isEmpty()) {
+    if (downloadedSongs.isEmpty() && downloadTasks.isEmpty()) {
         EmptyStateView(
             title = "Offline Archive Empty",
             message = "Save tracks to local memory for instant zero-latency playback without network.",
@@ -639,47 +648,213 @@ fun DownloadsTabContent(
             contentPadding = PaddingValues(bottom = 96.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    LcdBadge(text = "${downloadedSongs.size} OFFLINE MASTER COPIES", textColor = MaterialTheme.colorScheme.tertiary)
-                    SkeuoTactileButton(
-                        onClick = onPlayAll,
-                        shape = RoundedCornerShape(18.dp),
+            // Live In-Progress Downloads Section
+            if (downloadTasks.isNotEmpty()) {
+                val activeCollection = downloadTasks.firstOrNull { !it.sourceCollection.isNullOrBlank() }?.sourceCollection
+                item {
+                    Column(
                         modifier = Modifier
-                            .height(30.dp)
-                            .testTag("play_all_downloads")
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 10.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("PLAY OFFLINE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                            LcdBadge(
+                                text = "${downloadTasks.size} DOWNLOADING NOW",
+                                textColor = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        if (!activeCollection.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "⚡ DOWNLOADING $activeCollection",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
                         }
                     }
                 }
+
+                items(downloadTasks, key = { "downloading_${it.song.id}" }) { task ->
+                    DownloadingSongRow(
+                        task = task,
+                        onCancel = { onCancelDownloadTask(task.song.id) },
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Divider(
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                    )
+                }
             }
 
-            items(downloadedSongs, key = { it.id }) { song ->
-                val isCurrent = playerState.currentSong?.id == song.id
-                SongItemRow(
-                    song = song,
-                    isPlaying = playerState.isPlaying && isCurrent,
-                    isCurrentTrack = isCurrent,
-                    onClick = { onSongClick(song) },
-                    onDownloadClick = { onRemoveDownload(song.id) },
-                    onFavoriteToggle = { onFavoriteToggle(song) },
-                    onPlayNext = { onPlayNext(song) },
-                    onAddToQueue = { onAddToQueue(song) },
-                    onAddToPlaylist = { onAddToPlaylist(song) },
-                    modifier = Modifier.padding(horizontal = 6.dp)
+            // Completed Offline Songs Section
+            if (downloadedSongs.isNotEmpty()) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        LcdBadge(text = "${downloadedSongs.size} OFFLINE MASTER COPIES", textColor = MaterialTheme.colorScheme.tertiary)
+                        SkeuoTactileButton(
+                            onClick = onPlayAll,
+                            shape = RoundedCornerShape(18.dp),
+                            modifier = Modifier
+                                .height(30.dp)
+                                .testTag("play_all_downloads")
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("PLAY OFFLINE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                }
+
+                items(downloadedSongs, key = { it.id }) { song ->
+                    val isCurrent = playerState.currentSong?.id == song.id
+                    SongItemRow(
+                        song = song,
+                        isPlaying = playerState.isPlaying && isCurrent,
+                        isCurrentTrack = isCurrent,
+                        onClick = { onSongClick(song) },
+                        onDownloadClick = { onRemoveDownload(song.id) },
+                        onFavoriteToggle = { onFavoriteToggle(song) },
+                        onPlayNext = { onPlayNext(song) },
+                        onAddToQueue = { onAddToQueue(song) },
+                        onAddToPlaylist = { onAddToPlaylist(song) },
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DownloadingSongRow(
+    task: DownloadTask,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val song = task.song
+    val isDownloading = task.status == DownloadStatus.DOWNLOADING
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+            .border(
+                1.dp,
+                if (isDownloading) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                RoundedCornerShape(14.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Album Art
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    AsyncImage(
+                        model = song.artworkUrl,
+                        contentDescription = song.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // Song Title & Details
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = song.title,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "${song.artist} • ${if (isDownloading) "DOWNLOADING ${(task.progress * 100).toInt()}%" else "QUEUED IN LINE"}",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = if (isDownloading) FontWeight.Bold else FontWeight.Normal
+                        ),
+                        color = if (isDownloading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Cancel Button
+                IconButton(
+                    onClick = onCancel,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel Download",
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            if (isDownloading) {
+                Spacer(modifier = Modifier.height(6.dp))
+                LinearProgressIndicator(
+                    progress = { task.progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .clip(RoundedCornerShape(2.dp)),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surface
                 )
             }
         }
