@@ -51,6 +51,8 @@ class MusicRepositoryImpl(
     private fun loadSettingsFromPrefs(): UserSettings {
         val qualityStr = prefs.getString("audio_quality", AudioQuality.HIGH.name) ?: AudioQuality.HIGH.name
         val quality = try { AudioQuality.valueOf(qualityStr) } catch (_: Exception) { AudioQuality.HIGH }
+        val colorwayStr = prefs.getString("theme_colorway", ThemeColorway.AMBER.id) ?: ThemeColorway.AMBER.id
+        val colorway = ThemeColorway.fromId(colorwayStr)
         return UserSettings(
             audioQuality = quality,
             cacheSizeLimitMb = prefs.getInt("cache_size_limit_mb", 1000),
@@ -60,7 +62,8 @@ class MusicRepositoryImpl(
             autoplayEnabled = prefs.getBoolean("autoplay_enabled", true),
             customApiBaseUrl = prefs.getString("custom_api_url", "") ?: "",
             apiProvider = prefs.getString("api_provider", "auto") ?: "auto",
-            isPureOfflineMode = prefs.getBoolean("is_pure_offline", false)
+            isPureOfflineMode = prefs.getBoolean("is_pure_offline", false),
+            themeColorway = colorway
         )
     }
 
@@ -1418,8 +1421,14 @@ class MusicRepositoryImpl(
             .putString("custom_api_url", settings.customApiBaseUrl)
             .putString("api_provider", settings.apiProvider)
             .putBoolean("is_pure_offline", settings.isPureOfflineMode)
+            .putString("theme_colorway", settings.themeColorway.id)
             .apply()
         _userSettingsFlow.value = settings
+    }
+
+    override suspend fun setThemeColorway(colorway: ThemeColorway) = withContext(Dispatchers.IO) {
+        prefs.edit().putString("theme_colorway", colorway.id).apply()
+        _userSettingsFlow.value = _userSettingsFlow.value.copy(themeColorway = colorway)
     }
 
     override suspend fun setProvider(provider: MusicProvider) = withContext(Dispatchers.IO) {

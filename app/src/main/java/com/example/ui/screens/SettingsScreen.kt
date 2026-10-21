@@ -4,6 +4,7 @@ import androidx.compose.runtime.collectAsState
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,12 +30,14 @@ import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Warning
+import com.example.domain.model.ThemeColorway
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -422,6 +425,90 @@ fun SettingsScreen(
                             ),
                             modifier = Modifier.testTag("pure_offline_switch")
                         )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Section: Deck Color Scheme / Hardware Finish
+        item {
+            SettingsSectionHeader(icon = Icons.Default.Palette, title = "Deck Hardware Finish")
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SkeuoBevelCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Text(
+                        text = "App Color Scheme",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = "Switch full app between studio amber, 70s Pioneer cyan, and analog VU green",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    ThemeColorway.entries.forEach { colorway ->
+                        val isSelected = uiState.userSettings.themeColorway == colorway
+                        val accentColor = Color(colorway.hexAccent)
+                        val subtitle = when (colorway) {
+                            ThemeColorway.AMBER -> "Warm analog vacuum-tube illumination (Default)"
+                            ThemeColorway.CYAN -> "1970s Pioneer receiver fluorescent display"
+                            ThemeColorway.GREEN -> "Analog VU meter needle & phosphor green"
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(
+                                    border = if (isSelected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else BorderStroke(1.dp, Color(0xFF2A2B2F)),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) else Color(0xFF161719))
+                                .clickable { viewModel.setColorway(colorway) }
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                SkeuoLedLamp(isLit = true, size = 10.dp, color = accentColor)
+                                Column {
+                                    Text(
+                                        text = colorway.displayName.uppercase(),
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                                    )
+                                    Text(
+                                        text = subtitle,
+                                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            if (isSelected) {
+                                LcdBadge(text = "ACTIVE", textColor = MaterialTheme.colorScheme.primary)
+                            } else {
+                                RadioButton(
+                                    selected = false,
+                                    onClick = { viewModel.setColorway(colorway) },
+                                    colors = RadioButtonDefaults.colors(
+                                        unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

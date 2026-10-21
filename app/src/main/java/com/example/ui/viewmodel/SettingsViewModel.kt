@@ -8,6 +8,7 @@ import com.example.domain.model.AudioQuality
 import com.example.domain.model.MusicProvider
 import com.example.domain.model.PlayerState
 import com.example.domain.model.ProviderStatus
+import com.example.domain.model.ThemeColorway
 import com.example.domain.model.UserSettings
 import com.example.domain.usecase.ManageSettingsUseCase
 import com.example.player.MusicPlayerController
@@ -118,6 +119,12 @@ class SettingsViewModel(
         val updated = _uiState.value.userSettings.copy(isPureOfflineMode = enabled)
         viewModelScope.launch {
             manageSettingsUseCase.updateSettings(updated)
+        }
+    }
+
+    fun setColorway(colorway: ThemeColorway) {
+        viewModelScope.launch {
+            manageSettingsUseCase.setThemeColorway(colorway)
         }
     }
 

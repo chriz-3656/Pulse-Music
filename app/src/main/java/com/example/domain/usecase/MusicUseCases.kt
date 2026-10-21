@@ -61,6 +61,7 @@ class ManageSettingsUseCase(private val repository: MusicRepository) {
     fun getSettings(): Flow<UserSettings> = repository.getUserSettings()
     suspend fun updateSettings(settings: UserSettings) = repository.updateSettings(settings)
     suspend fun setProvider(provider: MusicProvider) = repository.setProvider(provider)
+    suspend fun setThemeColorway(colorway: ThemeColorway) = repository.setThemeColorway(colorway)
     suspend fun checkAllProviders(): Map<MusicProvider, ProviderStatus> = repository.checkAllProviders()
     fun getCacheSizeBytes(): Long = repository.getCacheSizeBytes()
     suspend fun clearCache() = repository.clearCache()

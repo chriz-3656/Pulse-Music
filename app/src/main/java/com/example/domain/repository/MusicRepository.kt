@@ -80,6 +80,7 @@ interface MusicRepository {
     fun getUserSettings(): Flow<UserSettings>
     suspend fun updateSettings(settings: UserSettings)
     suspend fun setProvider(provider: MusicProvider)
+    suspend fun setThemeColorway(colorway: ThemeColorway)
     suspend fun checkAllProviders(): Map<MusicProvider, ProviderStatus>
     fun getCacheSizeBytes(): Long
     suspend fun clearCache()

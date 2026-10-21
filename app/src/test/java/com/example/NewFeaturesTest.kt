@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.domain.model.Song
+import com.example.domain.model.ThemeColorway
 import com.example.domain.model.UserSettings
 import com.example.ui.components.parseLrc
 import org.junit.Assert.assertEquals
@@ -9,6 +10,35 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NewFeaturesTest {
+
+    @Test
+    fun testThemeColorwayResolutionAndDefaults() {
+        // Test default UserSettings theme colorway
+        val defaultSettings = UserSettings()
+        assertEquals(ThemeColorway.AMBER, defaultSettings.themeColorway)
+
+        // Test theme copy
+        val cyanSettings = defaultSettings.copy(themeColorway = ThemeColorway.CYAN)
+        assertEquals(ThemeColorway.CYAN, cyanSettings.themeColorway)
+
+        val greenSettings = defaultSettings.copy(themeColorway = ThemeColorway.GREEN)
+        assertEquals(ThemeColorway.GREEN, greenSettings.themeColorway)
+
+        // Test fromId resolution
+        assertEquals(ThemeColorway.AMBER, ThemeColorway.fromId("amber"))
+        assertEquals(ThemeColorway.CYAN, ThemeColorway.fromId("cyan"))
+        assertEquals(ThemeColorway.GREEN, ThemeColorway.fromId("green"))
+        assertEquals(ThemeColorway.CYAN, ThemeColorway.fromId("CYAN"))
+
+        // Test fallback for unknown / empty ID
+        assertEquals(ThemeColorway.AMBER, ThemeColorway.fromId("unknown"))
+        assertEquals(ThemeColorway.AMBER, ThemeColorway.fromId(""))
+
+        // Verify hex accents
+        assertEquals(0xFFFFC107, ThemeColorway.AMBER.hexAccent)
+        assertEquals(0xFF00D9FF, ThemeColorway.CYAN.hexAccent)
+        assertEquals(0xFF7CFF5B, ThemeColorway.GREEN.hexAccent)
+    }
 
     @Test
     fun testUserSettingsPureOfflineModeDefaultAndCopy() {

@@ -166,6 +166,17 @@ data class ProviderStatus(
     val details: String = statusMessage
 )
 
+enum class ThemeColorway(val id: String, val displayName: String, val hexAccent: Long) {
+    AMBER("amber", "Obsidian Amber", 0xFFFFC107),
+    CYAN("cyan", "Pioneer Ice Blue", 0xFF00D9FF),
+    GREEN("green", "Studio VU Green", 0xFF7CFF5B);
+
+    companion object {
+        fun fromId(id: String): ThemeColorway =
+            entries.firstOrNull { it.id.equals(id, ignoreCase = true) } ?: AMBER
+    }
+}
+
 data class UserSettings(
     val audioQuality: AudioQuality = AudioQuality.HIGH,
     val cacheSizeLimitMb: Int = 1000,
@@ -175,7 +186,8 @@ data class UserSettings(
     val autoplayEnabled: Boolean = true,
     val customApiBaseUrl: String = "",
     val apiProvider: String = "youtube",
-    val isPureOfflineMode: Boolean = false
+    val isPureOfflineMode: Boolean = false,
+    val themeColorway: ThemeColorway = ThemeColorway.AMBER
 ) {
     val provider: MusicProvider get() = MusicProvider.fromId(apiProvider)
 }

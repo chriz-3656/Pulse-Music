@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.domain.model.UserSettings
 import com.example.ui.PulseMusicApp
 import com.example.ui.theme.PulseMusicTheme
 import com.example.ui.theme.SkeuoAmberGlow
@@ -39,8 +41,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val appContainer = (applicationContext as PulseMusicApplication).appContainer
         setContent {
-            PulseMusicTheme {
+            val userSettings by appContainer.musicRepository.getUserSettings().collectAsState(initial = UserSettings())
+            PulseMusicTheme(colorway = userSettings.themeColorway) {
                 KillSwitchWrapper {
                     PulseMusicApp()
                 }

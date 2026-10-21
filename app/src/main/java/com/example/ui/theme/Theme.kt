@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.example.domain.model.ThemeColorway
 
 val CurvedShapes = Shapes(
     extraSmall = RoundedCornerShape(10.dp),
@@ -31,7 +32,9 @@ data class NeuColors(
     val darkShadow: Color,
     val textPrimary: Color,
     val textSecondary: Color,
-    val accent: Color
+    val accent: Color,
+    val accentGlow: Color = accent,
+    val accentDim: Color = accent.copy(alpha = 0.4f)
 )
 
 val LocalNeuColors = staticCompositionLocalOf {
@@ -41,39 +44,67 @@ val LocalNeuColors = staticCompositionLocalOf {
         darkShadow = NeuDarkShadowDark,
         textPrimary = NeuDarkTextPrimary,
         textSecondary = NeuDarkTextSecondary,
-        accent = NeuDarkAccent
+        accent = NeuDarkAccent,
+        accentGlow = NeuDarkAccent,
+        accentDim = NeuDarkAccent.copy(alpha = 0.4f)
     )
 }
-
-private val LightColorScheme = lightColorScheme(
-    primary = NeuLightAccent,
-    background = NeuLightBackground,
-    surface = NeuLightBackground,
-    onPrimary = Color.White,
-    onBackground = NeuLightTextPrimary,
-    onSurface = NeuLightTextPrimary
-)
-
-private val DarkColorScheme = darkColorScheme(
-    primary = NeuDarkAccent,
-    background = NeuDarkBackground,
-    surface = NeuDarkBackground,
-    onPrimary = Color.Black,
-    onBackground = NeuDarkTextPrimary,
-    onSurface = NeuDarkTextPrimary
-)
 
 @Composable
 fun PulseMusicTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
+    colorway: ThemeColorway = ThemeColorway.AMBER,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    val neuColors = if (darkTheme) {
-        NeuColors(NeuDarkBackground, NeuDarkShadowLight, NeuDarkShadowDark, NeuDarkTextPrimary, NeuDarkTextSecondary, NeuDarkAccent)
+    val (accentColor, glowColor, dimColor) = when (colorway) {
+        ThemeColorway.CYAN -> Triple(Color(0xFF00D9FF), Color(0xFF38E1FF), Color(0x6600D9FF))
+        ThemeColorway.GREEN -> Triple(Color(0xFF7CFF5B), Color(0xFF9EFF84), Color(0x667CFF5B))
+        ThemeColorway.AMBER -> Triple(Color(0xFFFFC107), Color(0xFFFFB300), Color(0x66FFC107))
+    }
+
+    val colorScheme = if (darkTheme) {
+        darkColorScheme(
+            primary = accentColor,
+            background = NeuDarkBackground,
+            surface = NeuDarkBackground,
+            onPrimary = Color.Black,
+            onBackground = NeuDarkTextPrimary,
+            onSurface = NeuDarkTextPrimary
+        )
     } else {
-        NeuColors(NeuLightBackground, NeuLightShadowLight, NeuLightShadowDark, NeuLightTextPrimary, NeuLightTextSecondary, NeuLightAccent)
+        lightColorScheme(
+            primary = accentColor,
+            background = NeuLightBackground,
+            surface = NeuLightBackground,
+            onPrimary = Color.White,
+            onBackground = NeuLightTextPrimary,
+            onSurface = NeuLightTextPrimary
+        )
+    }
+
+    val neuColors = if (darkTheme) {
+        NeuColors(
+            background = NeuDarkBackground,
+            lightShadow = NeuDarkShadowLight,
+            darkShadow = NeuDarkShadowDark,
+            textPrimary = NeuDarkTextPrimary,
+            textSecondary = NeuDarkTextSecondary,
+            accent = accentColor,
+            accentGlow = glowColor,
+            accentDim = dimColor
+        )
+    } else {
+        NeuColors(
+            background = NeuLightBackground,
+            lightShadow = NeuLightShadowLight,
+            darkShadow = NeuLightShadowDark,
+            textPrimary = NeuLightTextPrimary,
+            textSecondary = NeuLightTextSecondary,
+            accent = accentColor,
+            accentGlow = glowColor,
+            accentDim = dimColor
+        )
     }
 
     val view = LocalView.current
