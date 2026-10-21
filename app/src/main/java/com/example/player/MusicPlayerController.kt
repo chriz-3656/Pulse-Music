@@ -125,9 +125,9 @@ class MusicPlayerController(
         }
         onServiceCommand?.invoke(ServiceAction.PlayTrack(song, queue, index))
 
-        // If playing a single track (radio mode) or near queue end, proactively pre-fetch suggestions
+        // If playing a single track (radio mode) or at the end of the queue, proactively pre-fetch suggestions
         if (isAutoplayEnabled && (autoplaySongProvider != null || autoplayProvider != null)) {
-            if (queue.size <= 1 || (queue.size - index) <= 3) {
+            if (queue.size == 1 || index >= queue.size - 1) {
                 scope.launch {
                     try {
                         val suggestions = fetchSuggestionsForSong(song)
