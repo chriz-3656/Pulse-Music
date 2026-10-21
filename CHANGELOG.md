@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.7.0] - 2026-10-21
+### Added
+- **Instant Live Download Queue & Offline Section Population:** Starting a download for a single track, an album, or an entire playlist immediately registers all songs in the offline downloads archive. Users immediately see all queued and downloading tracks with active state indications.
+- **Live Byte-Streaming Download Progress:** Download tasks report real-time byte progress with animated progress bars and percentage displays (`DOWNLOADING 45%`), while upcoming songs display `QUEUED IN LINE`. Completed tracks automatically transition into the `OFFLINE MASTER COPIES` library.
+- **Batch Album & Playlist Downloads:** One-tap full download button on Album and Playlist detail screens with live progress counter (`DOWNLOAD` → `DOWNLOADING X/Y` → `OFFLINE`) and instant batch removal.
+- **Dedicated "Pure Offline" Mode Toggle:** Added a persistent offline flight mode switch in Settings and an active alert banner on Home (`✈️ PURE OFFLINE MODE ACTIVE`). When active, search and recommendations query strictly locally stored and cached tracks with zero remote network calls.
+- **Download Task Cancellation:** Interactive cancel button (`✕`) for active or queued download tasks directly in the Downloads tab, immediately aborting network streaming and clearing temporary files.
+
+### Fixed
+- **Mid-Playback Song Selection Position Carryover:** Fixed bug where selecting a new song while another song was playing in the middle caused the new song to start at the previous song's elapsed time instead of 0:00. Now halts previous playback and resets progress immediately upon selection.
+- **Song Selection Pause Glitch:** Fixed bug where selecting a song would resolve the stream and then enter a paused state, requiring a second tap on the play button. `playWhenReady` is now explicitly set to `true` upon track selection.
+- **Continuous Play & Radio Provider Switching:** Fixed bug where starting a YouTube song in Auto (Multi-Source) mode switched to JioSaavn for subsequent radio songs. Radio recommendation routing now respects the seed song's actual source provider (YouTube stays on YouTube, JioSaavn on JioSaavn, SoundCloud on SoundCloud) with multi-source failover.
+- **YouTube Video ID Format Matching:** Corrected regex detection for 11-character base64url YouTube IDs that contain underscores (`_`) or hyphens (`-`), preventing accidental fallback to JioSaavn stream queries.
+- **Queue Pre-Filling & Upcoming Songs:** Fixed bug where the upcoming song queue failed to pre-populate. Proactively pre-fetches and fills upcoming suggestions whenever 3 or fewer tracks remain in the queue and eagerly populates when the Queue bottom sheet is opened.
+- **Dynamic Cache Evictor Infinite Loop:** Fixed potential deadlock and infinite loop in `DynamicCacheEvictor` when span removal failed due to locked cache files.
+- **Jam Ghost Participants & Vote-Skip Threshold:** Added Firebase `.onDisconnect().removeValue()` to participant references so disconnected listeners are automatically removed and do not block 50% vote-skip consensus.
+- **OkHttp Socket Descriptor Leak:** Wrapped download HTTP execution in `TrackDownloadManager` with `response.use { }` to prevent connection leaks during track downloads.
+- **HttpURLConnection Descriptor Leaks:** Enforced safe stream reading and `.disconnect()` calls across JioSaavn stream resolution.
+
 ## [2.6.1] - 2026-10-21
 ### Fixed
 - **Mid-Playback Song Selection Position Carryover:** Fixed bug where selecting a new song while another song was playing in the middle caused the new song to start at the previous song's elapsed time instead of 0:00. Now halts previous playback and resets progress immediately upon selection.

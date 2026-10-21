@@ -7,7 +7,7 @@
   <p><strong>A high-fidelity, aesthetically driven Android music streaming & offline player crafted with Jetpack Compose, featuring an analog Skeuomorphic & Yellow Neumorphic hardware design language.</strong></p>
 
   <p>
-    <a href="https://github.com/chriz-3656/Pulse-Music/releases"><img src="https://img.shields.io/badge/Release-v2.6.0-FFC107?style=for-the-badge&logo=android&logoColor=black" alt="Version 2.6.0"></a>
+    <a href="https://github.com/chriz-3656/Pulse-Music/releases"><img src="https://img.shields.io/badge/Release-v2.7.0-FFC107?style=for-the-badge&logo=android&logoColor=black" alt="Version 2.7.0"></a>
     <a href="https://github.com/chriz-3656/Pulse-Music/actions"><img src="https://img.shields.io/badge/CI-Passing-28a745?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status"></a>
     <img src="https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-202124?style=for-the-badge&logo=android&logoColor=FFC107" alt="Platform">
     <img src="https://img.shields.io/badge/Language-Kotlin%202.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin">
@@ -96,7 +96,11 @@ Featuring deep acoustic amber lighting, authentic beveled decks, reactive VU met
 
 ### 💾 High-Fidelity Audio & Offline Downloads
 *Audiophile stream quality, everywhere you go.*
-- **Multi-Source Routing:** Aggregates streams across JioSaavn (up to 320kbps HD) and YouTube Music (via NewPipe engine) with automatic fallback.
+- **Dedicated Pure Offline Mode:** Instant zero-network flight mode switch in Settings with a live status banner (`✈️ PURE OFFLINE MODE ACTIVE`). Queries strictly local database and cached tracks with zero background cellular requests.
+- **Instant Live Download Queue:** Downloading an entire album, playlist, or single track populates all items immediately in the Offline tab with live streaming byte progress (`DOWNLOADING XX%`) and distinct queue position (`QUEUED IN LINE`).
+- **Batch Playlist & Album Downloads:** Single-tap download button on Album and Playlist detail pages with dynamic progress counters (`DOWNLOAD` → `DOWNLOADING X/Y` → `OFFLINE`) and one-tap removal.
+- **Task Cancellation:** Interactive cancel button (`✕`) for active or queued download tasks directly in the Downloads tab.
+- **Multi-Source Routing:** Aggregates streams across JioSaavn (up to 320kbps HD), SoundCloud, and YouTube Music with automatic fallback.
 - **Offline Storage:** Save tracks locally with ID3 metadata and album art cached for full offline playback.
 - **Offline Priority:** Automatically prioritizes locally downloaded files over cellular streams when offline.
 
@@ -168,7 +172,7 @@ Pulse-Music/
 │   │   │   ├── res/                      # Android Resources (Fonts, Drawables, Mipmaps)
 │   │   │   └── AndroidManifest.xml
 │   │   └── test/                         # JVM Unit Tests (Robolectric & Coroutines Test)
-│   └── build.gradle.kts                  # App-level build configuration (v2.6.0)
+│   └── build.gradle.kts                  # App-level build configuration (v2.7.0)
 ├── gradle/                               # Gradle Wrapper & Version Catalog
 │   └── libs.versions.toml
 ├── .github/workflows/ci.yml              # Cloud CI/CD Automated Build & Release Pipeline
@@ -226,8 +230,8 @@ Pulse Music includes an automated **GitHub Actions CI/CD Pipeline** (`.github/wo
 
 Pulse Music follows [Semantic Versioning](https://semver.org/). See the full release notes and change logs in [CHANGELOG.md](CHANGELOG.md).
 
-- **Current Stable Version:** `v2.6.0` (2026-10-18)
-- **Highlights:** Pulse JAM playback activation & manual sync, continuous background autoplay with WakeLocks, language-aware radio recommendation engine, 3-dot playlist management, favorite love button fix, and full codebase deduplication.
+- **Current Stable Version:** `v2.7.0` (2026-10-21)
+- **Highlights:** Instant live offline download queue with streaming progress, dedicated Pure Offline mode toggle, batch playlist and album downloads, multi-source continuous radio engine with seed provider affinity, song selection mid-playback position & pause fixes, and upcoming queue pre-filling.
 
 ---
 
