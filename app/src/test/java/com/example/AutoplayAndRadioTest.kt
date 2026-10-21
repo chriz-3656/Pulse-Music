@@ -194,4 +194,31 @@ class AutoplayAndRadioTest {
         assertEquals(recommendedSong1.id, controller.playerState.value.queue[1].id)
         assertEquals(recommendedSong2.id, controller.playerState.value.queue[2].id)
     }
+
+    @Test
+    fun testSongResolvedProviderAccurateDetection() {
+        val ytSong = Song(
+            id = "sFmrM_n5r6g",
+            title = "YouTube Track With Underscore",
+            artist = "YT Artist",
+            artworkUrl = "https://i.ytimg.com/vi/sFmrM_n5r6g/hqdefault.jpg"
+        )
+        assertEquals(com.example.domain.model.MusicProvider.YOUTUBE, ytSong.resolvedProvider)
+
+        val jioSong = Song(
+            id = "KGfDrbWe",
+            title = "Jio Track",
+            artist = "Jio Artist",
+            artworkUrl = "https://c.saavncdn.com/123/track-500x500.jpg"
+        )
+        assertEquals(com.example.domain.model.MusicProvider.JIOSAAVN, jioSong.resolvedProvider)
+
+        val scSong = Song(
+            id = "sc_284056452",
+            title = "SoundCloud Track",
+            artist = "SC Artist",
+            artworkUrl = "https://i1.sndcdn.com/artworks-500x500.jpg"
+        )
+        assertEquals(com.example.domain.model.MusicProvider.SOUNDCLOUD, scSong.resolvedProvider)
+    }
 }

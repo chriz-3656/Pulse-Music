@@ -16,8 +16,33 @@ data class Song(
     val year: String = "",
     val artistId: String = "",
     val albumId: String = "",
-    val downloadUrls: Map<String, String> = emptyMap()
+    val downloadUrls: Map<String, String> = emptyMap(),
+    val sourceProvider: String = ""
 ) {
+    val resolvedProvider: MusicProvider
+        get() {
+            if (sourceProvider.isNotBlank()) {
+                val p = MusicProvider.fromId(sourceProvider)
+                if (p != MusicProvider.AUTO) return p
+            }
+            if (id.startsWith("sc_") || artworkUrl.contains("sndcdn.com") || artworkUrl.contains("soundcloud.com") || stream160Url.contains("sndcdn.com")) {
+                return MusicProvider.SOUNDCLOUD
+            }
+            if (artworkUrl.contains("saavncdn.com") || artworkUrl.contains("jiosaavn.com") || stream320Url.contains("saavn") || stream160Url.contains("saavn")) {
+                return MusicProvider.JIOSAAVN
+            }
+            if (artworkUrl.contains("ytimg.com") || artworkUrl.contains("googleusercontent.com") || artworkUrl.contains("ggpht.com") || stream160Url.contains("googlevideo.com")) {
+                return MusicProvider.YOUTUBE
+            }
+            if (id.length == 11 && !id.startsWith("sc_") && id.matches(Regex("^[A-Za-z0-9_-]{11}$"))) {
+                return MusicProvider.YOUTUBE
+            }
+            if (id.isNotBlank() && (id.all { it.isDigit() } || id.length in 6..9)) {
+                return MusicProvider.JIOSAAVN
+            }
+            return MusicProvider.AUTO
+        }
+
     val streamUrl: String
         get() = getStreamUrl(preferHighQuality = true)
 

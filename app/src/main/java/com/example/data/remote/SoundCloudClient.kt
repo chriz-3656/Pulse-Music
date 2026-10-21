@@ -25,6 +25,7 @@ object SoundCloudClient {
 
     // Fallback client IDs known to be active
     private val FALLBACK_CLIENT_IDS = listOf(
+        "pJaCCaoD8RMOSFmlbrbYQuyvkjP1fiES",
         "Pb72ranhoyt6gw7hM7TkzUItXlMWSNSo",
         "iZIs9mchVcX5lhVR1OiZAkGCUgu2K642",
         "a3e059563d7fd3372b49b37f00a00bcf"
@@ -269,7 +270,8 @@ object SoundCloudClient {
                             artist = artist,
                             album = "SoundCloud",
                             duration = durationMs,
-                            artworkUrl = artworkUrl
+                            artworkUrl = artworkUrl,
+                            sourceProvider = "soundcloud"
                         )
                     )
                 }
@@ -500,7 +502,8 @@ object SoundCloudClient {
                             artist = artist,
                             album = "SoundCloud",
                             duration = durationMs,
-                            artworkUrl = artworkUrl
+                            artworkUrl = artworkUrl,
+                            sourceProvider = "soundcloud"
                         )
                     )
                 }

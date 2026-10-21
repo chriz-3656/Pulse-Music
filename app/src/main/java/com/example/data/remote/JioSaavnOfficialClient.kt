@@ -139,7 +139,8 @@ object JioSaavnOfficialClient {
             album = album.replace("&quot;", "\""),
             duration = duration,
             artworkUrl = imageUrl,
-            stream320Url = encryptedMediaUrl // we'll decrypt this in repository
+            stream320Url = encryptedMediaUrl, // we'll decrypt this in repository
+            sourceProvider = "jiosaavn"
         )
     }
 }
