@@ -1,0 +1,45 @@
+name: Deploy Firebase Rules
+
+on:
+  # Rules are committed for review, but deployment requires a FIREBASE_TOKEN
+  # secret that is not available in this repository yet. Run this workflow
+  # manually after adding the secret.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-rules:
+    name: Deploy Realtime Database Rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Firebase token
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ -z "$FIREBASE_TOKEN" ]; then
+            echo "::error::FIREBASE_TOKEN secret is not configured. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@13
+
+      - name: Deploy rules
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase deploy \
+            --only database \
+            --project pulse-musicapp \
+            --token "$FIREBASE_TOKEN" \
+            --non-interactive

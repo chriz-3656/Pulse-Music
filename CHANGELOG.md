@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.7.1] - 2026-10-23
+### Security
+- **In-App Update Verification:** The updater now requires HTTPS, verifies the downloaded APK's package name, version code, and SHA-256 signing-certificate digest against the installed app, checks DownloadManager's final status, and fails closed on any mismatch. Update files are copied into a private cache directory and exposed through a minimal FileProvider path.
+- **Pulse JAM Authorization:** Room creation, joining, kick, end-room, queue mutation, playback updates, and skip votes are checked against the authenticated Firebase user. Host-only actions are enforced in the client and documented in `database.rules.json`; room creation, participant limits, and concurrent queue updates are handled safely.
+- **Network Hardening:** Android cleartext traffic is disabled, custom API endpoints must use HTTPS, API/media clients reject requests in Pure Offline Mode, and HTTP logging is debug-only.
+- **Release Signing:** Release builds fail if `release.keystore` or its credentials are missing instead of silently falling back to the debug key. CI verifies the release APK signature against the configured keystore.
+
+### Changed
+- **R8 / Resource Shrinking:** Release builds now enable code and resource shrinking with keep rules for Moshi, Retrofit, Firebase models, NewPipeExtractor, Rhino, and Kotlin serialization.
+- **Privacy:** Removed the unused Firebase Analytics dependency. Android cloud backup is disabled. Third-party notices and the GPL-3.0 license are included in the repository.
+- **Offline Behavior:** Pure Offline Mode now guards search suggestions, song details, stream resolution, batch song loads, lyrics, suggestions, album/playlist/artist details, JAM sessions, the kill-switch check, and the update check. Cached artist pages fall back to Room data.
+- **Build and CI:** Added `fix/**` branch triggers, unit tests for version comparison and custom API URL merging, APK signature verification, test-report and R8 mapping artifacts, and required Firebase/keystore secrets.
+- **Repository Cleanup:** Removed the unused vendored `ytm-kt/` source tree; the app uses the published `dev.toastbits.ytmkt:ytmkt:0.3.2` artifact.
+
+### Fixed
+- **Custom API URL Paths:** The custom endpoint interceptor now preserves the configured base path, avoids duplicated boundary segments, and rejects invalid or non-HTTPS URLs.
+- **Cache Limit Setting:** The configured cache size limit is now applied to the media cache at startup.
+- **Artist Details:** Artist profiles, top songs, and albums now use cached Room data when available and fall back between remote layouts instead of returning empty lists.
+
 ## [2.7.0] - 2026-10-21
 ### Added
 - **Instant Live Download Queue & Offline Section Population:** Starting a download for a single track, an album, or an entire playlist immediately registers all songs in the offline downloads archive. Users immediately see all queued and downloading tracks with active state indications.

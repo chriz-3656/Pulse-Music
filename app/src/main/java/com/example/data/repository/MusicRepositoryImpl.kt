@@ -168,6 +168,9 @@ class MusicRepositoryImpl(
 
 
     override suspend fun getSearchSuggestions(query: String): List<String> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext emptyList()
+        }
         try {
             val res = api.SearchSuggestions.getSearchSuggestions(query).getOrNull()
             val list = res?.map { it.text } ?: emptyList()
@@ -242,7 +245,7 @@ class MusicRepositoryImpl(
             val local = songDao.getSongById(id)
             if (local != null) {
                 var streamUrl = if (local.stream320Url.isNotBlank()) local.stream320Url else local.stream160Url
-                if (streamUrl.isBlank()) {
+                if (streamUrl.isBlank() && !_userSettingsFlow.value.isPureOfflineMode) {
                     streamUrl = fetchStreamUrl(id, local.title, local.artist)
                 }
                 return@withContext Result.success(
@@ -302,6 +305,7 @@ class MusicRepositoryImpl(
         songCache[song.id] = song
         val existing = song.getStreamUrl(preferHighQuality = true)
         if (existing.isNotBlank()) return@withContext existing
+        if (_userSettingsFlow.value.isPureOfflineMode) return@withContext ""
 
         // Direct SoundCloud stream extraction if song is from SoundCloud
         if (song.id.startsWith("sc_")) {
@@ -321,6 +325,9 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getSongsBatch(ids: List<String>): List<Song> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext songDao.getSongsByIds(ids).map { it.toDomain() }
+        }
         val list = mutableListOf<Song>()
         for (id in ids) {
             getSongDetails(id).getOrNull()?.let { list.add(it) }
@@ -329,6 +336,14 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getLyrics(id: String): Result<String> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            val localLyrics = songDao.getSongById(id)?.lyrics
+            return@withContext if (localLyrics != null && localLyrics.isNotBlank()) {
+                Result.success(localLyrics)
+            } else {
+                Result.failure(Exception("Lyrics are not available offline."))
+            }
+        }
         try {
             val lyricsBrowseId = api.LoadSong.loadSong(id).getOrNull()?.lyrics_browse_id
             if (lyricsBrowseId != null) {
@@ -363,6 +378,9 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getSongSuggestions(song: Song): List<Song> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext emptyList()
+        }
         val list = mutableListOf<Song>()
         val seedId = song.id
         val artist = song.artist.trim()
@@ -565,6 +583,9 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getSongSuggestions(songId: String): List<Song> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext emptyList()
+        }
         val cached = songCache[songId] ?: songDao.getSongById(songId)?.let {
             Song(
                 id = it.id,
@@ -586,6 +607,14 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getAlbumDetails(id: String): Result<Album> = withContext(Dispatchers.IO) {
+        val localAlbum = albumDao.getAlbumById(id)
+        if (localAlbum != null) {
+            val songs = albumDao.getSongsForAlbum(id).map { it.toDomain() }
+            return@withContext Result.success(localAlbum.toDomain(songs))
+        }
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext Result.failure(Exception("Album is not available offline."))
+        }
         try {
             val playlist = api.LoadPlaylist.loadPlaylist(id).getOrNull()
             if (playlist != null) {
@@ -610,6 +639,9 @@ class MusicRepositoryImpl(
             val playlist = Playlist(localPlaylist.id, localPlaylist.title, localPlaylist.description, localPlaylist.artworkUrl, songs.size, localPlaylist.creator, localPlaylist.createdAt, songs)
             return@withContext Result.success(playlist)
         }
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext Result.failure(Exception("Playlist is not available offline."))
+        }
 
         try {
             val playlist = api.LoadPlaylist.loadPlaylist(id).getOrNull()
@@ -628,10 +660,33 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getArtistProfile(id: String): Result<Artist> = withContext(Dispatchers.IO) {
+        val localArtist = artistDao.getArtistById(id)
+        if (localArtist != null) {
+            val songs = artistDao.getSongsForArtist(id).map { it.toDomain() }
+            val albums = albumDao.getAlbumsForArtist(id).map { album ->
+                album.toDomain(albumDao.getSongsForAlbum(album.id).map { it.toDomain() })
+            }
+            return@withContext Result.success(localArtist.toDomain(songs, albums))
+        }
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext Result.failure(Exception("Artist is not available offline."))
+        }
         try {
             val artist = api.LoadArtist.loadArtist(id).getOrNull()
             if (artist != null) {
-                return@withContext Result.success(artist.toDomain())
+                val songs = artist.layouts.orEmpty()
+                    .flatMap { it.items.orEmpty() }
+                    .filterIsInstance<YtmSong>()
+                    .map { it.toDomain() }
+                    .distinctBy { it.id }
+                val albums = artist.layouts.orEmpty()
+                    .flatMap { it.items.orEmpty() }
+                    .filterIsInstance<YtmPlaylist>()
+                    .map { it.toDomainAlbum() }
+                    .distinctBy { it.id }
+                return@withContext Result.success(
+                    artist.toDomain().copy(topSongs = songs, topAlbums = albums)
+                )
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -640,11 +695,43 @@ class MusicRepositoryImpl(
     }
 
     override suspend fun getArtistSongs(artistId: String): List<Song> = withContext(Dispatchers.IO) {
-        emptyList()
+        val localSongs = artistDao.getSongsForArtist(artistId).map { it.toDomain() }
+        if (localSongs.isNotEmpty()) return@withContext localSongs
+        if (_userSettingsFlow.value.isPureOfflineMode) return@withContext emptyList()
+
+        try {
+            api.LoadArtist.loadArtist(artistId).getOrNull()
+                ?.layouts.orEmpty()
+                ?.flatMap { it.items.orEmpty() }
+                ?.filterIsInstance<YtmSong>()
+                ?.map { it.toDomain() }
+                ?.distinctBy { it.id }
+                ?: emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     override suspend fun getArtistAlbums(artistId: String): List<Album> = withContext(Dispatchers.IO) {
-        emptyList()
+        val localAlbums = albumDao.getAlbumsForArtist(artistId).map { album ->
+            album.toDomain(albumDao.getSongsForAlbum(album.id).map { it.toDomain() })
+        }
+        if (localAlbums.isNotEmpty()) return@withContext localAlbums
+        if (_userSettingsFlow.value.isPureOfflineMode) return@withContext emptyList()
+
+        try {
+            api.LoadArtist.loadArtist(artistId).getOrNull()
+                ?.layouts.orEmpty()
+                ?.flatMap { it.items.orEmpty() }
+                ?.filterIsInstance<YtmPlaylist>()
+                ?.map { it.toDomainAlbum() }
+                ?.distinctBy { it.id }
+                ?: emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     private fun searchJioSaavnSongs(query: String): List<Song> {
@@ -1540,14 +1627,27 @@ class MusicRepositoryImpl(
     override fun getCacheSizeBytes(): Long = mediaCacheManager.getUsedCacheSizeBytes()
     override suspend fun clearCache() = mediaCacheManager.clearMediaCache()
     override suspend fun testApiEndpoint(url: String): Result<Long> = withContext(Dispatchers.IO) {
+        if (_userSettingsFlow.value.isPureOfflineMode) {
+            return@withContext Result.failure(Exception("Disable Pure Offline Mode to test an endpoint."))
+        }
+        var conn: java.net.HttpURLConnection? = null
         try {
+            val normalized = if (url.startsWith("http://") || url.startsWith("https://")) {
+                url
+            } else {
+                "https://$url"
+            }
+            val parsedUrl = java.net.URL(normalized)
+            require(parsedUrl.protocol.equals("https", ignoreCase = true)) {
+                "Custom API endpoints must use HTTPS."
+            }
+
             val start = System.currentTimeMillis()
-            val u = java.net.URL(if (url.startsWith("http")) url else "https://$url")
-            val conn = u.openConnection() as java.net.HttpURLConnection
+            conn = parsedUrl.openConnection() as java.net.HttpURLConnection
             conn.connectTimeout = 5000
             conn.readTimeout = 5000
             conn.requestMethod = "GET"
-            conn.setRequestProperty("User-Agent", "PulseMusic/1.0")
+            conn.setRequestProperty("User-Agent", "PulseMusic/${com.example.BuildConfig.VERSION_NAME}")
             val code = conn.responseCode
             val latency = System.currentTimeMillis() - start
             if (code in 200..399) {
@@ -1557,6 +1657,8 @@ class MusicRepositoryImpl(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        } finally {
+            conn?.disconnect()
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,17 +56,23 @@ class MainActivity : ComponentActivity() {
 fun KillSwitchWrapper(content: @Composable () -> Unit) {
     var isKilled by remember { mutableStateOf(false) }
     var killMessage by remember { mutableStateOf("") }
-    var hasChecked by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("pulse_music_settings", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("is_pure_offline", false)) {
+            return@LaunchedEffect
+        }
+
         withContext(Dispatchers.IO) {
+            var connection: HttpURLConnection? = null
             try {
                 val url = URL("https://pulseapp-music.vercel.app/config.json")
-                val connection = url.openConnection() as HttpURLConnection
+                connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 5000
                 connection.readTimeout = 5000
-                
+
                 if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                     val response = connection.inputStream.bufferedReader().use { it.readText() }
                     val json = JSONObject(response)
@@ -75,9 +83,9 @@ fun KillSwitchWrapper(content: @Composable () -> Unit) {
                     }
                 }
             } catch (e: Exception) {
-                // Ignore errors and fail open
+                // Ignore errors and fail open.
             } finally {
-                hasChecked = true
+                connection?.disconnect()
             }
         }
     }

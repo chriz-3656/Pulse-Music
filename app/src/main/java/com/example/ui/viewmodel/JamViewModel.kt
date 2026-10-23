@@ -310,7 +310,7 @@ class JamViewModel(
                     if (state.queue.size > room.queue.size) {
                         val newSongs = state.queue.filter { s -> room.queue.none { it.id == s.id } }
                         for (song in newSongs) {
-                            jamSessionManager.addToQueue(room.roomId, song)
+                            runCatching { jamSessionManager.addToQueue(room.roomId, song) }
                         }
                     }
                     
@@ -330,7 +330,9 @@ class JamViewModel(
                             positionMs = state.currentPositionMs,
                             updatedAt = System.currentTimeMillis()
                         )
-                        jamSessionManager.updatePlaybackState(room.roomId, newPlayback)
+                        runCatching {
+                            jamSessionManager.updatePlaybackState(room.roomId, newPlayback)
+                        }
                         lastSyncedPosition = state.currentPositionMs
                         lastSyncedTime = System.currentTimeMillis()
                     }
