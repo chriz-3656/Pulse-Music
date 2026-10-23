@@ -12,8 +12,6 @@ jobs:
   deploy-rules:
     name: Deploy Realtime Database Rules
     runs-on: ubuntu-latest
-    env:
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
 
     steps:
       - name: Checkout
@@ -30,6 +28,7 @@ jobs:
       - name: Write service account credentials
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          CREDENTIALS_FILE: ${{ runner.temp }}/firebase-service-account.json
         run: |
           if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
             echo "::error::FIREBASE_SERVICE_ACCOUNT secret is not configured. Add the Firebase Admin SDK service account JSON under Settings > Secrets and variables > Actions."
@@ -37,13 +36,13 @@ jobs:
           fi
 
           umask 077
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$CREDENTIALS_FILE"
 
           python3 - <<'PY'
           import json
           import os
 
-          path = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+          path = os.environ["CREDENTIALS_FILE"]
           with open(path, encoding="utf-8") as handle:
               data = json.load(handle)
 
@@ -57,6 +56,8 @@ jobs:
           PY
 
       - name: Deploy rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
         run: |
           firebase deploy \
             --only database \
