@@ -109,17 +109,28 @@ jobs:
           APKSIGNER=$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)
           test -n "$APKSIGNER"
 
-          "$APKSIGNER" verify --print-certs "$APK"
+          CERT_OUTPUT=$("$APKSIGNER" verify --print-certs "$APK" 2>&1)
+          printf '%s\n' "$CERT_OUTPUT"
 
+          # Keytool prints colon-separated SHA-256 fingerprints; apksigner prints
+          # the digest without separators. Extract the 64 hex digits from each so
+          # formatting changes cannot turn into false mismatches.
           EXPECTED_SHA=$(keytool -list -v -keystore release.keystore \
             -storepass "$KEYSTORE_PASSWORD" -alias "${KEY_ALIAS:-upload}" 2>/dev/null \
-            | awk -F': ' '/SHA(256|-256):/ { print $2; exit }' \
-            | tr -d ' :' | tr '[:upper:]' '[:lower:]')
-          ACTUAL_SHA=$("$APKSIGNER" verify --print-certs "$APK" \
-            | awk -F': ' '/SHA-256 digest:/ { print $2; exit }' \
-            | tr -d ' :' | tr '[:upper:]' '[:lower:]')
+            | grep -oE '([0-9A-Fa-f]{2}:){31}[0-9A-Fa-f]{2}' \
+            | head -n 1 | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          ACTUAL_SHA=$(printf '%s\n' "$CERT_OUTPUT" \
+            | grep -oE '[0-9A-Fa-f]{64}' \
+            | head -n 1 | tr '[:upper:]' '[:lower:]')
 
-          if [ -z "$EXPECTED_SHA" ] || [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
+          if [ "${#EXPECTED_SHA}" -ne 64 ] || [ "${#ACTUAL_SHA}" -ne 64 ]; then
+            echo "::error::Could not read the release signing certificate fingerprints."
+            echo "Expected: $EXPECTED_SHA"
+            echo "Actual:   $ACTUAL_SHA"
+            exit 1
+          fi
+
+          if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
             echo "::error::Release APK is not signed with the configured release key."
             echo "Expected: $EXPECTED_SHA"
             echo "Actual:   $ACTUAL_SHA"
