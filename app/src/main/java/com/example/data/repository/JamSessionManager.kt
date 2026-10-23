@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 
 class JamSessionManager(private val context: Context) {
@@ -60,23 +61,16 @@ class JamSessionManager(private val context: Context) {
 
             // Claim the room atomically so two hosts cannot overwrite each other
             // when they pick the same random code at the same time.
-            val result = roomRef.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    if (currentData.value != null) return Transaction.abort()
+            val committed = roomRef.runTransactionAwait { currentData ->
+                if (currentData.value != null) {
+                    Transaction.abort()
+                } else {
                     currentData.value = newRoom
-                    return Transaction.success(currentData)
+                    Transaction.success(currentData)
                 }
+            }
 
-                override fun onComplete(
-                    error: DatabaseError?,
-                    committed: Boolean,
-                    snapshot: DataSnapshot?
-                ) {
-                    if (error != null) error.toException().printStackTrace()
-                }
-            }).await()
-
-            if (result.committed) {
+            if (committed) {
                 roomRef.child("participants").child(currentUserId).onDisconnect().removeValue()
                 return roomCode
             }
@@ -126,50 +120,31 @@ class JamSessionManager(private val context: Context) {
     suspend fun removeFromQueue(roomCode: String, index: Int) {
         requireHost(roomCode)
         val queueRef = database.child("rooms").child(roomCode).child("queue")
-        queueRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                val currentQueue = currentData.children
-                    .mapNotNull { it.getValue(Song::class.java) }
-                    .toMutableList()
-                if (index !in currentQueue.indices) {
-                    return Transaction.abort()
-                }
+        queueRef.runTransactionAwait { currentData ->
+            val currentQueue = currentData.children
+                .mapNotNull { it.getValue(Song::class.java) }
+                .toMutableList()
+            if (index !in currentQueue.indices) {
+                Transaction.abort()
+            } else {
                 currentQueue.removeAt(index)
                 currentData.value = currentQueue
-                return Transaction.success(currentData)
+                Transaction.success(currentData)
             }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                snapshot: DataSnapshot?
-            ) {
-                if (error != null) error.toException().printStackTrace()
-            }
-        }).await()
+        }
     }
 
     suspend fun addToQueue(roomCode: String, song: Song) {
         requireParticipant(roomCode)
         val queueRef = database.child("rooms").child(roomCode).child("queue")
-        queueRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                val currentQueue = currentData.children
-                    .mapNotNull { it.getValue(Song::class.java) }
-                    .toMutableList()
-                currentQueue.add(song)
-                currentData.value = currentQueue
-                return Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                snapshot: DataSnapshot?
-            ) {
-                if (error != null) error.toException().printStackTrace()
-            }
-        }).await()
+        queueRef.runTransactionAwait { currentData ->
+            val currentQueue = currentData.children
+                .mapNotNull { it.getValue(Song::class.java) }
+                .toMutableList()
+            currentQueue.add(song)
+            currentData.value = currentQueue
+            Transaction.success(currentData)
+        }
     }
 
     fun observeRoom(roomCode: String): Flow<JamRoom?> = callbackFlow {
@@ -215,6 +190,32 @@ class JamSessionManager(private val context: Context) {
         database.child("rooms").child(roomCode).child("skipVotes")
             .removeValue()
             .await()
+    }
+
+    /**
+     * Firebase's Android SDK exposes transactions as a callback API. Bridge the
+     * callback into a suspend function so callers can await the committed result.
+     */
+    private suspend fun DatabaseReference.runTransactionAwait(
+        doTransaction: (MutableData) -> Transaction.Result
+    ): Boolean = suspendCancellableCoroutine { continuation ->
+        runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result =
+                doTransaction(currentData)
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                snapshot: DataSnapshot?
+            ) {
+                if (!continuation.isActive) return
+                if (error != null) {
+                    continuation.resumeWith(Result.failure(error.toException()))
+                } else {
+                    continuation.resumeWith(Result.success(committed))
+                }
+            }
+        })
     }
 
     private suspend fun requireAuthenticated() {
