@@ -14,8 +14,8 @@ android {
     applicationId = "com.aistudio.pulsemusic.kzvpmx"
     minSdk = 24
     targetSdk = 36
-    versionCode = 16
-    versionName = "2.7.0"
+    versionCode = 17
+    versionName = "2.7.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -25,9 +25,9 @@ android {
       val keystoreFile = file("${rootDir}/release.keystore")
       if (keystoreFile.exists()) {
           storeFile = keystoreFile
-          storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "android"
+          storePassword = System.getenv("KEYSTORE_PASSWORD").orEmpty()
           keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
-          keyPassword = System.getenv("KEY_PASSWORD") ?: "android"
+          keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD").orEmpty()
       }
     }
   }
@@ -35,13 +35,11 @@ android {
   buildTypes {
     release {
       isCrunchPngs = false
-      isMinifyEnabled = false
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      val keystoreFile = file("${rootDir}/release.keystore")
-      if (keystoreFile.exists()) {
+      if (file("${rootDir}/release.keystore").exists()) {
           signingConfig = signingConfigs.getByName("release")
-      } else {
-          signingConfig = signingConfigs.getByName("debug")
       }
     }
     debug { signingConfig = signingConfigs.getByName("debug") }
@@ -59,12 +57,38 @@ android {
     includeInApk = false
     includeInBundle = true
   }
+
+  packaging {
+    resources {
+      excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+  }
+}
+
+// Release builds must never silently fall back to the debug key. Debug builds and
+// unit tests remain usable without a keystore. The check runs when a release-
+// producing task is requested, including aggregate tasks such as `build`.
+val releaseKeystoreFile = file("${rootDir}/release.keystore")
+val requestedTaskNames = gradle.startParameter.taskNames.map { it.substringAfterLast(':') }
+val releaseBuildRequested = requestedTaskNames.any { taskName ->
+    taskName.contains("release", ignoreCase = true) ||
+        taskName == "build" ||
+        taskName == "assemble" ||
+        taskName == "bundle" ||
+        taskName == "publish"
+}
+if (releaseBuildRequested) {
+    check(releaseKeystoreFile.exists()) {
+        "release.keystore is required for release builds. Restore it from the KEYSTORE_BASE64 secret or place it at the repository root."
+    }
+    check(!System.getenv("KEYSTORE_PASSWORD").isNullOrBlank()) {
+        "KEYSTORE_PASSWORD must be set for release builds."
+    }
 }
 
 
 dependencies {
   implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
-  implementation("com.google.firebase:firebase-analytics")
   implementation("com.google.firebase:firebase-database")
   implementation("com.google.firebase:firebase-auth")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")

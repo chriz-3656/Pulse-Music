@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-path name="external_files" path="." />
-    <external-files-path name="external_files_path" path="." />
-    <external-cache-path name="external_cache_path" path="." />
-    <cache-path name="cache_path" path="." />
-    <files-path name="files_path" path="." />
+    <!-- The update installer only needs access to the verified APK copied into
+         the app's private cache directory. Do not expose the whole filesystem. -->
+    <cache-path name="updates" path="updates/" />
 </paths>

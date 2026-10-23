@@ -28,7 +28,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import coil.ImageLoader
+import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.example.MainActivity
@@ -440,7 +440,7 @@ class MusicPlaybackService : Service() {
 
         serviceScope.launch(Dispatchers.IO) {
             try {
-                val loader = ImageLoader(this@MusicPlaybackService)
+                val loader = applicationContext.imageLoader
                 val request = ImageRequest.Builder(this@MusicPlaybackService)
                     .data(url)
                     .allowHardware(false)

@@ -2,10 +2,12 @@ package com.example.data.remote
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Cache
 import okhttp3.CacheControl
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -31,10 +33,21 @@ object NetworkClient {
     fun createApiOkHttpClient(context: Context): OkHttpClient {
         val cacheDir = File(context.cacheDir, "http_api_cache")
         val cache = Cache(cacheDir, CACHE_SIZE)
-        val prefs: SharedPreferences = context.getSharedPreferences("pulse_music_prefs", Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = context.getSharedPreferences("pulse_music_settings", Context.MODE_PRIVATE)
 
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BASIC
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BASIC
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+
+        val offlineGuard = Interceptor { chain ->
+            if (prefs.getBoolean("is_pure_offline", false)) {
+                throw IOException("Pure Offline Mode is enabled")
+            }
+            chain.proceed(chain.request())
         }
 
         // Dynamic Host & Custom Endpoint Interceptor ONLY for API requests
@@ -49,27 +62,7 @@ object NetworkClient {
                     request.url.encodedPath.startsWith("/api")
 
             if (!customUrl.isNullOrBlank() && isApiTarget) {
-                val targetHttpUrl = customUrl.toHttpUrlOrNull()
-                if (targetHttpUrl != null) {
-                    val originalUrl = request.url
-                    val basePathSegments = targetHttpUrl.pathSegments.filter { it.isNotEmpty() }
-                    val requestPathSegments = originalUrl.pathSegments.filter { it.isNotEmpty() }
-
-                    val finalSegments = mutableListOf<String>()
-                    finalSegments.addAll(basePathSegments)
-
-                    for (seg in requestPathSegments) {
-                        if (finalSegments.isEmpty() || !finalSegments.last().equals(seg, ignoreCase = true)) {
-                            finalSegments.add(seg)
-                        }
-                    }
-
-                    val newUrl = originalUrl.newBuilder()
-                        .scheme(targetHttpUrl.scheme)
-                        .host(targetHttpUrl.host)
-                        .port(targetHttpUrl.port)
-                        .build()
-
+                buildCustomApiUrl(request.url, customUrl)?.let { newUrl ->
                     request = request.newBuilder()
                         .url(newUrl)
                         .header("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
@@ -130,6 +123,7 @@ object NetworkClient {
 
         return OkHttpClient.Builder()
             .cache(cache)
+            .addInterceptor(offlineGuard)
             .addInterceptor(dynamicHostInterceptor)
             .addInterceptor(safeRetryInterceptor)
             .addInterceptor(logging)
@@ -141,8 +135,20 @@ object NetworkClient {
     }
 
     fun createMediaOkHttpClient(context: Context): OkHttpClient {
+        val prefs: SharedPreferences = context.getSharedPreferences("pulse_music_settings", Context.MODE_PRIVATE)
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BASIC
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BASIC
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+
+        val offlineGuard = Interceptor { chain ->
+            if (prefs.getBoolean("is_pure_offline", false)) {
+                throw IOException("Pure Offline Mode is enabled")
+            }
+            chain.proceed(chain.request())
         }
 
         val userAgentInterceptor = Interceptor { chain ->
@@ -158,11 +164,41 @@ object NetworkClient {
         return OkHttpClient.Builder()
             .followRedirects(true)
             .followSslRedirects(true)
+            .addInterceptor(offlineGuard)
             .addInterceptor(userAgentInterceptor)
             .addInterceptor(logging)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    /**
+     * Builds the effective API URL by combining the configured base URL with the
+     * original request path. The base path is preserved, and a duplicated first
+     * segment (for example, `/api` + `/api/search`) is removed.
+     */
+    internal fun buildCustomApiUrl(originalUrl: HttpUrl, customUrl: String): HttpUrl? {
+        val target = customUrl.trim().toHttpUrlOrNull() ?: return null
+        if (!target.scheme.equals("https", ignoreCase = true)) return null
+
+        val mergedSegments = target.pathSegments
+            .filter { it.isNotEmpty() }
+            .toMutableList()
+        for (segment in originalUrl.pathSegments.filter { it.isNotEmpty() }) {
+            if (mergedSegments.isEmpty() ||
+                !mergedSegments.last().equals(segment, ignoreCase = true)
+            ) {
+                mergedSegments.add(segment)
+            }
+        }
+
+        return originalUrl.newBuilder()
+            .scheme(target.scheme)
+            .host(target.host)
+            .port(target.port)
+            .encodedPath("/")
+            .apply { mergedSegments.forEach { segment -> addPathSegment(segment) } }
             .build()
     }
 
