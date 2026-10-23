@@ -1,9 +1,8 @@
 name: Deploy Firebase Rules
 
 on:
-  # Rules are committed for review, but deployment requires a FIREBASE_TOKEN
-  # secret that is not available in this repository yet. Run this workflow
-  # manually after adding the secret.
+  # Rules are committed for review. Add the Firebase Admin SDK service account
+  # JSON as the FIREBASE_SERVICE_ACCOUNT secret, then run this workflow manually.
   workflow_dispatch:
 
 permissions:
@@ -13,18 +12,12 @@ jobs:
   deploy-rules:
     name: Deploy Realtime Database Rules
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Check Firebase token
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: |
-          if [ -z "$FIREBASE_TOKEN" ]; then
-            echo "::error::FIREBASE_TOKEN secret is not configured. Add it under Settings > Secrets and variables > Actions."
-            exit 1
-          fi
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -34,12 +27,39 @@ jobs:
       - name: Install Firebase CLI
         run: npm install --global firebase-tools@13
 
-      - name: Deploy rules
+      - name: Write service account credentials
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT secret is not configured. Add the Firebase Admin SDK service account JSON under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          umask 077
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
+
+          python3 - <<'PY'
+          import json
+          import os
+
+          path = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+          with open(path, encoding="utf-8") as handle:
+              data = json.load(handle)
+
+          required = ("type", "project_id", "private_key", "client_email")
+          missing = [key for key in required if not data.get(key)]
+          if data.get("type") != "service_account" or missing:
+              raise SystemExit(
+                  "The FIREBASE_SERVICE_ACCOUNT secret is not a valid service account key. "
+                  "Download a new Firebase Admin SDK private key and paste the full JSON."
+              )
+          PY
+
+      - name: Deploy rules
         run: |
           firebase deploy \
             --only database \
             --project pulse-musicapp \
-            --token "$FIREBASE_TOKEN" \
-            --non-interactive
+            --non-interactive \
+            --force
