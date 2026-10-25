@@ -4,6 +4,10 @@
 # Firebase Realtime Database model mapping, Retrofit and Kotlin serialization),
 # so those models and annotations must survive shrinking and obfuscation.
 
+# Disable aggressive whole-program optimizations (replaces old proguard-android.txt behavior)
+# to prevent cross-class merging and method inlining across Compose and ViewModel boundaries.
+-dontoptimize
+
 # Preserve metadata used by Kotlin reflection and Moshi.
 -keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, AnnotationDefault, RuntimeVisibleParameterAnnotations
 
@@ -19,9 +23,30 @@
 
 # Domain, DTO and Room models are read/written reflectively by Firebase and Moshi.
 -keep class com.example.domain.model.** { *; }
+-keepclassmembers class com.example.domain.model.** { *; }
 -keep class com.example.data.remote.dto.** { *; }
 -keep class com.example.data.remote.dto.**JsonAdapter { *; }
 -keep class com.example.data.local.entity.** { *; }
+
+# ViewModels and lifecycle
+-keep class * extends androidx.lifecycle.ViewModel { *; }
+-keepclassmembers class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+-keep class com.example.ui.viewmodel.** { *; }
+-keepclassmembers class com.example.ui.viewmodel.** { *; }
+
+# Room Database, DAOs, and generated implementations
+-keep class * extends androidx.room.RoomDatabase { *; }
+-keep class com.example.data.local.** { *; }
+-keepclassmembers class * extends androidx.room.RoomDatabase {
+    <init>();
+}
+-keep class **_Impl { *; }
+
+# Dependency injection and services
+-keep class com.example.di.** { *; }
+-keep class com.example.service.** { *; }
 
 # Retrofit service interfaces and suspend functions.
 -keepclassmembers,allowshrinking,allowobfuscation interface * {
@@ -35,17 +60,17 @@
 -dontwarn javax.annotation.**
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
-# Kotlin serialization (used by ytm-kt).
+# Kotlin serialization & ytm-kt (YouTube Music API via Ktor).
 -keepclassmembers class **$$serializer { *; }
 -keepclasseswithmembers class * {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keepclassmembers class dev.toastbits.ytmkt.** {
-    *** Companion;
-}
--keepclasseswithmembers class dev.toastbits.ytmkt.** {
-    kotlinx.serialization.KSerializer serializer(...);
-}
+-keep class dev.toastbits.ytmkt.** { *; }
+-keepclassmembers class dev.toastbits.ytmkt.** { *; }
+
+# Ktor client and engine loading
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
 
 # NewPipeExtractor loads service classes by name and parses remote JSON.
 -keep class org.schabi.newpipe.extractor.** { *; }
