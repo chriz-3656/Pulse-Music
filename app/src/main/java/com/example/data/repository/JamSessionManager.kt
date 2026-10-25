@@ -20,9 +20,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 
 class JamSessionManager(private val context: Context) {
-    private val database =
+    private val database by lazy {
         FirebaseDatabase.getInstance("https://pulse-musicapp-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
-    private val auth = FirebaseAuth.getInstance()
+    }
+    private val auth by lazy {
+        FirebaseAuth.getInstance()
+    }
     private val prefs = context.getSharedPreferences("pulse_music_settings", Context.MODE_PRIVATE)
 
     var currentUserId: String = ""

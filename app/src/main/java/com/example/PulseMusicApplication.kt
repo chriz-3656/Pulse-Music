@@ -38,11 +38,15 @@ class PulseMusicApplication : Application(), ImageLoaderFactory {
 
         // Sync settings (autoplay, audio quality, crossfade) with player controller
         appScope.launch {
-            appContainer.musicRepository.getUserSettings().collectLatest { settings ->
-                appContainer.playerController.isAutoplayEnabled = settings.autoplayEnabled
-                appContainer.playerController.setAudioQuality(settings.audioQuality)
-                appContainer.playerController.setCrossfade(settings.crossfadeDurationSec)
-                appContainer.mediaCacheManager.setCacheLimitMb(settings.cacheSizeLimitMb.coerceIn(100, 5000))
+            try {
+                appContainer.musicRepository.getUserSettings().collectLatest { settings ->
+                    appContainer.playerController.isAutoplayEnabled = settings.autoplayEnabled
+                    appContainer.playerController.setAudioQuality(settings.audioQuality)
+                    appContainer.playerController.setCrossfade(settings.crossfadeDurationSec)
+                    appContainer.mediaCacheManager.setCacheLimitMb(settings.cacheSizeLimitMb.coerceIn(100, 5000))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

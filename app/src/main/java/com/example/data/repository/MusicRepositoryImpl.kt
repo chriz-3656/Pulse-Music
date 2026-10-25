@@ -64,7 +64,7 @@ class MusicRepositoryImpl(
         )
     }
 
-    private val api: YtmApi = YoutubeiApi(data_language = "en-GB")
+    private val api: YtmApi by lazy { YoutubeiApi(data_language = "en-GB") }
     private val songCache = java.util.concurrent.ConcurrentHashMap<String, Song>()
 
     init {
