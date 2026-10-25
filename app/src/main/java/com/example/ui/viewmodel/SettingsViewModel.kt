@@ -121,6 +121,14 @@ class SettingsViewModel(
         }
     }
 
+    fun toggleLockscreenArt(enabled: Boolean) {
+        val updated = _uiState.value.userSettings.copy(isLockscreenArtEnabled = enabled)
+        _uiState.update { it.copy(userSettings = updated) }
+        viewModelScope.launch {
+            manageSettingsUseCase.setLockscreenArtEnabled(enabled)
+        }
+    }
+
     fun toggleAutoSkip(autoSkip: Boolean) {
         val updated = _uiState.value.userSettings.copy(autoSkipFailedTracks = autoSkip)
         viewModelScope.launch {

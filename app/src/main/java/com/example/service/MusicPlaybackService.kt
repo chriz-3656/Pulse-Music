@@ -38,6 +38,7 @@ import com.example.domain.model.RepeatMode
 import com.example.domain.model.Song
 import com.example.player.MusicPlayerController
 import com.example.player.ServiceAction
+import com.example.util.LockscreenWallpaperHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,8 +88,29 @@ class MusicPlaybackService : Service() {
     private var isForegroundActive = false
     private var fetchWakeLock: android.os.PowerManager.WakeLock? = null
 
+    private val lockscreenWallpaperHelper by lazy {
+        LockscreenWallpaperHelper(applicationContext)
+    }
+    private var isLockscreenArtEnabled = false
+
     override fun onCreate() {
         super.onCreate()
+        
+        serviceScope.launch {
+            musicRepository.getUserSettings().collect { settings ->
+                val prev = isLockscreenArtEnabled
+                isLockscreenArtEnabled = settings.isLockscreenArtEnabled
+                if (prev && !isLockscreenArtEnabled) {
+                    lockscreenWallpaperHelper.clearLockscreenWallpaper()
+                } else if (!prev && isLockscreenArtEnabled) {
+                    currentArtworkBitmap?.let { bitmap ->
+                        if (exoPlayer.isPlaying) {
+                            lockscreenWallpaperHelper.setLockscreenWallpaper(bitmap)
+                        }
+                    }
+                }
+            }
+        }
         
         val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
         fetchWakeLock = powerManager.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "PulseMusic:FetchWakeLock")
@@ -197,6 +219,11 @@ class MusicPlaybackService : Service() {
                 updateNotification()
                 if (isPlaying) {
                     startProgressPolling()
+                    if (isLockscreenArtEnabled && currentArtworkBitmap != null) {
+                        serviceScope.launch {
+                            lockscreenWallpaperHelper.setLockscreenWallpaper(currentArtworkBitmap!!)
+                        }
+                    }
                 } else {
                     stopProgressPolling()
                 }
@@ -426,6 +453,9 @@ class MusicPlaybackService : Service() {
     }
 
     private fun stopPlayback() {
+        serviceScope.launch {
+            lockscreenWallpaperHelper.clearLockscreenWallpaper()
+        }
         exoPlayer.stop()
         stopForeground(STOP_FOREGROUND_REMOVE)
         isForegroundActive = false
@@ -448,6 +478,9 @@ class MusicPlaybackService : Service() {
                 val result = loader.execute(request)
                 if (result is SuccessResult) {
                     currentArtworkBitmap = (result.drawable as? BitmapDrawable)?.bitmap
+                    if (isLockscreenArtEnabled && currentArtworkBitmap != null) {
+                        lockscreenWallpaperHelper.setLockscreenWallpaper(currentArtworkBitmap!!)
+                    }
                     withContext(Dispatchers.Main) {
                         updateNotification()
                         updateMediaMetadata(playerController.playerState.value.currentSong!!)
@@ -632,6 +665,9 @@ class MusicPlaybackService : Service() {
     }
 
     override fun onDestroy() {
+        serviceScope.launch {
+            lockscreenWallpaperHelper.clearLockscreenWallpaper()
+        }
         stopProgressPolling()
         exoPlayer.release()
         mediaSession.release()

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
@@ -227,6 +228,52 @@ fun SettingsScreen(
                         subtitle = "Fast streaming & data conservation",
                         isSelected = uiState.userSettings.audioQuality == AudioQuality.STANDARD,
                         onSelect = { viewModel.setQuality(AudioQuality.STANDARD) }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Section: Lock Screen & Visuals
+        item {
+            SettingsSectionHeader(icon = Icons.Default.Wallpaper, title = "Lock Screen & Visuals")
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SkeuoBevelCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.toggleLockscreenArt(!uiState.userSettings.isLockscreenArtEnabled) },
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(14.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Lock Screen Album Art",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Display slightly zoomed and blurred album artwork on lock screen wallpaper during playback",
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = uiState.userSettings.isLockscreenArtEnabled,
+                        onCheckedChange = { viewModel.toggleLockscreenArt(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.background,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.background
+                        ),
+                        modifier = Modifier.testTag("lockscreen_art_switch")
                     )
                 }
             }

@@ -60,7 +60,8 @@ class MusicRepositoryImpl(
             autoplayEnabled = prefs.getBoolean("autoplay_enabled", true),
             customApiBaseUrl = prefs.getString("custom_api_url", "") ?: "",
             apiProvider = prefs.getString("api_provider", "auto") ?: "auto",
-            isPureOfflineMode = prefs.getBoolean("is_pure_offline", false)
+            isPureOfflineMode = prefs.getBoolean("is_pure_offline", false),
+            isLockscreenArtEnabled = prefs.getBoolean("lockscreen_art_enabled", false)
         )
     }
 
@@ -1505,8 +1506,14 @@ class MusicRepositoryImpl(
             .putString("custom_api_url", settings.customApiBaseUrl)
             .putString("api_provider", settings.apiProvider)
             .putBoolean("is_pure_offline", settings.isPureOfflineMode)
+            .putBoolean("lockscreen_art_enabled", settings.isLockscreenArtEnabled)
             .apply()
         _userSettingsFlow.value = settings
+    }
+
+    override suspend fun setLockscreenArtEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
+        prefs.edit().putBoolean("lockscreen_art_enabled", enabled).apply()
+        _userSettingsFlow.value = _userSettingsFlow.value.copy(isLockscreenArtEnabled = enabled)
     }
 
     override suspend fun setProvider(provider: MusicProvider) = withContext(Dispatchers.IO) {

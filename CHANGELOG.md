@@ -1,6 +1,9 @@
 # Changelog
 
 ## [2.7.1] - 2026-10-23
+### Added
+- **Dynamic Blurred Lock Screen Album Art:** Native lock screen wallpaper dynamically mirrors the currently playing track's artwork with a slightly zoomed (1.12x), fast StackBlur (radius 22), and 28% dark scrim for system clock and notification legibility. Includes an on/off toggle under Settings ("Lock Screen & Visuals") defaulting to off, with automatic cleanup on playback stop/service destroy.
+
 ### Security
 - **In-App Update Verification:** The updater now requires HTTPS, verifies the downloaded APK's package name, version code, and SHA-256 signing-certificate digest against the installed app, checks DownloadManager's final status, and fails closed on any mismatch. Update files are copied into a private cache directory and exposed through a minimal FileProvider path.
 - **Pulse JAM Authorization:** Room creation, joining, kick, end-room, queue mutation, playback updates, and skip votes are checked against the authenticated Firebase user. Host-only actions are enforced in the client and documented in `database.rules.json`; room creation, participant limits, and concurrent queue updates are handled safely.

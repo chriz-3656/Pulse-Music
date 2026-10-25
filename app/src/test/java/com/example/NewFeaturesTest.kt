@@ -20,6 +20,16 @@ class NewFeaturesTest {
     }
 
     @Test
+    fun testUserSettingsLockscreenArtDefaultAndCopy() {
+        val defaultSettings = UserSettings()
+        assertFalse("Lockscreen art should be false by default", defaultSettings.isLockscreenArtEnabled)
+
+        val lockscreenEnabled = defaultSettings.copy(isLockscreenArtEnabled = true)
+        assertTrue("Lockscreen art should be true after toggle", lockscreenEnabled.isLockscreenArtEnabled)
+        assertFalse("Toggling lockscreen art should not alter pure offline mode", lockscreenEnabled.isPureOfflineMode)
+    }
+
+    @Test
     fun testPlainTextLyricsParsingFallback() {
         val plainLyrics = "Line 1 of song\nLine 2 of song\nLine 3 of song"
         val parsed = parseLrc(plainLyrics)

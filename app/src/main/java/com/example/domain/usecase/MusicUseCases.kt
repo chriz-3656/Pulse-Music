@@ -65,4 +65,5 @@ class ManageSettingsUseCase(private val repository: MusicRepository) {
     fun getCacheSizeBytes(): Long = repository.getCacheSizeBytes()
     suspend fun clearCache() = repository.clearCache()
     suspend fun testApiEndpoint(url: String): Result<Long> = repository.testApiEndpoint(url)
+    suspend fun setLockscreenArtEnabled(enabled: Boolean) = repository.setLockscreenArtEnabled(enabled)
 }
