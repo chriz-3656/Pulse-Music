@@ -65,6 +65,7 @@ abstract class MusicDatabase : RoomDatabase() {
                     MusicDatabase::class.java,
                     "pulse_music_database"
                 )
+                .fallbackToDestructiveMigration()
                 .fallbackToDestructiveMigrationOnDowngrade()
                 .addMigrations(MIGRATION_2_3)
                 .build()

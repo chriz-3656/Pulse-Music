@@ -121,6 +121,14 @@ class SettingsViewModel(
         }
     }
 
+    fun toggleLockscreenArt(enabled: Boolean) {
+        val updated = _uiState.value.userSettings.copy(isLockscreenArtEnabled = enabled)
+        _uiState.update { it.copy(userSettings = updated) }
+        viewModelScope.launch {
+            manageSettingsUseCase.setLockscreenArtEnabled(enabled)
+        }
+    }
+
     fun toggleAutoSkip(autoSkip: Boolean) {
         val updated = _uiState.value.userSettings.copy(autoSkipFailedTracks = autoSkip)
         viewModelScope.launch {
@@ -145,9 +153,16 @@ class SettingsViewModel(
     }
 
     fun saveApiEndpoint(provider: String, customUrl: String) {
+        val trimmedUrl = customUrl.trim()
+        if (trimmedUrl.isNotEmpty() && !trimmedUrl.startsWith("https://", ignoreCase = true)) {
+            _uiState.update {
+                it.copy(apiTestStatus = ApiEndpointStatus.Error("Custom API URL must use HTTPS."))
+            }
+            return
+        }
         val updated = _uiState.value.userSettings.copy(
             apiProvider = provider,
-            customApiBaseUrl = customUrl.trim()
+            customApiBaseUrl = trimmedUrl
         )
         viewModelScope.launch {
             manageSettingsUseCase.updateSettings(updated)

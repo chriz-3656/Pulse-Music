@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Pulse Music only talks to HTTPS endpoints. Custom API endpoints are also
+         required to use HTTPS, so cleartext traffic is disabled app-wide. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

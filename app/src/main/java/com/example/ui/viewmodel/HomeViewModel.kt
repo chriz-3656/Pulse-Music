@@ -28,7 +28,8 @@ data class HomeUiState(
     val moodPlaylists: List<Playlist> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
-    val isPureOfflineMode: Boolean = false
+    val isPureOfflineMode: Boolean = false,
+    val isSettingsLoaded: Boolean = false
 )
 
 class HomeViewModel(
@@ -44,7 +45,12 @@ class HomeViewModel(
         viewModelScope.launch {
             appContainer.musicRepository.getUserSettings().collectLatest { settings ->
                 val prevOffline = _uiState.value.isPureOfflineMode
-                _uiState.update { it.copy(isPureOfflineMode = settings.isPureOfflineMode) }
+                _uiState.update {
+                    it.copy(
+                        isPureOfflineMode = settings.isPureOfflineMode,
+                        isSettingsLoaded = true
+                    )
+                }
                 if (prevOffline != settings.isPureOfflineMode) {
                     loadData()
                 }

@@ -84,4 +84,5 @@ interface MusicRepository {
     fun getCacheSizeBytes(): Long
     suspend fun clearCache()
     suspend fun testApiEndpoint(url: String): Result<Long>
+    suspend fun setLockscreenArtEnabled(enabled: Boolean)
 }

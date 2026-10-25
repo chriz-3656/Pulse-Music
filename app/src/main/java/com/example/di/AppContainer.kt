@@ -84,6 +84,6 @@ class AppContainer(private val context: Context) {
     val manageSettingsUseCase by lazy { ManageSettingsUseCase(musicRepository) }
 
     val jamSessionManager: JamSessionManager by lazy {
-        JamSessionManager()
+        JamSessionManager(context)
     }
 }

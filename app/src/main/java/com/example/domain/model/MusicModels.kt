@@ -54,10 +54,17 @@ data class Song(
             }
         }
 
-        fun isValidMediaUrl(url: String?): Boolean {
-            if (url.isNullOrBlank()) return false
-            if (url.contains("jiosaavn.com/song") || url.contains("jiosaavn.com/album") || url.endsWith(".html")) return false
-            return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file:") || url.startsWith("content://")
+        fun secureMediaUrl(url: String?): String? {
+            if (url.isNullOrBlank()) return null
+            if (url.contains("jiosaavn.com/song") || url.contains("jiosaavn.com/album") || url.endsWith(".html")) return null
+            val secure = if (url.startsWith("http://")) {
+                "https://" + url.removePrefix("http://")
+            } else {
+                url
+            }
+            return secure.takeIf {
+                it.startsWith("https://") || it.startsWith("file:") || it.startsWith("content://")
+            }
         }
 
         val qualityOrder = if (preferHighQuality) {
@@ -67,22 +74,19 @@ data class Song(
         }
 
         for (q in qualityOrder) {
-            val candidate = downloadUrls[q]
-            if (isValidMediaUrl(candidate)) {
-                return candidate!!
-            }
+            secureMediaUrl(downloadUrls[q])?.let { return it }
         }
 
         if (preferHighQuality) {
-            if (isValidMediaUrl(stream320Url)) return stream320Url
-            if (isValidMediaUrl(stream160Url)) return stream160Url
+            secureMediaUrl(stream320Url)?.let { return it }
+            secureMediaUrl(stream160Url)?.let { return it }
         } else {
-            if (isValidMediaUrl(stream160Url)) return stream160Url
-            if (isValidMediaUrl(stream320Url)) return stream320Url
+            secureMediaUrl(stream160Url)?.let { return it }
+            secureMediaUrl(stream320Url)?.let { return it }
         }
 
         for (v in downloadUrls.values) {
-            if (isValidMediaUrl(v)) return v
+            secureMediaUrl(v)?.let { return it }
         }
 
         return ""
@@ -175,7 +179,8 @@ data class UserSettings(
     val autoplayEnabled: Boolean = true,
     val customApiBaseUrl: String = "",
     val apiProvider: String = "youtube",
-    val isPureOfflineMode: Boolean = false
+    val isPureOfflineMode: Boolean = false,
+    val isLockscreenArtEnabled: Boolean = false
 ) {
     val provider: MusicProvider get() = MusicProvider.fromId(apiProvider)
 }

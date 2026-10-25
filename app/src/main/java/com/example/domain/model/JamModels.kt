@@ -7,7 +7,7 @@ data class JamRoom(
     val playback: JamPlaybackState = JamPlaybackState(),
     val queue: List<Song> = emptyList(),
     val participants: Map<String, JamParticipant> = emptyMap(),
-    val skipVotes: List<String> = emptyList()
+    val skipVotes: Map<String, Boolean> = emptyMap()
 )
 
 data class JamSettings(

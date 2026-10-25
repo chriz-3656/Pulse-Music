@@ -94,12 +94,15 @@ fun HomeScreen(
     var downloadProgress by remember { mutableStateOf(0f) }
     var obsoleteApks by remember { mutableStateOf<List<java.io.File>>(emptyList()) }
     
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.isSettingsLoaded, uiState.isPureOfflineMode) {
+        if (!uiState.isSettingsLoaded || uiState.isPureOfflineMode) {
+            return@LaunchedEffect
+        }
         val info = AppUpdater.checkForUpdates()
         if (info != null && info.isUpdateAvailable) {
             updateInfo = info
         } else {
-            obsoleteApks = AppUpdater.getObsoleteApks()
+            obsoleteApks = AppUpdater.getObsoleteApks(context)
         }
     }
 

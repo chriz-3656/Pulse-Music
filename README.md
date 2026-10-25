@@ -7,7 +7,7 @@
   <p><strong>A high-fidelity, aesthetically driven Android music streaming & offline player crafted with Jetpack Compose, featuring an analog Skeuomorphic & Yellow Neumorphic hardware design language.</strong></p>
 
   <p>
-    <a href="https://github.com/chriz-3656/Pulse-Music/releases"><img src="https://img.shields.io/badge/Release-v2.7.0-FFC107?style=for-the-badge&logo=android&logoColor=black" alt="Version 2.7.0"></a>
+    <a href="https://github.com/chriz-3656/Pulse-Music/releases"><img src="https://img.shields.io/badge/Release-v2.7.1-FFC107?style=for-the-badge&logo=android&logoColor=black" alt="Version 2.7.1"></a>
     <a href="https://github.com/chriz-3656/Pulse-Music/actions"><img src="https://img.shields.io/badge/CI-Passing-28a745?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status"></a>
     <img src="https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-202124?style=for-the-badge&logo=android&logoColor=FFC107" alt="Platform">
     <img src="https://img.shields.io/badge/Language-Kotlin%202.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin">
@@ -36,6 +36,7 @@
   - [Prerequisites](#prerequisites)
   - [Clone & Build](#clone--build)
   - [Cloud CI / CD Pipeline](#cloud-ci--cd-pipeline)
+- [🔐 Privacy & Network Use](#-privacy--network-use)
 - [📥 Downloading the App](#-downloading-the-app)
 - [📜 Versioning & Changelog](#-versioning--changelog)
 - [🤝 Contributing](#-contributing)
@@ -172,7 +173,7 @@ Pulse-Music/
 │   │   │   ├── res/                      # Android Resources (Fonts, Drawables, Mipmaps)
 │   │   │   └── AndroidManifest.xml
 │   │   └── test/                         # JVM Unit Tests (Robolectric & Coroutines Test)
-│   └── build.gradle.kts                  # App-level build configuration (v2.7.0)
+│   └── build.gradle.kts                  # App-level build configuration (v2.7.1)
 ├── gradle/                               # Gradle Wrapper & Version Catalog
 │   └── libs.versions.toml
 ├── .github/workflows/ci.yml              # Cloud CI/CD Automated Build & Release Pipeline
@@ -197,12 +198,20 @@ Pulse-Music/
 git clone https://github.com/chriz-3656/Pulse-Music.git
 cd Pulse-Music
 
+# Add your own Firebase Android configuration
+# (create an app with package com.aistudio.pulsemusic.kzvpmx in your Firebase project)
+cp /path/to/google-services.json app/google-services.json
+
 # Run unit test suite
 ./gradlew :app:testDebugUnitTest
 
 # Assemble Debug APK
 ./gradlew :app:assembleDebug
 ```
+
+Release builds require a signing keystore at `release.keystore` and the
+`KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` environment variables. The
+build intentionally fails rather than falling back to the debug signing key.
 
 Output APK will be generated at:
 ```text
@@ -218,6 +227,20 @@ Pulse Music includes an automated **GitHub Actions CI/CD Pipeline** (`.github/wo
 
 ---
 
+## 🔐 Privacy & Network Use
+
+Pulse Music does not include advertising, analytics, or telemetry SDKs. Network access is used only for functionality you invoke:
+
+- **Streaming, search, lyrics, and artwork** are fetched from the selected third-party music providers.
+- **Downloads** are fetched from the provider's media CDN when you start a download.
+- **Pulse JAM** uses Firebase Authentication (anonymous sign-in) and Firebase Realtime Database. Room state, participant display names, queue entries, and playback state are stored in Firebase until the host ends the room. Anonymous sessions and room data may persist until cleaned up.
+- **Update checks** contact the public GitHub Releases API. **Kill-switch/config checks** contact the Pulse website. The downloaded update APK is verified against the installed app's package name, version code, and signing certificate before Android's package installer is opened.
+- **Pure Offline Mode** blocks background app network calls from the music repository and HTTP clients. User-initiated actions such as leaving a JAM room may still contact Firebase, and downloaded files remain on the device until you remove them.
+
+The app enforces HTTPS for its own API endpoints and disables cleartext traffic. Android cloud backup is disabled so local databases, download metadata, and authentication state are not uploaded to Google's backup service. Crash reports are not collected by the app.
+
+---
+
 ## 📥 Downloading the App
 
 1. Visit the [GitHub Releases](https://github.com/chriz-3656/Pulse-Music/releases) page for stable release APKs.
@@ -230,8 +253,8 @@ Pulse Music includes an automated **GitHub Actions CI/CD Pipeline** (`.github/wo
 
 Pulse Music follows [Semantic Versioning](https://semver.org/). See the full release notes and change logs in [CHANGELOG.md](CHANGELOG.md).
 
-- **Current Stable Version:** `v2.7.0` (2026-10-21)
-- **Highlights:** Instant live offline download queue with streaming progress, dedicated Pure Offline mode toggle, batch playlist and album downloads, multi-source continuous radio engine with seed provider affinity, song selection mid-playback position & pause fixes, and upcoming queue pre-filling.
+- **Current Stable Version:** `v2.7.1` (2026-10-23)
+- **Highlights:** Security hardening for in-app updates and Pulse JAM, strict HTTPS networking, complete Pure Offline network guards, release signing enforcement and R8 shrinking, GPL-3.0 licensing, and removal of unused analytics and vendored code.
 
 ---
 
@@ -245,7 +268,7 @@ Contributions, issues, and feature proposals are warmly welcome!
 
 ## 📄 License
 
-This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for complete details.
+This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for complete details. Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 

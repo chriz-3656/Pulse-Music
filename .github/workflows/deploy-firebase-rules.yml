@@ -1,0 +1,66 @@
+name: Deploy Firebase Rules
+
+on:
+  # Rules are committed for review. Add the Firebase Admin SDK service account
+  # JSON as the FIREBASE_SERVICE_ACCOUNT secret, then run this workflow manually.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-rules:
+    name: Deploy Realtime Database Rules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@13
+
+      - name: Write service account credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          CREDENTIALS_FILE: ${{ runner.temp }}/firebase-service-account.json
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT secret is not configured. Add the Firebase Admin SDK service account JSON under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          umask 077
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$CREDENTIALS_FILE"
+
+          python3 - <<'PY'
+          import json
+          import os
+
+          path = os.environ["CREDENTIALS_FILE"]
+          with open(path, encoding="utf-8") as handle:
+              data = json.load(handle)
+
+          required = ("type", "project_id", "private_key", "client_email")
+          missing = [key for key in required if not data.get(key)]
+          if data.get("type") != "service_account" or missing:
+              raise SystemExit(
+                  "The FIREBASE_SERVICE_ACCOUNT secret is not a valid service account key. "
+                  "Download a new Firebase Admin SDK private key and paste the full JSON."
+              )
+          PY
+
+      - name: Deploy rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+        run: |
+          firebase deploy \
+            --only database \
+            --project pulse-musicapp \
+            --non-interactive \
+            --force

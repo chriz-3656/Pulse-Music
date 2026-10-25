@@ -1,6 +1,8 @@
 package com.example
 
 import android.app.Application
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.example.di.AppContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,11 +10,18 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class PulseMusicApplication : Application() {
+class PulseMusicApplication : Application(), ImageLoaderFactory {
     lateinit var appContainer: AppContainer
         private set
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .okHttpClient { appContainer.mediaOkHttpClient }
+            .crossfade(true)
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -29,10 +38,15 @@ class PulseMusicApplication : Application() {
 
         // Sync settings (autoplay, audio quality, crossfade) with player controller
         appScope.launch {
-            appContainer.musicRepository.getUserSettings().collectLatest { settings ->
-                appContainer.playerController.isAutoplayEnabled = settings.autoplayEnabled
-                appContainer.playerController.setAudioQuality(settings.audioQuality)
-                appContainer.playerController.setCrossfade(settings.crossfadeDurationSec)
+            try {
+                appContainer.musicRepository.getUserSettings().collectLatest { settings ->
+                    appContainer.playerController.isAutoplayEnabled = settings.autoplayEnabled
+                    appContainer.playerController.setAudioQuality(settings.audioQuality)
+                    appContainer.playerController.setCrossfade(settings.crossfadeDurationSec)
+                    appContainer.mediaCacheManager.setCacheLimitMb(settings.cacheSizeLimitMb.coerceIn(100, 5000))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
