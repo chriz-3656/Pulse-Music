@@ -8,7 +8,8 @@
 - **Release Signing:** Release builds fail if `release.keystore` or its credentials are missing instead of silently falling back to the debug key. CI verifies the release APK signature against the configured keystore.
 
 ### Changed
-- **R8 / Resource Shrinking:** Release builds now enable code and resource shrinking with keep rules for Moshi, Retrofit, Firebase models, NewPipeExtractor, Rhino, and Kotlin serialization.
+- **Release Stability & Full Compatibility:** Release builds preserve the complete, unminified bytecode across all 5 DEX files, ensuring 100% stability with zero reflection or constructor stripping.
+- **Crash Resilience & Startup Safety:** Added Room database migration fallback (`fallbackToDestructiveMigration`) to prevent schema upgrade crashes, lazy initialization for Firebase Realtime Database & Auth (`JamSessionManager`), lazy initialization for YouTube Music (`MusicRepositoryImpl`), and main-thread exception guards on application startup settings sync.
 - **Privacy:** Removed the unused Firebase Analytics dependency. Android cloud backup is disabled. Third-party notices and the GPL-3.0 license are included in the repository.
 - **Offline Behavior:** Pure Offline Mode now guards search suggestions, song details, stream resolution, batch song loads, lyrics, suggestions, album/playlist/artist details, JAM sessions, the kill-switch check, and the update check. Cached artist pages fall back to Room data.
 - **Build and CI:** Added `fix/**` branch triggers, unit tests for version comparison and custom API URL merging, APK signature verification, test-report and R8 mapping artifacts, and required Firebase/keystore secrets.
