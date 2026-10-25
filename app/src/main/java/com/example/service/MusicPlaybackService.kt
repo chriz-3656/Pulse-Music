@@ -9,7 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -103,11 +105,7 @@ class MusicPlaybackService : Service() {
                 if (prev && !isLockscreenArtEnabled) {
                     lockscreenWallpaperHelper.clearLockscreenWallpaper()
                 } else if (!prev && isLockscreenArtEnabled) {
-                    currentArtworkBitmap?.let { bitmap ->
-                        if (exoPlayer.isPlaying) {
-                            lockscreenWallpaperHelper.setLockscreenWallpaper(bitmap)
-                        }
-                    }
+                    applyCurrentSongLockscreenArt(force = true)
                 }
             }
         }
@@ -219,10 +217,8 @@ class MusicPlaybackService : Service() {
                 updateNotification()
                 if (isPlaying) {
                     startProgressPolling()
-                    if (isLockscreenArtEnabled && currentArtworkBitmap != null) {
-                        serviceScope.launch {
-                            lockscreenWallpaperHelper.setLockscreenWallpaper(currentArtworkBitmap!!)
-                        }
+                    if (isLockscreenArtEnabled) {
+                        applyCurrentSongLockscreenArt()
                     }
                 } else {
                     stopProgressPolling()
@@ -462,8 +458,57 @@ class MusicPlaybackService : Service() {
         stopSelf()
     }
 
+    private fun applyCurrentSongLockscreenArt(force: Boolean = false) {
+        if (!isLockscreenArtEnabled) return
+        val currentSong = playerController.playerState.value.currentSong ?: return
+
+        serviceScope.launch(Dispatchers.IO) {
+            val bitmap = currentArtworkBitmap ?: fetchBitmapForSong(currentSong)
+            if (bitmap != null) {
+                currentArtworkBitmap = bitmap
+                lockscreenWallpaperHelper.setLockscreenWallpaper(bitmap, force = force)
+            }
+        }
+    }
+
+    private suspend fun fetchBitmapForSong(song: Song): Bitmap? {
+        val url = song.artworkUrl
+        if (url.isBlank()) return null
+        return try {
+            val loader = applicationContext.imageLoader
+            val request = ImageRequest.Builder(applicationContext)
+                .data(url)
+                .allowHardware(false)
+                .build()
+            val result = loader.execute(request)
+            if (result is SuccessResult) {
+                (result.drawable as? BitmapDrawable)?.bitmap ?: result.drawable.extractBitmap()
+            } else {
+                null
+            }
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    private fun Drawable.extractBitmap(): Bitmap? {
+        return try {
+            if (this is BitmapDrawable && this.bitmap != null) {
+                return this.bitmap
+            }
+            val w = intrinsicWidth.takeIf { it > 0 } ?: 512
+            val h = intrinsicHeight.takeIf { it > 0 } ?: 512
+            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            setBounds(0, 0, canvas.width, canvas.height)
+            draw(canvas)
+            bitmap
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
     private fun loadArtwork(url: String) {
-        currentArtworkBitmap = null
         if (url.isBlank()) {
             return
         }
@@ -477,17 +522,22 @@ class MusicPlaybackService : Service() {
                     .build()
                 val result = loader.execute(request)
                 if (result is SuccessResult) {
-                    currentArtworkBitmap = (result.drawable as? BitmapDrawable)?.bitmap
-                    if (isLockscreenArtEnabled && currentArtworkBitmap != null) {
-                        lockscreenWallpaperHelper.setLockscreenWallpaper(currentArtworkBitmap!!)
+                    val bitmap = (result.drawable as? BitmapDrawable)?.bitmap ?: result.drawable.extractBitmap()
+                    if (bitmap != null) {
+                        currentArtworkBitmap = bitmap
+                        if (isLockscreenArtEnabled) {
+                            lockscreenWallpaperHelper.setLockscreenWallpaper(bitmap)
+                        }
                     }
                     withContext(Dispatchers.Main) {
                         updateNotification()
-                        updateMediaMetadata(playerController.playerState.value.currentSong!!)
+                        playerController.playerState.value.currentSong?.let {
+                            updateMediaMetadata(it)
+                        }
                     }
                 }
             } catch (e: Exception) {
-                currentArtworkBitmap = null
+                e.printStackTrace()
             }
         }
     }

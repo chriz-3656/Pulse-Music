@@ -9,6 +9,8 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.os.Build
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
@@ -22,53 +24,65 @@ class LockscreenWallpaperHelper(private val context: Context) {
         WallpaperManager.getInstance(context.applicationContext)
     }
 
+    private val wallpaperMutex = Mutex()
+
     @Volatile
     private var hasSetWallpaper: Boolean = false
 
     @Volatile
-    private var lastAppliedArtworkHash: Int? = null
+    private var lastSourceHash: Int? = null
+
+    private var lastBlurredWallpaper: Bitmap? = null
 
     /**
      * Blurs, zooms, and sets the given artwork as the lock screen wallpaper.
      */
-    suspend fun setLockscreenWallpaper(artwork: Bitmap) = withContext(Dispatchers.IO) {
-        val currentHash = artwork.generationId
-        if (hasSetWallpaper && lastAppliedArtworkHash == currentHash) {
-            return@withContext
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            return@withContext
-        }
-
-        try {
-            if (!wallpaperManager.isWallpaperSupported || !wallpaperManager.isSetWallpaperAllowed) {
-                return@withContext
+    suspend fun setLockscreenWallpaper(artwork: Bitmap, force: Boolean = false) = withContext(Dispatchers.IO) {
+        wallpaperMutex.withLock {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                return@withLock
             }
 
-            val displayMetrics = context.resources.displayMetrics
-            val screenWidth = displayMetrics.widthPixels
-            val screenHeight = displayMetrics.heightPixels
+            try {
+                if (!wallpaperManager.isWallpaperSupported || !wallpaperManager.isSetWallpaperAllowed) {
+                    return@withLock
+                }
 
-            if (screenWidth <= 0 || screenHeight <= 0) return@withContext
+                val currentHash = artwork.generationId
+                if (!force && hasSetWallpaper && lastSourceHash == currentHash) {
+                    return@withLock
+                }
 
-            val blurredWallpaper = createBlurredZoomedWallpaper(
-                source = artwork,
-                targetWidth = screenWidth,
-                targetHeight = screenHeight
-            ) ?: return@withContext
+                val displayMetrics = context.resources.displayMetrics
+                val screenWidth = displayMetrics.widthPixels
+                val screenHeight = displayMetrics.heightPixels
 
-            wallpaperManager.setBitmap(
-                blurredWallpaper,
-                null,
-                false,
-                WallpaperManager.FLAG_LOCK
-            )
+                if (screenWidth <= 0 || screenHeight <= 0) return@withLock
 
-            hasSetWallpaper = true
-            lastAppliedArtworkHash = currentHash
-        } catch (e: Exception) {
-            e.printStackTrace()
+                val blurredWallpaper = if (lastSourceHash == currentHash && lastBlurredWallpaper != null && !lastBlurredWallpaper!!.isRecycled) {
+                    lastBlurredWallpaper!!
+                } else {
+                    val created = createBlurredZoomedWallpaper(
+                        source = artwork,
+                        targetWidth = screenWidth,
+                        targetHeight = screenHeight
+                    ) ?: return@withLock
+                    lastBlurredWallpaper = created
+                    lastSourceHash = currentHash
+                    created
+                }
+
+                wallpaperManager.setBitmap(
+                    blurredWallpaper,
+                    null,
+                    false,
+                    WallpaperManager.FLAG_LOCK
+                )
+
+                hasSetWallpaper = true
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -76,17 +90,16 @@ class LockscreenWallpaperHelper(private val context: Context) {
      * Clears the dynamic lock screen wallpaper and restores the user's default wallpaper.
      */
     suspend fun clearLockscreenWallpaper() = withContext(Dispatchers.IO) {
-        if (!hasSetWallpaper) return@withContext
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && wallpaperManager.isWallpaperSupported) {
-                wallpaperManager.clear(WallpaperManager.FLAG_LOCK)
+        wallpaperMutex.withLock {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && wallpaperManager.isWallpaperSupported) {
+                    wallpaperManager.clear(WallpaperManager.FLAG_LOCK)
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            } finally {
+                hasSetWallpaper = false
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            hasSetWallpaper = false
-            lastAppliedArtworkHash = null
         }
     }
 

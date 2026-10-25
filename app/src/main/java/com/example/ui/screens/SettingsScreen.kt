@@ -267,7 +267,7 @@ fun SettingsScreen(
                     }
                     Switch(
                         checked = uiState.userSettings.isLockscreenArtEnabled,
-                        onCheckedChange = { viewModel.toggleLockscreenArt(it) },
+                        onCheckedChange = null,
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.background,
                             checkedTrackColor = MaterialTheme.colorScheme.primary,
@@ -305,7 +305,7 @@ fun SettingsScreen(
                     }
                     androidx.compose.material3.Switch(
                         checked = uiState.isDeveloperMode,
-                        onCheckedChange = { viewModel.setDeveloperMode(it) },
+                        onCheckedChange = null,
                         colors = androidx.compose.material3.SwitchDefaults.colors(
                             checkedThumbColor = Color(0xFF81C995),
                             checkedTrackColor = MaterialTheme.colorScheme.background,
