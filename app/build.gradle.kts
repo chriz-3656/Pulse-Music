@@ -35,8 +35,7 @@ android {
   buildTypes {
     release {
       isCrunchPngs = false
-      isMinifyEnabled = true
-      isShrinkResources = true
+      isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       if (file("${rootDir}/release.keystore").exists()) {
           signingConfig = signingConfigs.getByName("release")
